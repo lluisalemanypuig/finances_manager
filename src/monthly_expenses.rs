@@ -13,11 +13,9 @@ impl MonthlyExpenses {
 		let pos = self.expenses.binary_search(&exp);
 		match pos {
 			Ok(idx) => {
-				println!("This date already existed, but it's Ok!");
 				self.expenses.insert(idx, exp);
 			},
 			Err(idx) => {
-				println!("This date did not exist before, and it's Ok!");
 				self.expenses.insert(idx, exp);
 			}
 		}
