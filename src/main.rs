@@ -145,10 +145,10 @@ fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses
 	let mut total_spent: f32 = 0.0;
 	let mut total_income: f32 = 0.0;
 
+	{
 	let month = &month_data.month;
 	println!("    {month} ({})", month_data.expenses.len());
-
-	{
+	
 	let entries_str = format!("{}", month_data.expenses.len()).to_string();
 	let dashes_number: String = std::iter::repeat('-').take( entries_str.len() ).collect();
 
