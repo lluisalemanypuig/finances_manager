@@ -141,14 +141,10 @@ fn expense_types_menu(all_expense_data: &mut AllExpenses) {
 /* ------------------------------------------------------------------------- */
 
 fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses) {
-	let mut accounting: std::collections::HashMap<String, f32> = std::collections::HashMap::new();
-	let mut total_spent: f32 = 0.0;
-	let mut total_income: f32 = 0.0;
-
 	{
 	let month = &month_data.month;
 	println!("    {month} ({})", month_data.expenses.len());
-	
+
 	let entries_str = format!("{}", month_data.expenses.len()).to_string();
 	let dashes_number: String = std::iter::repeat('-').take( entries_str.len() ).collect();
 
@@ -157,6 +153,10 @@ fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses
 	println!("    {}--{}-", dashes_month, dashes_number);
 	println!("");
 	}
+
+	let mut accounting: std::collections::HashMap<String, f32> = std::collections::HashMap::new();
+	let mut total_spent: f32 = 0.0;
+	let mut total_income: f32 = 0.0;
 
 	for (i, Expense {
 		day_of_year: d,
@@ -191,19 +191,19 @@ fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses
 	let tab = "            ";
 	//             00000000011111111112222222222
 	//             12345678901234567890123456789
-	println!("{tab}Expense type       Total   Percentage");
-	println!("{tab}-------------------------------------");
+	println!("{tab}{:<15}    {:>6}    {:>10}", "Expense type", "Total", "Percentage");
+	println!("{tab}---------------------------------------");
 	for (expense_type, value) in accounting.iter() {
-		println!("{tab}{expense_type:<15}   {value:>6.2}      {:>6.2}%", (value/total_spent)*100.0);
+		println!("{tab}{:<15}    {:>6.2}    {:>9.2}%", expense_type, value, (value/total_spent)*100.0);
 	}
 	
-	println!("{tab}-------------------------------------");
+	println!("{tab}---------------------------------------");
 	let total_spent_msg: String = "Total spent".to_string();
-	println!("{tab}{total_spent_msg:<15}   {total_spent:>6.2}");
-	println!("{tab}{:<15} {total_income:>6.2}", all_data.expense_types.income_name);
-	println!("{tab}-------------------------------------");
+	println!("{tab}{:<15}    {:>6.2}", total_spent_msg, total_spent);
+	println!("{tab}{:<15}    {:>6.2}", all_data.expense_types.income_name, total_income);
+	println!("{tab}---------------------------------------");
 	let balance_msg: String = "Balance".to_string();
-	println!("{tab}{balance_msg:<15}   {:>6.2}", total_spent + total_income);
+	println!("{tab}{:<15}    {:>6.2}", balance_msg, total_spent + total_income);
 	println!("");
 	println!("");
 }
