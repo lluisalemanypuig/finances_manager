@@ -146,7 +146,7 @@ fn print_expense_data_month(month_data: &MonthlyExpenses) {
 	let mut total_income: f32 = 0.0;
 
 	let month = &month_data.month;
-	println!("    Month {month} ({})", month_data.expenses.len());
+	println!("    {month} ({})", month_data.expenses.len());
 
 	{
 	let entries_str = format!("{}", month_data.expenses.len()).to_string();
@@ -154,7 +154,7 @@ fn print_expense_data_month(month_data: &MonthlyExpenses) {
 
 	let month_name_str = format!("{}", month_data.month).to_string();
 	let dashes_month: String = std::iter::repeat('-').take(month_name_str.len()).collect();
-	println!("    ------{}--{}-", dashes_month, dashes_number);
+	println!("    {}--{}-", dashes_month, dashes_number);
 	println!("");
 	}
 
@@ -262,6 +262,13 @@ fn print_expense_data_month_user(all_expense_data: &AllExpenses) {
 }
 
 fn add_new_expense(all_expense_data: &mut AllExpenses) {
+	println!("Expense Type:");
+	let expense_type = io::read_input_string();
+	if !all_expense_data.expense_types.exists_expense_type(&expense_type) {
+		println!("Expense type '{expense_type}' is not valid.");
+		return;
+	}
+
 	println!("Year:");
 	let year = io::read_input_string().parse().unwrap();
 	println!("Month:");
@@ -277,8 +284,7 @@ fn add_new_expense(all_expense_data: &mut AllExpenses) {
 	let day: u8 = io::read_input_string().parse().unwrap();
 	println!("Price:");
 	let price: f32 = io::read_input_string().parse().unwrap();
-	println!("Expense Type:");
-	let expense_type = io::read_input_string();
+	
 	println!("Place:");
 	let place = io::read_input_string();
 	println!("Description:");
