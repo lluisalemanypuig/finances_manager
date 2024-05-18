@@ -154,7 +154,7 @@ fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses
 	println!("");
 	}
 
-	let mut accounting: std::collections::HashMap<String, f32> = std::collections::HashMap::new();
+	let mut accounting: std::collections::BTreeMap<String, f32> = std::collections::BTreeMap::new();
 	let mut total_spent: f32 = 0.0;
 	let mut total_income: f32 = 0.0;
 
