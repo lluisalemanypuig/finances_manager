@@ -67,7 +67,7 @@ pub fn read_all_expense_data(data_dir: &String) -> AllExpenses {
 	let mut all_expense_data = AllExpenses {
 		min_year: 9999,
 		max_year: 0,
-		expense_types: ExpenseTypes::new(),
+		expense_types: ExpenseTypes::new("".to_string()),
 		expenses: Vec::new()
 	};
 	

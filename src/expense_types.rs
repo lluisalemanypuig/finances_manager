@@ -2,20 +2,24 @@
 #[derive(Debug)]
 pub struct ExpenseTypes {
 	changes: bool,
-	pub types: Vec<String>
+
+	pub types: Vec<String>,
+	pub income_name: String
 }
 
 impl ExpenseTypes {
-	pub fn new() -> ExpenseTypes {
+	pub fn new(income_name: String) -> ExpenseTypes {
 		ExpenseTypes {
 			changes: false,
-			types: Vec::new()
+			types: Vec::new(),
+			income_name
 		}
 	}
-	pub fn new_vec(ts: Vec<String>) -> ExpenseTypes {
+	pub fn new_vec(ts: Vec<String>, income_name: String) -> ExpenseTypes {
 		ExpenseTypes {
 			changes: false,
-			types: ts
+			types: ts,
+			income_name
 		}
 	}
 

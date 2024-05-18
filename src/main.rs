@@ -140,7 +140,7 @@ fn expense_types_menu(all_expense_data: &mut AllExpenses) {
 
 /* ------------------------------------------------------------------------- */
 
-fn print_expense_data_month(month_data: &MonthlyExpenses) {
+fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses) {
 	let mut accounting: std::collections::HashMap<String, f32> = std::collections::HashMap::new();
 	let mut total_spent: f32 = 0.0;
 	let mut total_income: f32 = 0.0;
@@ -167,7 +167,7 @@ fn print_expense_data_month(month_data: &MonthlyExpenses) {
 	})
 	in month_data.expenses.iter().enumerate()
 	{
-		if et == "Income" || et == "Ingressos" {
+		if et == &all_data.expense_types.income_name {
 			total_income += pr;
 		}
 		else {
@@ -200,7 +200,7 @@ fn print_expense_data_month(month_data: &MonthlyExpenses) {
 	println!("{tab}-------------------------------------");
 	let total_spent_msg: String = "Total spent".to_string();
 	println!("{tab}{total_spent_msg:<15}   {total_spent:>6.2}");
-	println!("{tab}{:<15}   {total_income:>6.2}", "Income");
+	println!("{tab}{:<15} {total_income:>6.2}", all_data.expense_types.income_name);
 	println!("{tab}-------------------------------------");
 	let balance_msg: String = "Balance".to_string();
 	println!("{tab}{balance_msg:<15}   {:>6.2}", total_spent + total_income);
@@ -208,7 +208,7 @@ fn print_expense_data_month(month_data: &MonthlyExpenses) {
 	println!("");
 }
 
-fn print_expense_data_year(year_data: &YearlyExpenses) {
+fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyExpenses) {
 	println!("Data from year: {}", year_data.year);
 	println!("====================");
 	
@@ -219,30 +219,30 @@ fn print_expense_data_year(year_data: &YearlyExpenses) {
 	
 	println!("    Found {} entries", total_entries);
 	for month_data in year_data.expenses.iter() {
-		print_expense_data_month(month_data);
+		print_expense_data_month(all_data, month_data);
 	}
 }
 
-fn print_expense_data_all(all_expense_data: &AllExpenses) {
-	for year_expense in all_expense_data.expenses.iter() {
-		print_expense_data_year(&year_expense);
+fn print_expense_data_all(all_data: &AllExpenses) {
+	for year_expense in all_data.expenses.iter() {
+		print_expense_data_year(all_data, &year_expense);
 	}
 }
 
-fn print_expense_data_year_user(all_expense_data: &AllExpenses) {
+fn print_expense_data_year_user(all_data: &AllExpenses) {
 	println!("What year do you want to see?");
 	let year_int: u32 = io::read_input_string().parse().unwrap();
 	
-	let res = all_expense_data.get_year(&year_int);
+	let res = all_data.get_year(&year_int);
 	if let Some(year) = res {
-		print_expense_data_year(year);
+		print_expense_data_year(all_data, year);
 	}
 	else {
 		println!("Year {year_int} not found!");
 	};
 }
 
-fn print_expense_data_month_user(all_expense_data: &AllExpenses) {
+fn print_expense_data_month_user(all_data: &AllExpenses) {
 	println!("What year and month do you want to see? Year -> Month");
 	let year_int: u32 = io::read_input_string().parse().unwrap();
 	
@@ -251,14 +251,13 @@ fn print_expense_data_month_user(all_expense_data: &AllExpenses) {
 		format!("String '{month_str}' not valid for a month").as_str()
 	);
 	
-	let res = all_expense_data.get_month(&year_int, &month);
+	let res = all_data.get_month(&year_int, &month);
 	if let Some(&ref month_data) = res {
-		print_expense_data_month(&month_data);
+		print_expense_data_month(all_data, &month_data);
 	}
 	else {
 		println!("Month '{month}' does not exist in year '{year_int}'.");
 	}
-	
 }
 
 fn add_new_expense(all_expense_data: &mut AllExpenses) {
@@ -377,7 +376,8 @@ fn main_menu(all_expense_data: &mut AllExpenses, data_dir: &String) {
 
 #[derive(serde::Serialize, serde::Deserialize)]
 struct ProjectData {
-	pub base_path: String
+	pub base_path: String,
+	pub income_name: String
 }
 
 fn main() {
@@ -397,8 +397,10 @@ fn main() {
 	
 	println!("    Reading expense types...");
 	all_expense_data.expense_types = ExpenseTypes::new_vec(
-		io::read_expense_types(&data_dir)
+		io::read_expense_types(&data_dir),
+		json.income_name
 	);
+	println!("    Income type name: '{}'", all_expense_data.expense_types.income_name);
 
 	println!("");
 	println!("");
