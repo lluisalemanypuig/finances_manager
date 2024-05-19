@@ -189,8 +189,6 @@ fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses
 
 	println!("");
 	let tab = "            ";
-	//             00000000011111111112222222222
-	//             12345678901234567890123456789
 	println!("{tab}{:<15}    {:>6}    {:>10}", "Expense type", "Total", "Percentage");
 	println!("{tab}---------------------------------------");
 	for (expense_type, value) in accounting.iter() {
