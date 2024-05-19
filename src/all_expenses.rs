@@ -36,6 +36,14 @@ impl AllExpenses {
 		}
 	}
 
+	pub fn has_year(&self, y: &u32) -> bool {
+		let res = self.expenses.binary_search_by(|e| e.year.cmp(&y));
+		match res {
+			Ok(_) => true,
+			Err(_) => false,
+		}
+	}
+
 	pub fn add_year_mut(&mut self, y: &u32) -> &mut YearlyExpenses {
 		let res = self.expenses.binary_search_by(|e| e.year.cmp(&y));
 		match res {

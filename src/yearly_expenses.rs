@@ -69,31 +69,27 @@ impl YearlyExpenses {
 		self.changes = c;
 	}
 
-	pub fn get_month(&self, m: &Month) -> Option<&MonthlyExpenses> {
-		if !(Month::January <= *m && *m <= Month::December) {
-			return None;
-		}
-		
+	pub fn has_month(&self, m: &Month) -> bool {
 		let res = self.expenses.binary_search_by(|e| e.month.cmp(&m));
-		if let Ok(idx) = res {
-			Some(&self.expenses[idx])
+		match res {
+			Ok(_) => true,
+			Err(_) => false
 		}
-		else {
-			None
+	}
+
+	pub fn get_month(&self, m: &Month) -> Option<&MonthlyExpenses> {
+		let res = self.expenses.binary_search_by(|e| e.month.cmp(&m));
+		match res {
+			Ok(idx) => Some(&self.expenses[idx]),
+			Err(_) => None
 		}
 	}
 
 	pub fn get_month_mut(&mut self, m: &Month) -> Option<&mut MonthlyExpenses> {
-		if !(Month::January <= *m && *m <= Month::December) {
-			return None;
-		}
-		
 		let res = self.expenses.binary_search_by(|e| e.month.cmp(&m));
-		if let Ok(idx) = res {
-			Some(&mut self.expenses[idx])
-		}
-		else {
-			None
+		match res {
+			Ok(idx) => Some(&mut self.expenses[idx]),
+			Err(_) => None
 		}
 	}
 

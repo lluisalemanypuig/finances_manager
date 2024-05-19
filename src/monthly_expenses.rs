@@ -21,4 +21,15 @@ impl MonthlyExpenses {
 		}
 	}
 
+	pub fn get_expense(&self, i: usize) -> &Expense {
+		&self.expenses[i]
+	}
+
+	pub fn get_expense_mut(&mut self, i: usize) -> &mut Expense {
+		&mut self.expenses[i]
+	}
+
+	pub fn num_expenses(&self) -> usize {
+		self.expenses.len()
+	}
 }
