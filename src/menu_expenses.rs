@@ -138,13 +138,6 @@ fn print_expense_data_month_user(all_data: &AllExpenses) {
 }
 
 fn add_new_expense(all_data: &mut AllExpenses) {
-	println!("Expense Type:");
-	let expense_type = io::read_input_string();
-	if !all_data.expense_types.exists_expense_type(&expense_type) {
-		println!("Expense type '{expense_type}' is not valid.");
-		return;
-	}
-
 	println!("Year:");
 	let year = io::read_input_string().parse().unwrap();
 	println!("Month:");
@@ -155,6 +148,18 @@ fn add_new_expense(all_data: &mut AllExpenses) {
 		return;
 	}
 	let month = month_res.unwrap();
+
+	let expense_type = || -> String {
+		println!("Expense Type:");
+		let expense_type = io::read_input_string();
+		if expense_type != "" {
+			if !all_data.expense_types.exists_expense_type(&expense_type) {
+				println!("Expense type '{expense_type}' is not valid.");
+				return "".to_string();
+			}
+		}
+		expense_type
+	}();
 
 	let year_data = all_data.add_year_mut(&year);
 	let month_data = year_data.add_month_mut(&month);
