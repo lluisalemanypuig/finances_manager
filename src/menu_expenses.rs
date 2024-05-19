@@ -130,10 +130,10 @@ fn print_expense_data_month_user(all_data: &AllExpenses) {
 	}
 }
 
-fn add_new_expense(all_expense_data: &mut AllExpenses) {
+fn add_new_expense(all_data: &mut AllExpenses) {
 	println!("Expense Type:");
 	let expense_type = io::read_input_string();
-	if !all_expense_data.expense_types.exists_expense_type(&expense_type) {
+	if !all_data.expense_types.exists_expense_type(&expense_type) {
 		println!("Expense type '{expense_type}' is not valid.");
 		return;
 	}
@@ -146,7 +146,7 @@ fn add_new_expense(all_expense_data: &mut AllExpenses) {
 		format!("String '{month_str}' not valid for a month").as_str()
 	);
 
-	let year_data = all_expense_data.add_year_mut(&year);
+	let year_data = all_data.add_year_mut(&year);
 	let month_data = year_data.add_month_mut(&month);
 
 	println!("Day:");
@@ -179,7 +179,7 @@ fn print_expenses_menu() {
 	println!("    0. Leave");
 }
 
-pub fn menu(all_expense_data: &mut AllExpenses) {
+pub fn menu(all_data: &mut AllExpenses) {
 	let print_function = print_expenses_menu;
 	let min_option = 0;
 	let max_option = 4;
@@ -187,16 +187,16 @@ pub fn menu(all_expense_data: &mut AllExpenses) {
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
 		if option == 1 {
-			print_expense_data_all(&all_expense_data);
+			print_expense_data_all(&all_data);
 		}
 		else if option == 2 {
-			print_expense_data_year_user(&all_expense_data);
+			print_expense_data_year_user(&all_data);
 		}
 		else if option == 3 {
-			print_expense_data_month_user(&all_expense_data);
+			print_expense_data_month_user(&all_data);
 		}
 		else if option == 4 {
-			add_new_expense(all_expense_data);
+			add_new_expense(all_data);
 		}
 		
 		option = menu_utils::read_option(print_function, min_option, max_option);

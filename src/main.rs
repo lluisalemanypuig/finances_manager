@@ -28,7 +28,7 @@ fn print_main_menu() {
 	println!("    0. Leave");
 }
 
-fn main_menu(all_expense_data: &mut AllExpenses, data_dir: &String) {
+fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 	let print_function = print_main_menu;
 	let min_option = 0;
 	let max_option = 3;
@@ -36,17 +36,17 @@ fn main_menu(all_expense_data: &mut AllExpenses, data_dir: &String) {
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
 		if option == 1 {
-			menu_expenses::menu(all_expense_data);
+			menu_expenses::menu(all_data);
 		}
 		else if option == 2 {
-			menu_expense_types::menu(all_expense_data);
+			menu_expense_types::menu(all_data);
 		}
 		else if option == 3 {
-			io::write_all_expense_data(&data_dir, all_expense_data).expect("Could not write data");
-			for ye in all_expense_data.expenses.iter_mut() {
+			io::write_all_expense_data(&data_dir, all_data).expect("Could not write data");
+			for ye in all_data.expenses.iter_mut() {
 				ye.set_changes(false);
 			}
-			all_expense_data.expense_types.set_changes(false);
+			all_data.expense_types.set_changes(false);
 		}
 		
 		option = menu_utils::read_option(print_function, min_option, max_option);
@@ -74,21 +74,21 @@ fn main() {
 	
 	println!("Reading data from directory '{data_dir}'...");
 	println!("    Reading expense data...");
-	let mut all_expense_data = io::read_all_expense_data(&data_dir);
+	let mut all_data = io::read_all_expense_data(&data_dir);
 	
 	println!("    Reading expense types...");
-	all_expense_data.expense_types = ExpenseTypes::new_vec(
+	all_data.expense_types = ExpenseTypes::new_vec(
 		io::read_expense_types(&data_dir),
 		json.income_name
 	);
-	println!("    Income type name: '{}'", all_expense_data.expense_types.income_name);
+	println!("    Income type name: '{}'", all_data.expense_types.income_name);
 
 	println!("");
 	println!("");
 	println!("");
 	println!("");
-	main_menu(&mut all_expense_data, &data_dir);
+	main_menu(&mut all_data, &data_dir);
 	
-	io::write_all_expense_data(&data_dir, &all_expense_data).expect("Could not write data");
+	io::write_all_expense_data(&data_dir, &all_data).expect("Could not write data");
 
 }

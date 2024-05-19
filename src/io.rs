@@ -64,7 +64,7 @@ pub fn read_expense_file(p: &std::path::PathBuf) -> YearlyExpenses {
 }
 
 pub fn read_all_expense_data(data_dir: &String) -> AllExpenses {
-	let mut all_expense_data = AllExpenses {
+	let mut all_data = AllExpenses {
 		min_year: 9999,
 		max_year: 0,
 		expense_types: ExpenseTypes::new("".to_string()),
@@ -80,17 +80,17 @@ pub fn read_all_expense_data(data_dir: &String) -> AllExpenses {
 		
 		let r = read_expense_file(&path);
 		
-		if all_expense_data.min_year > r.year {
-			all_expense_data.min_year = r.year;
+		if all_data.min_year > r.year {
+			all_data.min_year = r.year;
 		}
-		if all_expense_data.max_year < r.year {
-			all_expense_data.max_year = r.year;
+		if all_data.max_year < r.year {
+			all_data.max_year = r.year;
 		}
-		all_expense_data.expenses.push(r);
+		all_data.expenses.push(r);
 	}
-	all_expense_data.expenses.sort();
+	all_data.expenses.sort();
 	
-	all_expense_data
+	all_data
 }
 
 pub fn read_expense_types(data_dir: &String) -> Vec<String> {
@@ -114,8 +114,8 @@ pub fn read_expense_types(data_dir: &String) -> Vec<String> {
 
 /* ------------------------------------------------------------------------- */
 
-pub fn write_all_expense_data(data_dir: &String, all_expense_data: &AllExpenses) -> Result<()> {
-	for ye in all_expense_data.expenses.iter() {
+pub fn write_all_expense_data(data_dir: &String, all_data: &AllExpenses) -> Result<()> {
+	for ye in all_data.expenses.iter() {
 		if !ye.has_changes() { continue; }
 		
 		let filename = data_dir.to_owned() + &format!("/expenses/{}.txt", ye.year).to_string();
@@ -138,13 +138,13 @@ pub fn write_all_expense_data(data_dir: &String, all_expense_data: &AllExpenses)
 			}
 		}
 	}
-	if all_expense_data.expense_types.has_changes() {
+	if all_data.expense_types.has_changes() {
 		let filename = data_dir.to_owned() + &"/expense_types.txt".to_string();
 		println!("Writing into '{filename}'...");
 		
 		let mut file = std::fs::File::create(filename).expect("I wanted to create a file");
 		
-		for et in all_expense_data.expense_types.types.iter() {
+		for et in all_data.expense_types.types.iter() {
 			writeln!(file, "{et}")?;
 		}
 	}
