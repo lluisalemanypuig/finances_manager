@@ -252,6 +252,37 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	year_data.set_changes(true);
 }
 
+fn remove_expense(all_data: &mut AllExpenses) {
+	println!("Select year:");
+	let year: u32 = io::read_input_string().parse().unwrap();
+	if !all_data.has_year(&year) {
+		println!("Year '{year}' does not exist.");
+		return;
+	}
+	
+	println!("Select month:");
+	let month_str = io::read_input_string();
+	let month_res = month_str.parse::<date::Month>();
+	if let Err(_) = month_res {
+		println!("String '{month_str}' not valid for a month");
+		return;
+	}
+	let month = month_res.unwrap();
+
+	if !all_data.get_year(&year).unwrap().has_month(&month) {
+		println!("Month '{month_str}' does not exist");
+		return;
+	}
+
+	println!("Id of expense to be deleted.");
+	let id_expense: usize = io::read_input_string().parse().unwrap();
+
+	let year_data = all_data.add_year_mut(&year);
+	let month_data = year_data.add_month_mut(&month);
+
+	month_data.remove_expense(id_expense);
+}
+
 fn print_expenses_menu() {
 	println!("Query and edit the expenses:");
 	println!("");
@@ -259,14 +290,15 @@ fn print_expenses_menu() {
 	println!("    2. Show data of a specific year");
 	println!("    3. Show data of a specific month");
 	println!("    4. Add another expense");
-	println!("    5. Edit expense");
+	println!("    5. Edit an expense");
+	println!("    6. Remove an expense");
 	println!("    0. Leave");
 }
 
 pub fn menu(all_data: &mut AllExpenses) {
 	let print_function = print_expenses_menu;
 	let min_option = 0;
-	let max_option = 5;
+	let max_option = 6;
 	
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -277,6 +309,7 @@ pub fn menu(all_data: &mut AllExpenses) {
 			3 => print_expense_data_month_user(&all_data),
 			4 => add_new_expense(all_data),
 			5 => edit_expense(all_data),
+			6 => remove_expense(all_data),
 			_ => println!("Nothing to do..."),
 		}
 		

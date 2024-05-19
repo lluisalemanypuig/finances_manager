@@ -29,6 +29,10 @@ impl MonthlyExpenses {
 		&mut self.expenses[i]
 	}
 
+	pub fn remove_expense(&mut self, i: usize) {
+		self.expenses.remove(i);
+	}
+
 	pub fn num_expenses(&self) -> usize {
 		self.expenses.len()
 	}
