@@ -148,6 +148,8 @@ fn add_new_expense(all_data: &mut AllExpenses) {
 		return;
 	}
 	let month = month_res.unwrap();
+	println!("Day:");
+	let day: u8 = io::read_input_string().parse().unwrap();
 
 	let expense_type = || -> String {
 		println!("Expense Type:");
@@ -164,8 +166,6 @@ fn add_new_expense(all_data: &mut AllExpenses) {
 	let year_data = all_data.add_year_mut(&year);
 	let month_data = year_data.add_month_mut(&month);
 
-	println!("Day:");
-	let day: u8 = io::read_input_string().parse().unwrap();
 	println!("Price:");
 	let price: f32 = io::read_input_string().parse().unwrap();
 	
