@@ -219,6 +219,7 @@ fn remove_expense(all_data: &mut AllExpenses) {
 	let month_data = year_data.add_month_mut(&month);
 
 	month_data.remove_expense(id_expense);
+	year_data.set_changes(true);
 }
 
 fn print_expenses_menu() {
