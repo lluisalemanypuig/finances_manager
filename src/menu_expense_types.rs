@@ -84,17 +84,13 @@ pub fn menu(all_data: &mut AllExpenses) {
 	
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
-		if option == 1 {
-			print_expense_types_all(&all_data);
-		}
-		else if option == 2 {
-			add_expense_type(all_data);
-		}
-		else if option == 3 {
-			rename_expense_type(all_data);
-		}
-		else if option == 4 {
-			remove_expense_type(all_data);
+		
+		match option {
+			1 => print_expense_types_all(&all_data),
+			2 => add_expense_type(all_data),
+			3 => rename_expense_type(all_data),
+			4 => remove_expense_type(all_data),
+			_ => println!("Nothing to do..."),
 		}
 		
 		option = menu_utils::read_option(print_function, min_option, max_option);

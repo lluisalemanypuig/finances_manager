@@ -37,21 +37,19 @@ fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
-		if option == 1 {
-			menu_expenses::menu(all_data);
-		}
-		else if option == 2 {
-			menu_expense_types::menu(all_data);
-		}
-		else if option == 3 {
-			menu_statistics::menu(all_data);
-		}
-		else if option == 4 {
-			io::write_all_expense_data(&data_dir, all_data).expect("Could not write data");
-			for ye in all_data.expenses.iter_mut() {
-				ye.set_changes(false);
-			}
-			all_data.expense_types.set_changes(false);
+
+		match option {
+			1 => menu_expenses::menu(all_data),
+			2 => menu_expense_types::menu(all_data),
+			3 => menu_statistics::menu(all_data),
+			4 => {
+				io::write_all_expense_data(&data_dir, all_data).expect("Could not write data");
+				for ye in all_data.expenses.iter_mut() {
+					ye.set_changes(false);
+				}
+				all_data.expense_types.set_changes(false);
+			},
+			_ => println!("Nothing to do..."),
 		}
 		
 		option = menu_utils::read_option(print_function, min_option, max_option);
