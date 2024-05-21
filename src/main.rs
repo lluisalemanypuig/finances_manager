@@ -15,6 +15,7 @@ mod expense_types;
 mod menu_utils;
 mod menu_expenses;
 mod menu_expense_types;
+mod menu_statistics;
 
 type ExpenseTypes = expense_types::ExpenseTypes;
 type AllExpenses = all_expenses::AllExpenses;
@@ -24,14 +25,15 @@ fn print_main_menu() {
 	println!("");
 	println!("    1. Expenses menu");
 	println!("    2. Expenses types menu");
-	println!("    3. Save all data");
+	println!("    3. Statistics menu");
+	println!("    4. Save all data");
 	println!("    0. Leave");
 }
 
 fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 	let print_function = print_main_menu;
 	let min_option = 0;
-	let max_option = 3;
+	let max_option = 4;
 
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -42,6 +44,9 @@ fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 			menu_expense_types::menu(all_data);
 		}
 		else if option == 3 {
+			menu_statistics::menu(all_data);
+		}
+		else if option == 4 {
 			io::write_all_expense_data(&data_dir, all_data).expect("Could not write data");
 			for ye in all_data.expenses.iter_mut() {
 				ye.set_changes(false);
