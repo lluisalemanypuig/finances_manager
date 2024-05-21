@@ -55,7 +55,7 @@ fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses
 		}
 
 		let d_string = d.to_string();
-		println!("        {i:>2}: {d_string:>17} | {pr:>6.2} | {et:>15} | {pl:>21} | {descr}");
+		println!("        {i:>2}: {d_string:>17} | {pr:>6.2} | {et:>15} | {pl:>25} | {descr}");
 		
 	}
 
