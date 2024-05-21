@@ -40,10 +40,8 @@ fn statistics_by_place(all_data: &AllExpenses) {
 				place: pl,
 				description: descr
 			})
-			in month_data.expenses.iter().enumerate()
+			in month_data.expenses.iter().filter(|e| e.place == place).enumerate()
 			{
-				if pl != &place { continue; }
-
 				if et == &all_data.expense_types.income_name {
 					total_income += pr;
 				}
