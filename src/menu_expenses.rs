@@ -1,3 +1,6 @@
+extern crate chrono;
+use chrono::prelude::*;
+
 use crate::date;
 use crate::io;
 use crate::menu_utils;
@@ -75,20 +78,7 @@ fn print_expense_data_month_user(all_data: &AllExpenses) {
 	}
 }
 
-fn add_new_expense(all_data: &mut AllExpenses) {
-	println!("Year:");
-	let year = io::read_input_string().parse().unwrap();
-	println!("Month:");
-	let month_str = io::read_input_string();
-	let month_res = month_str.parse::<date::Month>();
-	if let Err(_) = month_res {
-		println!("String '{month_str}' not valid for a month");
-		return;
-	}
-	let month = month_res.unwrap();
-	println!("Day:");
-	let day: u8 = io::read_input_string().parse().unwrap();
-
+fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date::Month, day: u8) {
 	let expense_type = || -> String {
 		println!("Expense Type:");
 		let expense_type = io::read_input_string();
@@ -120,6 +110,41 @@ fn add_new_expense(all_data: &mut AllExpenses) {
 		description: description
 	});
 	year_data.set_changes(true);
+}
+
+fn add_new_expense(all_data: &mut AllExpenses) {
+	println!("Year:");
+	let year: u32 = io::read_input_string().parse().unwrap();
+	println!("Month:");
+	let month_str = io::read_input_string();
+	let month_res = month_str.parse::<date::Month>();
+	if let Err(_) = month_res {
+		println!("String '{month_str}' not valid for a month");
+		return;
+	}
+	let month = month_res.unwrap();
+	println!("Day:");
+	let day: u8 = io::read_input_string().parse().unwrap();
+
+	add_new_expense_with_date(all_data, year, month, day);
+}
+
+fn add_new_expense_today(all_data: &mut AllExpenses) {
+	let now = chrono::prelude::Utc::now();
+
+	// Get the current date in the local timezone
+	let local_date = now.with_timezone(&chrono::prelude::Local);
+
+	// Extract the day, month, and year
+	let year = local_date.year() as u32;
+	let month_conv = date::Month::from_u32(local_date.month() - 1);
+	if month_conv.is_none() {
+		println!("Retrieval of current date failed for month '{}'.", local_date.month());
+	}
+	let month = month_conv.expect("This should have worked!");
+	let day = local_date.day() as u8;
+
+	add_new_expense_with_date(all_data, year, month, day);
 }
 
 fn edit_expense(all_data: &mut AllExpenses) {
@@ -229,15 +254,16 @@ fn print_expenses_menu() {
 	println!("    2. Show data of a specific year");
 	println!("    3. Show data of a specific month");
 	println!("    4. Add another expense");
-	println!("    5. Edit an expense");
-	println!("    6. Remove an expense");
+	println!("    5. Add another expense today");
+	println!("    6. Edit an expense");
+	println!("    7. Remove an expense");
 	println!("    0. Leave");
 }
 
 pub fn menu(all_data: &mut AllExpenses) {
 	let print_function = print_expenses_menu;
 	let min_option = 0;
-	let max_option = 6;
+	let max_option = 7;
 	
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -247,8 +273,9 @@ pub fn menu(all_data: &mut AllExpenses) {
 			2 => print_expense_data_year_user(&all_data),
 			3 => print_expense_data_month_user(&all_data),
 			4 => add_new_expense(all_data),
-			5 => edit_expense(all_data),
-			6 => remove_expense(all_data),
+			5 => add_new_expense_today(all_data),
+			6 => edit_expense(all_data),
+			7 => remove_expense(all_data),
 			_ => println!("Nothing to do..."),
 		}
 		

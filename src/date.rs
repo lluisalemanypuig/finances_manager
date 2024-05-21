@@ -17,6 +17,26 @@ pub enum Month {
 	December
 }
 
+impl Month {
+	pub fn from_u32(value: u32) -> Option<Self> {
+		match value {
+			0 => Some(Month::January),
+			1 => Some(Month::February),
+			2 => Some(Month::March),
+			3 => Some(Month::April),
+			4 => Some(Month::May),
+			5 => Some(Month::June),
+			6 => Some(Month::July),
+			7 => Some(Month::August),
+			8 => Some(Month::September),
+			9 => Some(Month::October),
+			10 => Some(Month::November),
+			11 => Some(Month::December),
+			_ => None,
+		}
+	}
+}
+
 impl fmt::Display for Month {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		match self {
