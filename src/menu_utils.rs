@@ -93,7 +93,7 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	println!("{tab}{:<15}	{:>6.2}", all_data.expense_types.income_name, total_income);
 	println!("{tab}---------------------------------------");
 	let balance_msg: String = "Balance".to_string();
-	println!("{tab}{:<15}	{:>6.2}", balance_msg, total_spent + total_income);
+	println!("{tab}{:<15}	{:>6.2}", balance_msg, total_spent - total_income);
 	println!("");
 	println!("");
 
