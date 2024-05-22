@@ -83,7 +83,7 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 		println!("Expense Type:");
 		let expense_type = io::read_input_string();
 		if expense_type != "" {
-			if !all_data.expense_types.exists_expense_type(&expense_type) {
+			if !all_data.expense_types.is_expense_type_ok(&expense_type)  {
 				println!("Expense type '{expense_type}' is not valid.");
 				return "".to_string();
 			}
@@ -206,7 +206,7 @@ fn edit_expense(all_data: &mut AllExpenses) {
 		println!("Expense Type: {} (leave blank to keep the value)", expense.expense_type);
 		let expense_type = io::read_input_string();
 		if expense_type != "" {
-			if !all_data.expense_types.exists_expense_type(&expense_type) {
+			if !all_data.expense_types.is_expense_type_ok(&expense_type) {
 				println!("Expense type '{expense_type}' is not valid.");
 				return "".to_string();
 			}

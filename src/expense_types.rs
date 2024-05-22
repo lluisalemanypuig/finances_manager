@@ -51,4 +51,10 @@ impl ExpenseTypes {
 		self.changes = true;
 	}
 
+	pub fn is_expense_type_ok(&self, expense_type: &String) -> bool {
+		let is_expense = self.exists_expense_type(expense_type);
+		let is_income = self.income_name == *expense_type;
+		is_expense || is_income
+	}
+
 }
