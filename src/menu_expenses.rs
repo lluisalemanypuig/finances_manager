@@ -147,6 +147,33 @@ fn add_new_expense_today(all_data: &mut AllExpenses) {
 	add_new_expense_with_date(all_data, year, month, day);
 }
 
+fn add_new_expense_to_year_month(all_data: &mut AllExpenses) {
+	println!("Year:");
+	let year: u32 = io::read_input_string().parse().unwrap();
+	println!("Month:");
+	let month_str = io::read_input_string();
+	let month_res = month_str.parse::<date::Month>();
+	if let Err(_) = month_res {
+		println!("String '{month_str}' not valid for a month");
+		return;
+	}
+	let month = month_res.unwrap();
+
+	let mut changes: bool = false;
+	loop {
+		println!("Day:");
+		let day_str = io::read_input_string();
+		if day_str == "" { break; }
+		let day: u8 = day_str.parse().unwrap();
+
+		add_new_expense_with_date(all_data, year, month.clone(), day);
+		changes = true;
+		println!("");
+	}
+
+	all_data.get_year_mut(&year).unwrap().set_changes(changes);
+}
+
 fn edit_expense(all_data: &mut AllExpenses) {
 	println!("Select year:");
 	let year: u32 = io::read_input_string().parse().unwrap();
@@ -255,15 +282,16 @@ fn print_expenses_menu() {
 	println!("    3. Show data of a specific month");
 	println!("    4. Add another expense");
 	println!("    5. Add another expense today");
-	println!("    6. Edit an expense");
-	println!("    7. Remove an expense");
+	println!("    6. Add expenses to a year and month");
+	println!("    7. Edit an expense");
+	println!("    8. Remove an expense");
 	println!("    0. Leave");
 }
 
 pub fn menu(all_data: &mut AllExpenses) {
 	let print_function = print_expenses_menu;
 	let min_option = 0;
-	let max_option = 7;
+	let max_option = 8;
 	
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -274,8 +302,9 @@ pub fn menu(all_data: &mut AllExpenses) {
 			3 => print_expense_data_month_user(&all_data),
 			4 => add_new_expense(all_data),
 			5 => add_new_expense_today(all_data),
-			6 => edit_expense(all_data),
-			7 => remove_expense(all_data),
+			6 => add_new_expense_to_year_month(all_data),
+			7 => edit_expense(all_data),
+			8 => remove_expense(all_data),
 			_ => println!("Nothing to do..."),
 		}
 		

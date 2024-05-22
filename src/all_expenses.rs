@@ -26,6 +26,19 @@ impl AllExpenses {
 			None
 		}
 	}
+	pub fn get_year_mut(&mut self, y: &u32) -> Option<&mut YearlyExpenses> {
+		if !(self.min_year <= *y && *y <= self.max_year) {
+			return None;
+		}
+		
+		let res = self.expenses.binary_search_by(|e| e.year.cmp(&y));
+		if let Ok(idx) = res {
+			Some(&mut self.expenses[idx])
+		}
+		else {
+			None
+		}
+	}
 
 	pub fn get_month(&self, y: &u32, m: &Month) -> Option<&MonthlyExpenses> {
 		if let Some(year) = self.get_year(y) {
