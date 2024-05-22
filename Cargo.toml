@@ -5,5 +5,6 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.0"
+duplicate = "1.0.0"
 serde = { version = "1.0.104", features = ["derive"] }
 serde_json = { version = "1.0.48", default-features = false, features = ["alloc"] }

@@ -91,8 +91,8 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 		expense_type
 	}();
 
-	let year_data = all_data.add_year_mut(&year);
-	let month_data = year_data.add_month_mut(&month);
+	let year_data = all_data.add_year(&year);
+	let month_data = year_data.add_month(&month);
 
 	println!("Price:");
 	let price: f32 = io::read_input_string().parse().unwrap();
@@ -214,8 +214,8 @@ fn edit_expense(all_data: &mut AllExpenses) {
 		expense_type
 	}();
 	
-	let year_data = all_data.add_year_mut(&year);
-	let month_data = year_data.add_month_mut(&month);
+	let year_data = all_data.add_year(&year);
+	let month_data = year_data.add_month(&month);
 	let expense = month_data.get_expense_mut(id_expense);
 	
 	if expense_type != "" {
@@ -267,8 +267,8 @@ fn remove_expense(all_data: &mut AllExpenses) {
 	println!("Id of expense to be deleted.");
 	let id_expense: usize = io::read_input_string().parse().unwrap();
 
-	let year_data = all_data.add_year_mut(&year);
-	let month_data = year_data.add_month_mut(&month);
+	let year_data = all_data.add_year(&year);
+	let month_data = year_data.add_month(&month);
 
 	month_data.remove_expense(id_expense);
 	year_data.set_changes(true);

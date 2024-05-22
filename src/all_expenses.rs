@@ -1,3 +1,5 @@
+extern crate duplicate;
+
 use crate::date::Month;
 use crate::expense_types::ExpenseTypes;
 use crate::monthly_expenses::MonthlyExpenses;
@@ -13,27 +15,19 @@ pub struct AllExpenses {
 
 impl AllExpenses {
 
-	pub fn get_year(&self, y: &u32) -> Option<&YearlyExpenses> {
+	#[duplicate::duplicate_item(
+		method          convert   reference(type);
+		[get_year]      [as_ref]  [& type]       ;
+		[get_year_mut]  [as_mut]  [&mut type]    ;
+	)]
+	pub fn method(self: reference([Self]), y: &u32) -> Option<reference([YearlyExpenses])> {
 		if !(self.min_year <= *y && *y <= self.max_year) {
 			return None;
 		}
 		
 		let res = self.expenses.binary_search_by(|e| e.year.cmp(&y));
 		if let Ok(idx) = res {
-			Some(&self.expenses[idx])
-		}
-		else {
-			None
-		}
-	}
-	pub fn get_year_mut(&mut self, y: &u32) -> Option<&mut YearlyExpenses> {
-		if !(self.min_year <= *y && *y <= self.max_year) {
-			return None;
-		}
-		
-		let res = self.expenses.binary_search_by(|e| e.year.cmp(&y));
-		if let Ok(idx) = res {
-			Some(&mut self.expenses[idx])
+			Some( self.expenses[idx].convert() )
 		}
 		else {
 			None
@@ -57,7 +51,7 @@ impl AllExpenses {
 		}
 	}
 
-	pub fn add_year_mut(&mut self, y: &u32) -> &mut YearlyExpenses {
+	pub fn add_year(&mut self, y: &u32) -> &mut YearlyExpenses {
 		let res = self.expenses.binary_search_by(|e| e.year.cmp(&y));
 		match res {
 			Ok(pos) => {

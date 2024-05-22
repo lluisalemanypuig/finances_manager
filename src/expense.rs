@@ -91,3 +91,7 @@ impl std::str::FromStr for Expense {
 	}
 }
 
+impl Expense {
+	pub fn as_ref(&self) -> &Expense { self }
+	pub fn as_mut(&mut self) -> &mut Expense { self }
+}

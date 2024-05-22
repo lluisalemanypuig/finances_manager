@@ -64,6 +64,9 @@ impl YearlyExpenses {
 		}
 	}
 
+	pub fn as_ref(&self) -> &YearlyExpenses { self }
+	pub fn as_mut(&mut self) -> &mut YearlyExpenses { self }
+
 	pub fn has_changes(&self) -> bool { self.changes }
 	pub fn set_changes(&mut self, c: bool) {
 		self.changes = c;
@@ -77,23 +80,20 @@ impl YearlyExpenses {
 		}
 	}
 
-	pub fn get_month(&self, m: &Month) -> Option<&MonthlyExpenses> {
+	#[duplicate::duplicate_item(
+		method           convert   reference(type);
+		[get_month]      [as_ref]  [& type]       ;
+		[get_month_mut]  [as_mut]  [&mut type]    ;
+	)]
+	pub fn method(self: reference([Self]), m: &Month) -> Option<reference([MonthlyExpenses])> {
 		let res = self.expenses.binary_search_by(|e| e.month.cmp(&m));
 		match res {
-			Ok(idx) => Some(&self.expenses[idx]),
+			Ok(idx) => Some(self.expenses[idx].convert()),
 			Err(_) => None
 		}
 	}
 
-	pub fn get_month_mut(&mut self, m: &Month) -> Option<&mut MonthlyExpenses> {
-		let res = self.expenses.binary_search_by(|e| e.month.cmp(&m));
-		match res {
-			Ok(idx) => Some(&mut self.expenses[idx]),
-			Err(_) => None
-		}
-	}
-
-	pub fn add_month_mut(&mut self, m: &Month) -> &mut MonthlyExpenses {
+	pub fn add_month(&mut self, m: &Month) -> &mut MonthlyExpenses {
 		let res = self.expenses.binary_search_by(|e| e.month.cmp(&m));
 		match res {
 			Ok(pos) => {
