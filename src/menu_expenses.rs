@@ -61,13 +61,9 @@ fn print_expense_data_month_user(all_data: &AllExpenses) {
 		return;
 	}
 	
-	let month_str = io::read_input_string();
-	let month_res = month_str.parse::<date::Month>();
-	if let Err(_) = month_res {
-		println!("String '{month_str}' not valid for a month");
-		return;
-	}
-	let month = month_res.unwrap();
+	let month_opt = menu_utils::read_correct_month();
+	if month_opt.is_none() { return; }
+	let month = month_opt.unwrap();
 	
 	let res = all_data.get_month(&year, &month);
 	if let Some(&ref month_data) = res {
@@ -79,17 +75,12 @@ fn print_expense_data_month_user(all_data: &AllExpenses) {
 }
 
 fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date::Month, day: u8) {
-	let expense_type = || -> String {
+	let expense_type_opt = || -> Option<String> {
 		println!("Expense Type:");
-		let mut expense_type = io::read_input_string();
-		if expense_type != "" {
-			while !all_data.expense_types.is_expense_type_ok(&expense_type)  {
-				println!("Expense type '{expense_type}' is not valid.");
-				expense_type = io::read_input_string();
-			}
-		}
-		expense_type
+		menu_utils::read_correct_expense_type(&all_data.expense_types)
 	}();
+	if expense_type_opt.is_none() { return; }
+	let expense_type = expense_type_opt.unwrap();
 
 	let year_data = all_data.add_year(&year);
 	let month_data = year_data.add_month(&month);
@@ -99,6 +90,7 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 	
 	println!("Place:");
 	let place = io::read_input_string();
+
 	println!("Description:");
 	let description = io::read_input_string();
 
@@ -115,14 +107,12 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 fn add_new_expense(all_data: &mut AllExpenses) {
 	println!("Year:");
 	let year: u32 = io::read_input_string().parse().unwrap();
+
 	println!("Month:");
-	let month_str = io::read_input_string();
-	let month_res = month_str.parse::<date::Month>();
-	if let Err(_) = month_res {
-		println!("String '{month_str}' not valid for a month");
-		return;
-	}
-	let month = month_res.unwrap();
+	let month_opt = menu_utils::read_correct_month();
+	if month_opt.is_none() { return; }
+	let month = month_opt.unwrap();
+
 	println!("Day:");
 	let day: u8 = io::read_input_string().parse().unwrap();
 
@@ -132,11 +122,10 @@ fn add_new_expense(all_data: &mut AllExpenses) {
 fn add_new_expense_today(all_data: &mut AllExpenses) {
 	let now = chrono::prelude::Utc::now();
 
-	// Get the current date in the local timezone
 	let local_date = now.with_timezone(&chrono::prelude::Local);
 
-	// Extract the day, month, and year
 	let year = local_date.year() as u32;
+
 	let month_conv = date::Month::from_u32(local_date.month() - 1);
 	if month_conv.is_none() {
 		println!("Retrieval of current date failed for month '{}'.", local_date.month());
@@ -150,14 +139,11 @@ fn add_new_expense_today(all_data: &mut AllExpenses) {
 fn add_new_expense_to_year_month(all_data: &mut AllExpenses) {
 	println!("Year:");
 	let year: u32 = io::read_input_string().parse().unwrap();
+
 	println!("Month:");
-	let month_str = io::read_input_string();
-	let month_res = month_str.parse::<date::Month>();
-	if let Err(_) = month_res {
-		println!("String '{month_str}' not valid for a month");
-		return;
-	}
-	let month = month_res.unwrap();
+	let month_opt = menu_utils::read_correct_month();
+	if month_opt.is_none() { return; }
+	let month = month_opt.unwrap();
 
 	let mut changes: bool = false;
 	loop {
@@ -183,36 +169,27 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	}
 	
 	println!("Select month:");
-	let month_str = io::read_input_string();
-	let month_res = month_str.parse::<date::Month>();
-	if let Err(_) = month_res {
-		println!("String '{month_str}' not valid for a month");
-		return;
-	}
-	let month = month_res.unwrap();
+	let month_opt = menu_utils::read_correct_month();
+	if month_opt.is_none() { return; }
+	let month = month_opt.unwrap();
 
 	if !all_data.get_year(&year).unwrap().has_month(&month) {
-		println!("Month '{month_str}' does not exist");
+		println!("Month '{month}' does not exist");
 		return;
 	}
 
 	println!("Id of expense to be edited.");
 	let id_expense: usize = io::read_input_string().parse().unwrap();
 
-	let expense_type = || -> String {
+	let expense_type_opt = || -> Option<String> {
 		let month_data = all_data.get_month(&year, &month).expect("Expected month data");
 		let expense = month_data.get_expense(id_expense);
 		
 		println!("Expense Type: {} (leave blank to keep the value)", expense.expense_type);
-		let mut expense_type = io::read_input_string();
-		if expense_type != "" {
-			while !all_data.expense_types.is_expense_type_ok(&expense_type) {
-				println!("Expense type '{expense_type}' is not valid.");
-				expense_type = io::read_input_string();
-			}
-		}
-		expense_type
+		menu_utils::read_correct_expense_type(&all_data.expense_types)
 	}();
+	if expense_type_opt.is_none() { return; }
+	let expense_type = expense_type_opt.unwrap();
 	
 	let year_data = all_data.add_year(&year);
 	let month_data = year_data.add_month(&month);
@@ -251,16 +228,12 @@ fn remove_expense(all_data: &mut AllExpenses) {
 	}
 	
 	println!("Select month:");
-	let month_str = io::read_input_string();
-	let month_res = month_str.parse::<date::Month>();
-	if let Err(_) = month_res {
-		println!("String '{month_str}' not valid for a month");
-		return;
-	}
-	let month = month_res.unwrap();
+	let month_opt = menu_utils::read_correct_month();
+	if month_opt.is_none() { return; }
+	let month = month_opt.unwrap();
 
 	if !all_data.get_year(&year).unwrap().has_month(&month) {
-		println!("Month '{month_str}' does not exist");
+		println!("Month '{month}' does not exist");
 		return;
 	}
 

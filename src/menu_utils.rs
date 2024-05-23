@@ -1,10 +1,13 @@
 use crate::io;
 
+use crate::date;
 use crate::expense;
+use crate::expense_types;
 use crate::monthly_expenses;
 use crate::all_expenses;
 
 type Expense = expense::Expense;
+type ExpenseTypes = expense_types::ExpenseTypes;
 type MonthlyExpenses = monthly_expenses::MonthlyExpenses;
 type AllExpenses = all_expenses::AllExpenses;
 
@@ -97,4 +100,31 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	println!("");
 	println!("");
 
+}
+
+pub fn read_correct_month() -> Option<date::Month> {
+	let mut month_str = io::read_input_string();
+	loop {
+		if month_str == "".to_string() {
+			return None;
+		}
+		let month_res = month_str.parse::<date::Month>();
+		if let Ok(m) = month_res {
+			return Some(m);
+		}
+		month_str = io::read_input_string();
+	}
+}
+
+pub fn read_correct_expense_type(expense_types: &ExpenseTypes) -> Option<String> {
+	let mut expense_str = io::read_input_string();
+	loop {
+		if expense_str == "".to_string() {
+			return None;
+		}
+		if expense_types.is_expense_type_ok(&expense_str) {
+			return Some(expense_str);
+		}
+		expense_str = io::read_input_string();
+	}
 }

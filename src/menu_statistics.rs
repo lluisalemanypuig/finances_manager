@@ -6,9 +6,11 @@ use crate::all_expenses;
 type AllExpenses = all_expenses::AllExpenses;
 
 fn statistics_by_expense_type(all_data: &AllExpenses) {
-	let expense_type: String = io::read_input_string();
+	let expense_type_opt = menu_utils::read_correct_expense_type(&all_data.expense_types);
+	if expense_type_opt.is_none() { return; }
+	let expense_type = expense_type_opt.unwrap();
 
-	if !all_data.expense_types.exists_expense_type(&expense_type) {
+	if !all_data.expense_types.has_expense_type(&expense_type) {
 		println!("Non existent data type '{expense_type}'.");
 		return;
 	}
