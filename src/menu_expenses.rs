@@ -188,15 +188,13 @@ fn edit_expense(all_data: &mut AllExpenses) {
 		println!("Expense Type: {} (leave blank to keep the value)", expense.expense_type);
 		menu_utils::read_correct_expense_type(&all_data.expense_types)
 	}();
-	if expense_type_opt.is_none() { return; }
-	let expense_type = expense_type_opt.unwrap();
 	
 	let year_data = all_data.add_year(&year);
 	let month_data = year_data.add_month(&month);
 	let expense = month_data.get_expense_mut(id_expense);
 	
-	if expense_type != "" {
-		expense.expense_type = expense_type;
+	if expense_type_opt.is_some() {
+		expense.expense_type = expense_type_opt.unwrap();
 	}
 
 	println!("Price: {} (leave blank to keep the value)", expense.price);
