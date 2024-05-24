@@ -83,7 +83,7 @@ impl FromStr for Month {
 
 /* ------------------------------------------------------------------------- */
 
-#[derive(Debug,PartialEq,Eq,PartialOrd,Ord)]
+#[derive(Debug,Clone,PartialEq,Eq,PartialOrd,Ord)]
 pub struct Date {
 	// It is crucial that these fields are declared in this exact order,
 	// otherwise the PartialOrd and Ord traits will not compare dates properly

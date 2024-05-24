@@ -53,6 +53,7 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	let mut total_spent: f32 = 0.0;
 	let mut total_income: f32 = 0.0;
 
+	let mut previous_date: date::Date = date::Date { year: 1900, month: date::Month::January, day: 1};
 	for (i, Expense {
 		day_of_year: d,
 		price: pr,
@@ -78,7 +79,13 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 		}
 
 		let d_string = d.to_string();
-		println!("        {i:>2}: {d_string:>17} | {pr:>6.2} | {et:>15} | {pl:>25} | {descr}");
+		if &previous_date != d {
+			println!("        {i:>2}: {d_string:>17} | {pr:>6.2} | {et:>15} | {pl:>25} | {descr}");
+			previous_date = d.clone();
+		}
+		else {
+			println!("        {i:>2}: {:>17} | {pr:>6.2} | {et:>15} | {pl:>25} | {descr}", "");
+		}
 		
 	}
 
