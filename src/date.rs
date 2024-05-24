@@ -18,7 +18,7 @@ pub enum Month {
 }
 
 impl Month {
-	pub fn from_u32(value: u32) -> Option<Self> {
+	pub fn from_u32(value: u32) -> Option<Month> {
 		match value {
 			0 => Some(Month::January),
 			1 => Some(Month::February),
