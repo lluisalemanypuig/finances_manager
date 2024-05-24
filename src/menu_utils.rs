@@ -53,6 +53,8 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	let mut total_spent: f32 = 0.0;
 	let mut total_income: f32 = 0.0;
 
+	let mut first: bool = true;
+	let mut some_data: bool = false;
 	let mut previous_date: date::Date = date::Date { year: 1900, month: date::Month::January, day: 1};
 	for (i, Expense {
 		day_of_year: d,
@@ -63,6 +65,7 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	})
 	in month_data.expenses.iter().filter(|e| func(e)).enumerate()
 	{
+		some_data = true;
 		if et == &all_data.expense_types.income_name {
 			total_income += pr;
 		}
@@ -80,30 +83,43 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 
 		let d_string = d.to_string();
 		if &previous_date != d {
-			println!("        {i:>2}: {d_string:>17} | {pr:>6.2} | {et:>15} | {pl:>25} | {descr}");
+
+			if first {
+				println!("        +----+-------------------+--------+-----------------+---------------------------+");
+				first = false;
+			}
+			else {
+				println!("        +····+···················+········+·················+···························+");
+			}
+
+			println!("        | {i:>2} | {d_string:>17} | {pr:>6.2} | {et:>15} | {pl:>25} | {descr}");
 			previous_date = d.clone();
 		}
 		else {
-			println!("        {i:>2}: {:>17} | {pr:>6.2} | {et:>15} | {pl:>25} | {descr}", "");
+			println!("        | {i:>2} | {:>17} | {pr:>6.2} | {et:>15} | {pl:>25} | {descr}", "");
 		}
-		
+	}
+	if some_data {
+		println!("        +----+-------------------+--------+-----------------+---------------------------+");
 	}
 
 	println!("");
 	let tab = "            ";
-	println!("{tab}{:<15}	{:>6}	{:>10}", "Expense type", "Total", "Percentage");
-	println!("{tab}---------------------------------------");
+	println!("{tab}+=================+========+============+");
+	println!("{tab}| {:<15} | {:>6} | {:>10} |", "Expense type", "Total", "Percentage");
+	println!("{tab}+=================+========+============+");
 	for (expense_type, value) in accounting.iter() {
-		println!("{tab}{:<15}	{:>6.2}	{:>9.2}%", expense_type, value, (value/total_spent)*100.0);
+		println!("{tab}| {:<15} | {:>6.2} | {:>9.2}% |", expense_type, value, (value/total_spent)*100.0);
 	}
 	
-	println!("{tab}---------------------------------------");
+	println!("{tab}+·················+········+············+");
 	let total_spent_msg: String = "Total spent".to_string();
-	println!("{tab}{:<15}	{:>6.2}", total_spent_msg, total_spent);
-	println!("{tab}{:<15}	{:>6.2}", all_data.expense_types.income_name, total_income);
-	println!("{tab}---------------------------------------");
+	println!("{tab}| {:<15} | {:>6.2} |            |", total_spent_msg, total_spent);
+	println!("{tab}| {:<15} | {:>6.2} |            |", all_data.expense_types.income_name, total_income);
+	println!("{tab}+·················+········+············+");
 	let balance_msg: String = "Balance".to_string();
-	println!("{tab}{:<15}	{:>6.2}", balance_msg, total_spent - total_income);
+	println!("{tab}| {:<15} | {:>6.2} |            |", balance_msg, total_spent - total_income);
+	println!("{tab}+=================+========+============+");
 	println!("");
 	println!("");
 
