@@ -74,6 +74,27 @@ fn print_expense_data_month_user(all_data: &AllExpenses) {
 	}
 }
 
+fn print_expense_data_current_month(all_data: &AllExpenses) {
+	let now = chrono::prelude::Utc::now();
+	let local_date = now.with_timezone(&chrono::prelude::Local);
+
+	let year = local_date.year() as u32;
+
+	let month_conv = date::Month::from_u32(local_date.month() - 1);
+	if month_conv.is_none() {
+		println!("Retrieval of current date failed for month '{}'.", local_date.month());
+	}
+	let month = month_conv.expect("This should have worked!");
+	
+	let res = all_data.get_month(&year, &month);
+	if let Some(&ref month_data) = res {
+		print_expense_data_month(all_data, &month_data);
+	}
+	else {
+		println!("Month '{month}' does not exist in year '{year}'.");
+	}
+}
+
 fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date::Month, day: u8) {
 	let expense_type_opt = || -> Option<String> {
 		println!("Expense Type:");
@@ -121,7 +142,6 @@ fn add_new_expense(all_data: &mut AllExpenses) {
 
 fn add_new_expense_today(all_data: &mut AllExpenses) {
 	let now = chrono::prelude::Utc::now();
-
 	let local_date = now.with_timezone(&chrono::prelude::Local);
 
 	let year = local_date.year() as u32;
@@ -251,18 +271,19 @@ fn print_expenses_menu() {
 	println!("    1. Show all current data");
 	println!("    2. Show data of a specific year");
 	println!("    3. Show data of a specific month");
-	println!("    4. Add another expense");
-	println!("    5. Add another expense today");
-	println!("    6. Add expenses to a year and month");
-	println!("    7. Edit an expense");
-	println!("    8. Remove an expense");
+	println!("    4. Show data of the current month");
+	println!("    5. Add another expense");
+	println!("    6. Add another expense today");
+	println!("    7. Add expenses to a year and month");
+	println!("    8. Edit an expense");
+	println!("    9. Remove an expense");
 	println!("    0. Leave");
 }
 
 pub fn menu(all_data: &mut AllExpenses) {
 	let print_function = print_expenses_menu;
 	let min_option = 0;
-	let max_option = 8;
+	let max_option = 9;
 	
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -271,11 +292,12 @@ pub fn menu(all_data: &mut AllExpenses) {
 			1 => print_expense_data_all(&all_data),
 			2 => print_expense_data_year_user(&all_data),
 			3 => print_expense_data_month_user(&all_data),
-			4 => add_new_expense(all_data),
-			5 => add_new_expense_today(all_data),
-			6 => add_new_expense_to_year_month(all_data),
-			7 => edit_expense(all_data),
-			8 => remove_expense(all_data),
+			4 => print_expense_data_current_month(&all_data),
+			5 => add_new_expense(all_data),
+			6 => add_new_expense_today(all_data),
+			7 => add_new_expense_to_year_month(all_data),
+			8 => edit_expense(all_data),
+			9 => remove_expense(all_data),
 			_ => println!("Nothing to do..."),
 		}
 		
