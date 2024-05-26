@@ -36,24 +36,14 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	func: F
 )
 {
-	{
-	let month = &month_data.month;
-	println!("	{month} ({})", month_data.expenses.len());
-
-	let entries_str = format!("{}", month_data.expenses.len()).to_string();
-	let dashes_number: String = std::iter::repeat('-').take( entries_str.len() ).collect();
-
-	let month_name_str = format!("{}", month_data.month).to_string();
-	let dashes_month: String = std::iter::repeat('-').take(month_name_str.len()).collect();
-	println!("	{}--{}-", dashes_month, dashes_number);
-	println!("");
-	}
-
 	let longest_place =
-		month_data.expenses
-		.iter()
-		.filter(|e: &&expense::Expense| func(e))
-		.fold(0, |max, val| if val.place.len() > max { val.place.len() } else { max });
+		std::cmp::max(
+			5,
+			month_data.expenses
+			.iter()
+			.filter(|e: &&expense::Expense| func(e))
+			.fold(0, |max, val| if val.place.len() > max { val.place.len() } else { max })
+		);
 
 	let place_top_bot_divider = std::iter::repeat("—").take(longest_place).collect::<String>();
 	let place_mid_divider: String = std::iter::repeat("·").take(longest_place).collect::<String>();
