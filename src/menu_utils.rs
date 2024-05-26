@@ -49,6 +49,15 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	println!("");
 	}
 
+	let longest_place =
+		month_data.expenses
+		.iter()
+		.filter(|e: &&expense::Expense| func(e))
+		.fold(0, |max, val| if val.place.len() > max { val.place.len() } else { max });
+
+	let place_top_bot_divider = std::iter::repeat("—").take(longest_place).collect::<String>();
+	let place_mid_divider: String = std::iter::repeat("·").take(longest_place).collect::<String>();
+
 	let mut accounting: std::collections::BTreeMap<String, f32> = std::collections::BTreeMap::new();
 	let mut total_spent: f32 = 0.0;
 	let mut total_income: f32 = 0.0;
@@ -85,22 +94,22 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 		if &previous_date != d {
 
 			if first {
-				println!("        +————+———————————————————+————————+—————————————————+———————————————————————————+");
+				println!("        +————+———————————————————+————————+—————————————————+—{}—+", place_top_bot_divider);
 				first = false;
 			}
 			else {
-				println!("        +————+···················+········+·················+···························+");
+				println!("        +————+···················+········+·················+·{}·+", place_mid_divider);
 			}
 
-			println!("        | {i:>2} | {d_string:>17} | {pr:>6.2} | {et:>15} | {pl:>25} | {descr}");
+			println!("        | {i:>2} | {d_string:>17} | {pr:>6.2} | {et:>15} | {pl:>longest_place$} | {descr}");
 			previous_date = d.clone();
 		}
 		else {
-			println!("        | {i:>2} | {:>17} | {pr:>6.2} | {et:>15} | {pl:>25} | {descr}", "");
+			println!("        | {i:>2} | {:>17} | {pr:>6.2} | {et:>15} | {pl:>longest_place$} | {descr}", "");
 		}
 	}
 	if some_data {
-		println!("        +————+———————————————————+————————+—————————————————+———————————————————————————+");
+		println!("        +————+———————————————————+————————+—————————————————+—{}—+", place_top_bot_divider);
 	}
 
 	println!("");
