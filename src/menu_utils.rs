@@ -57,6 +57,12 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 
 	let place_top_bot_divider = std::iter::repeat("—").take(longest_place).collect::<String>();
 	let place_mid_divider: String = std::iter::repeat("·").take(longest_place).collect::<String>();
+	
+	let place_text = "Place".to_string();
+	let left_padding = (longest_place - place_text.len())/2;
+    let right_padding = longest_place - left_padding - place_text.len();
+	let left_pad: String = std::iter::repeat(" ").take(left_padding).collect::<String>();
+	let right_pad: String = std::iter::repeat(" ").take(right_padding).collect::<String>();
 
 	let mut accounting: std::collections::BTreeMap<String, f32> = std::collections::BTreeMap::new();
 	let mut total_spent: f32 = 0.0;
@@ -94,6 +100,8 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 		if &previous_date != d {
 
 			if first {
+				println!("        +————+———————————————————+————————+—————————————————+—{}—+", place_top_bot_divider);
+				println!("        | ID |       Date        |  Price |   Expense type  | {}{}{} | Description", left_pad, place_text, right_pad);
 				println!("        +————+———————————————————+————————+—————————————————+—{}—+", place_top_bot_divider);
 				first = false;
 			}
