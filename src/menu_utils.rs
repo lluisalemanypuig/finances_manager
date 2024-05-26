@@ -104,7 +104,7 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	}
 
 	println!("");
-	let tab = "            ";
+	let tab = "        ";
 	println!("{tab}+=================+========+============+");
 	println!("{tab}| {:<15} | {:>6} | {:>10} |", "Expense type", "Total", "Percentage");
 	println!("{tab}+=================+========+============+");
