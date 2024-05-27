@@ -106,6 +106,8 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 			}
 		}
 
+		let expense_type_text = center_string( et, expense_type_width);
+		let place_text = center_string( pl, place_width);
 		if &previous_date != d {
 
 			if first {
@@ -118,13 +120,14 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 				println!("        +————+—{date_mid_divider}—+—{price_mid_divider}—+—{expense_type_mid_divider}—+—{place_mid_divider}—+");
 			}
 
+			let date_text = center_string(&d.to_string(), date_width);
+			println!("        | {i:>2} | {date_text} | {pr:>price_width$.2} | {expense_type_text} | {place_text} | {descr}");
 			previous_date = d.clone();
 		}
-		
-		let date_text = center_string(&d.to_string(), date_width);
-		let expense_type_text = center_string( et, expense_type_width);
-		let place_text = center_string( pl, place_width);
-		println!("        | {i:>2} | {date_text} | {pr:>price_width$.2} | {expense_type_text} | {place_text} | {descr}");
+		else {
+			let date_text = center_string(&" ".to_string(), date_width);
+			println!("        | {i:>2} | {date_text} | {pr:>price_width$.2} | {expense_type_text} | {place_text} | {descr}");
+		}
 	}
 	if some_data {
 		println!("        +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+");
