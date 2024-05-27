@@ -111,26 +111,26 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 		if &previous_date != d {
 
 			if first {
-				println!("        +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+");
-				println!("        | ID | {date_header} | {price_header} | {expense_type_header} | {place_header} | Description");
-				println!("        +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+");
+				println!("    | ID | {date_header} | {price_header} | {expense_type_header} | {place_header} | Description");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+");
 				first = false;
 			}
 			else {
-				println!("        +————+—{date_mid_divider}—+—{price_mid_divider}—+—{expense_type_mid_divider}—+—{place_mid_divider}—+");
+				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{expense_type_mid_divider}—+—{place_mid_divider}—+");
 			}
 
 			let date_text = center_string(&d.to_string(), date_width);
-			println!("        | {i:>2} | {date_text} | {pr:>price_width$.2} | {expense_type_text} | {place_text} | {descr}");
+			println!("    | {i:>2} | {date_text} | {pr:>price_width$.2} | {expense_type_text} | {place_text} | {descr}");
 			previous_date = d.clone();
 		}
 		else {
 			let date_text = center_string(&" ".to_string(), date_width);
-			println!("        | {i:>2} | {date_text} | {pr:>price_width$.2} | {expense_type_text} | {place_text} | {descr}");
+			println!("    | {i:>2} | {date_text} | {pr:>price_width$.2} | {expense_type_text} | {place_text} | {descr}");
 		}
 	}
 	if some_data {
-		println!("        +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+");
+		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+");
 	}
 
 	if some_data {

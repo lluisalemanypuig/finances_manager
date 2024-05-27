@@ -29,6 +29,7 @@ fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyExpenses) {
 	}
 	
 	println!("    Found {} entries", total_entries);
+	println!("");
 	for month_data in year_data.expenses.iter() {
 		print_expense_data_month(all_data, month_data);
 	}
