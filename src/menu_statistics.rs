@@ -2,8 +2,10 @@ use crate::io;
 use crate::menu_utils;
 
 use crate::all_expenses;
+use crate::expense_summary;
 
 type AllExpenses = all_expenses::AllExpenses;
+type ExpenseSummary = expense_summary::ExpenseSummary;
 
 fn statistics_by_expense_type(all_data: &AllExpenses) {
 	let expense_type_opt = menu_utils::read_correct_expense_type(&all_data.expense_types);
@@ -20,14 +22,20 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 		println!("====================");
 		println!("");
 
+		let mut current_year = ExpenseSummary::new();
+
 		for month_data in year_data.expenses.iter() {
 
-			menu_utils::display_and_accounting(
+			let current_month = menu_utils::display_and_accounting(
 				all_data,
 				month_data,
 				|e| e.expense_type == expense_type
 			);
+			current_year.merge(current_month);
 		}
+
+		println!("This year's summary:");
+		menu_utils::display_expense_summary(&current_year, all_data, &"");
 	}
 }
 
@@ -40,14 +48,20 @@ fn statistics_by_price(all_data: &AllExpenses) {
 		println!("====================");
 		println!("");
 
+		let mut current_year = ExpenseSummary::new();
+
 		for month_data in year_data.expenses.iter() {
 
-			menu_utils::display_and_accounting(
+			let current_month = menu_utils::display_and_accounting(
 				all_data,
 				month_data,
 				|e| lower <= e.price && e.price <= upper
 			);
+			current_year.merge(current_month);
 		}
+
+		println!("This year's summary:");
+		menu_utils::display_expense_summary(&current_year, all_data, &"");
 	}
 }
 
@@ -59,14 +73,20 @@ fn statistics_by_place(all_data: &AllExpenses) {
 		println!("====================");
 		println!("");
 
+		let mut current_year = ExpenseSummary::new();
+
 		for month_data in year_data.expenses.iter() {
 
-			menu_utils::display_and_accounting(
+			let current_month = menu_utils::display_and_accounting(
 				all_data,
 				month_data,
 				|e| e.place == place
 			);
+			current_year.merge(current_month);
 		}
+
+		println!("This year's summary:");
+		menu_utils::display_expense_summary(&current_year, all_data, &"");
 	}
 }
 

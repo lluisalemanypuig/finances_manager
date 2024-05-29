@@ -11,6 +11,7 @@ mod monthly_expenses;
 mod yearly_expenses;
 mod all_expenses;
 mod expense_types;
+mod expense_summary;
 
 mod menu_utils;
 mod menu_expenses;

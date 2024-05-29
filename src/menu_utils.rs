@@ -5,11 +5,13 @@ use crate::expense;
 use crate::expense_types;
 use crate::monthly_expenses;
 use crate::all_expenses;
+use crate::expense_summary;
 
 type Expense = expense::Expense;
 type ExpenseTypes = expense_types::ExpenseTypes;
 type MonthlyExpenses = monthly_expenses::MonthlyExpenses;
 type AllExpenses = all_expenses::AllExpenses;
+type ExpenseSummary = expense_summary::ExpenseSummary;
 
 pub fn read_option<F: Fn()>(f: F, min_valid: u32, max_valid: u32) -> u32 {
 	f();
@@ -41,11 +43,48 @@ fn center_string(s: &String, width: usize) -> String {
 	format!("{left_pad}{s}{right_pad}")
 }
 
+static EXPENSE_TYPE_WIDTH: usize = 15;
+static PRICE_WIDTH: usize = 8;
+static DATE_WIDTH: usize = 17;
+
+pub fn display_expense_summary(summary: &ExpenseSummary, all_data: &AllExpenses, pre_tab: &str) {
+	let expense_type_main_divider = std::iter::repeat("—").take(EXPENSE_TYPE_WIDTH).collect::<String>();
+	let expense_type_header = center_string(&"Expense type".to_string(), EXPENSE_TYPE_WIDTH);
+
+	let price_main_divider = std::iter::repeat("—").take(PRICE_WIDTH).collect::<String>();
+	let price_header = center_string(&"Price".to_string(), PRICE_WIDTH);
+
+	let percentage_width = 10;
+	let percentage_main_divider = std::iter::repeat("—").take(percentage_width).collect::<String>();
+	let percentage_header = center_string(&"Percentage".to_string(), percentage_width);
+
+	println!("");
+	let tab = pre_tab.to_owned() + "    ";
+	println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	println!("{tab}| {expense_type_header} | {price_header} | {percentage_header} |");
+	println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	for (expense_type, value) in summary.expense_to_price.iter() {
+		println!("{tab}| {:<EXPENSE_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} | {:>9.2}% |", expense_type, value, (value/summary.total_spent)*100.0);
+	}
+	
+	println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	let total_spent_msg: String = "Total spent".to_string();
+	println!("{tab}| {:<EXPENSE_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} |            |", total_spent_msg, summary.total_spent);
+	println!("{tab}| {:<EXPENSE_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} |            |", all_data.expense_types.income_name, summary.total_income);
+	println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	let balance_msg: String = "Balance".to_string();
+	println!("{tab}| {:<EXPENSE_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} |            |", balance_msg, summary.total_spent - summary.total_income);
+	println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	println!("");
+	println!("");
+}
+
 pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	all_data: &AllExpenses,
 	month_data: &MonthlyExpenses,
 	func: F
 )
+-> ExpenseSummary
 {
 	let place_width =
 		std::cmp::max(
@@ -59,25 +98,20 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	let place_mid_divider: String = std::iter::repeat("·").take(place_width).collect::<String>();
 	let place_header = center_string(&"Place".to_string(), place_width);
 
-	let expense_type_width = 15;
-	let expense_type_main_divider = std::iter::repeat("—").take(expense_type_width).collect::<String>();
-	let expense_type_mid_divider: String = std::iter::repeat("·").take(expense_type_width).collect::<String>();
-	let expense_type_header = center_string(&"Expense type".to_string(), expense_type_width);
+	let expense_type_main_divider = std::iter::repeat("—").take(EXPENSE_TYPE_WIDTH).collect::<String>();
+	let expense_type_mid_divider: String = std::iter::repeat("·").take(EXPENSE_TYPE_WIDTH).collect::<String>();
+	let expense_type_header = center_string(&"Expense type".to_string(), EXPENSE_TYPE_WIDTH);
 
-	let price_width = 7;
-	let price_main_divider = std::iter::repeat("—").take(price_width).collect::<String>();
-	let price_mid_divider: String = std::iter::repeat("·").take(price_width).collect::<String>();
-	let price_header = center_string(&"Price".to_string(), price_width);
+	let price_main_divider = std::iter::repeat("—").take(PRICE_WIDTH).collect::<String>();
+	let price_mid_divider: String = std::iter::repeat("·").take(PRICE_WIDTH).collect::<String>();
+	let price_header = center_string(&"Price".to_string(), PRICE_WIDTH);
 
-	let date_width = 17;
-	let date_main_divider = std::iter::repeat("—").take(date_width).collect::<String>();
-	let date_mid_divider: String = std::iter::repeat("·").take(date_width).collect::<String>();
-	let date_header = center_string(&"Date".to_string(), date_width);
+	let date_main_divider = std::iter::repeat("—").take(DATE_WIDTH).collect::<String>();
+	let date_mid_divider: String = std::iter::repeat("·").take(DATE_WIDTH).collect::<String>();
+	let date_header = center_string(&"Date".to_string(), DATE_WIDTH);
 
-	let mut accounting: std::collections::BTreeMap<String, f32> = std::collections::BTreeMap::new();
-	let mut total_spent: f32 = 0.0;
-	let mut total_income: f32 = 0.0;
-
+	let mut summary: ExpenseSummary = ExpenseSummary::new();
+	
 	let mut first: bool = true;
 	let mut some_data: bool = false;
 	let mut previous_date: date::Date = date::Date { year: 1900, month: date::Month::January, day: 1};
@@ -92,21 +126,21 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	{
 		some_data = true;
 		if et == &all_data.expense_types.income_name {
-			total_income += pr;
+			summary.total_income += pr;
 		}
 		else {
-			total_spent += pr;
-			match accounting.get_mut(et) {
+			summary.total_spent += pr;
+			match summary.expense_to_price.get_mut(et) {
 				Some(value) => {
 					*value += *pr;
 				},
 				None => {
-					accounting.insert(et.clone(), *pr);
+					summary.expense_to_price.insert(et.clone(), *pr);
 				}
 			}
 		}
 
-		let expense_type_text = center_string( et, expense_type_width);
+		let expense_type_text = center_string( et, EXPENSE_TYPE_WIDTH);
 		let place_text = center_string( pl, place_width);
 		if &previous_date != d {
 
@@ -120,13 +154,13 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{expense_type_mid_divider}—+—{place_mid_divider}—+");
 			}
 
-			let date_text = center_string(&d.to_string(), date_width);
-			println!("    | {i:>2} | {date_text} | {pr:>price_width$.2} | {expense_type_text} | {place_text} | {descr}");
+			let date_text = center_string(&d.to_string(), DATE_WIDTH);
+			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {expense_type_text} | {place_text} | {descr}");
 			previous_date = d.clone();
 		}
 		else {
-			let date_text = center_string(&" ".to_string(), date_width);
-			println!("    | {i:>2} | {date_text} | {pr:>price_width$.2} | {expense_type_text} | {place_text} | {descr}");
+			let date_text = center_string(&" ".to_string(), DATE_WIDTH);
+			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {expense_type_text} | {place_text} | {descr}");
 		}
 	}
 	if some_data {
@@ -134,30 +168,10 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	}
 
 	if some_data {
-		let percentage_width = 10;
-		let percentage_main_divider = std::iter::repeat("—").take(percentage_width).collect::<String>();
-		let percentage_header = center_string(&"Percentage".to_string(), percentage_width);
-
-		println!("");
-		let tab = "        ";
-		println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
-		println!("{tab}| {expense_type_header} | {price_header} | {percentage_header} |");
-		println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
-		for (expense_type, value) in accounting.iter() {
-			println!("{tab}| {:<15} | {:>7.2} | {:>9.2}% |", expense_type, value, (value/total_spent)*100.0);
-		}
-		
-		println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
-		let total_spent_msg: String = "Total spent".to_string();
-		println!("{tab}| {:<15} | {:>7.2} |            |", total_spent_msg, total_spent);
-		println!("{tab}| {:<15} | {:>7.2} |            |", all_data.expense_types.income_name, total_income);
-		println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
-		let balance_msg: String = "Balance".to_string();
-		println!("{tab}| {:<15} | {:>7.2} |            |", balance_msg, total_spent - total_income);
-		println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
-		println!("");
-		println!("");
+		display_expense_summary(&summary, all_data, &"    ");
 	}
+
+	summary
 }
 
 pub fn read_correct_month() -> Option<date::Month> {

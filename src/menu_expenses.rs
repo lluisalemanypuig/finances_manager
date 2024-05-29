@@ -9,14 +9,19 @@ use crate::expense;
 use crate::monthly_expenses;
 use crate::yearly_expenses;
 use crate::all_expenses;
+use crate::expense_summary;
 
 type Expense = expense::Expense;
 type MonthlyExpenses = monthly_expenses::MonthlyExpenses;
 type YearlyExpenses = yearly_expenses::YearlyExpenses;
 type AllExpenses = all_expenses::AllExpenses;
 
-fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses) {
-	menu_utils::display_and_accounting(all_data, month_data, |_| true);
+type ExpenseSummary = expense_summary::ExpenseSummary;
+
+fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses)
+-> ExpenseSummary
+{
+	menu_utils::display_and_accounting(all_data, month_data, |_| true)
 }
 
 fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyExpenses) {
@@ -28,11 +33,17 @@ fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyExpenses) {
 		total_entries += month_data.expenses.len();
 	}
 	
+	let mut current_year = ExpenseSummary::new();
+
 	println!("    Found {} entries", total_entries);
 	println!("");
 	for month_data in year_data.expenses.iter() {
-		print_expense_data_month(all_data, month_data);
+		let current_month = print_expense_data_month(all_data, month_data);
+		current_year.merge(current_month);
 	}
+
+	println!("This year's summary:");
+	menu_utils::display_expense_summary(&current_year, all_data, &"");
 }
 
 fn print_expense_data_all(all_data: &AllExpenses) {
