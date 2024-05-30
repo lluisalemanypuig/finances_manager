@@ -65,7 +65,7 @@ fn print_expense_data_year_user(all_data: &AllExpenses) {
 	};
 }
 
-fn print_expense_data_current_year(all_data: &AllExpenses) {
+fn print_expense_data_year_current(all_data: &AllExpenses) {
 	let now = chrono::prelude::Utc::now();
 	let local_date = now.with_timezone(&chrono::prelude::Local);
 
@@ -101,7 +101,7 @@ fn print_expense_data_month_user(all_data: &AllExpenses) {
 	}
 }
 
-fn print_expense_data_current_month(all_data: &AllExpenses) {
+fn print_expense_data_month_current(all_data: &AllExpenses) {
 	let now = chrono::prelude::Utc::now();
 	let local_date = now.with_timezone(&chrono::prelude::Local);
 
@@ -319,9 +319,9 @@ pub fn menu(all_data: &mut AllExpenses) {
 		match option {
 			1 => print_expense_data_all(&all_data),
 			2 => print_expense_data_year_user(&all_data),
-			3 => print_expense_data_current_year(&all_data),
+			3 => print_expense_data_year_current(&all_data),
 			4 => print_expense_data_month_user(&all_data),
-			5 => print_expense_data_current_month(&all_data),
+			5 => print_expense_data_month_current(&all_data),
 			6 => add_new_expense(all_data),
 			7 => add_new_expense_today(all_data),
 			8 => add_new_expense_to_year_month(all_data),
