@@ -295,17 +295,17 @@ fn remove_expense(all_data: &mut AllExpenses) {
 fn print_expenses_menu() {
 	println!("Query and edit the expenses:");
 	println!("");
-	println!("    1. Show all current data");
-	println!("    2. Show data of a year");
-	println!("    3.     Show data of the current year");
-	println!("    4. Show data of a month");
-	println!("    5.     Show data of the current month");
-	println!("    6. Add another expense");
-	println!("    7.     Add another expense today");
-	println!("    8. Add expenses to a year and month");
-	println!("    9. Edit an expense");
+	println!("     1. Show all current data");
+	println!("     2. Show data of a year");
+	println!("     3.     Show data of the current year");
+	println!("     4. Show data of a month");
+	println!("     5.     Show data of the current month");
+	println!("     6. Add another expense");
+	println!("     7.     Add another expense today");
+	println!("     8.     Add expenses to a year and month");
+	println!("     9. Edit an expense");
 	println!("    10. Remove an expense");
-	println!("    0. Leave");
+	println!("     0. Leave");
 }
 
 pub fn menu(all_data: &mut AllExpenses) {
