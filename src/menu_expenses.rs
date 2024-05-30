@@ -65,6 +65,21 @@ fn print_expense_data_year_user(all_data: &AllExpenses) {
 	};
 }
 
+fn print_expense_data_current_year(all_data: &AllExpenses) {
+	let now = chrono::prelude::Utc::now();
+	let local_date = now.with_timezone(&chrono::prelude::Local);
+
+	let year = local_date.year() as u32;
+
+	let res = all_data.get_year(&year);
+	if let Some(year) = res {
+		print_expense_data_year(all_data, year);
+	}
+	else {
+		println!("Year '{year}' does not exist!");
+	};
+}
+
 fn print_expense_data_month_user(all_data: &AllExpenses) {
 	println!("What year and month do you want to see? Year -> Month");
 	let year: u32 = io::read_input_string().parse().unwrap();
@@ -281,21 +296,22 @@ fn print_expenses_menu() {
 	println!("Query and edit the expenses:");
 	println!("");
 	println!("    1. Show all current data");
-	println!("    2. Show data of a specific year");
-	println!("    3. Show data of a specific month");
-	println!("    4. Show data of the current month");
-	println!("    5. Add another expense");
-	println!("    6. Add another expense today");
-	println!("    7. Add expenses to a year and month");
-	println!("    8. Edit an expense");
-	println!("    9. Remove an expense");
+	println!("    2. Show data of a year");
+	println!("    3.     Show data of the current year");
+	println!("    4. Show data of a month");
+	println!("    5.     Show data of the current month");
+	println!("    6. Add another expense");
+	println!("    7.     Add another expense today");
+	println!("    8. Add expenses to a year and month");
+	println!("    9. Edit an expense");
+	println!("    10. Remove an expense");
 	println!("    0. Leave");
 }
 
 pub fn menu(all_data: &mut AllExpenses) {
 	let print_function = print_expenses_menu;
 	let min_option = 0;
-	let max_option = 9;
+	let max_option = 10;
 	
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -303,13 +319,14 @@ pub fn menu(all_data: &mut AllExpenses) {
 		match option {
 			1 => print_expense_data_all(&all_data),
 			2 => print_expense_data_year_user(&all_data),
-			3 => print_expense_data_month_user(&all_data),
-			4 => print_expense_data_current_month(&all_data),
-			5 => add_new_expense(all_data),
-			6 => add_new_expense_today(all_data),
-			7 => add_new_expense_to_year_month(all_data),
-			8 => edit_expense(all_data),
-			9 => remove_expense(all_data),
+			3 => print_expense_data_current_year(&all_data),
+			4 => print_expense_data_month_user(&all_data),
+			5 => print_expense_data_current_month(&all_data),
+			6 => add_new_expense(all_data),
+			7 => add_new_expense_today(all_data),
+			8 => add_new_expense_to_year_month(all_data),
+			9 => edit_expense(all_data),
+			10 => remove_expense(all_data),
 			_ => println!("Nothing to do..."),
 		}
 		
