@@ -17,6 +17,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 		return;
 	}
 
+	let mut all_years = ExpenseSummary::new();
 	for year_data in all_data.expenses.iter() {
 		println!("Data from year: {}", year_data.year);
 		println!("====================");
@@ -36,13 +37,19 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 
 		println!("This year's summary:");
 		menu_utils::display_expense_summary(&current_year, all_data, &"");
+
+		all_years.merge(current_year);
 	}
+
+	println!("Total history:");
+	menu_utils::display_expense_summary(&all_years, all_data, &"");
 }
 
 fn statistics_by_price(all_data: &AllExpenses) {
 	let lower: f32 = io::read_input_string().parse().unwrap();
 	let upper: f32 = io::read_input_string().parse().unwrap();
 
+	let mut all_years = ExpenseSummary::new();
 	for year_data in all_data.expenses.iter() {
 		println!("Data from year: {}", year_data.year);
 		println!("====================");
@@ -62,12 +69,18 @@ fn statistics_by_price(all_data: &AllExpenses) {
 
 		println!("This year's summary:");
 		menu_utils::display_expense_summary(&current_year, all_data, &"");
+
+		all_years.merge(current_year);
 	}
+
+	println!("Total history:");
+	menu_utils::display_expense_summary(&all_years, all_data, &"");
 }
 
 fn statistics_by_place(all_data: &AllExpenses) {
 	let place: String = io::read_input_string();
 
+	let mut all_years = ExpenseSummary::new();
 	for year_data in all_data.expenses.iter() {
 		println!("Data from year: {}", year_data.year);
 		println!("====================");
@@ -87,7 +100,12 @@ fn statistics_by_place(all_data: &AllExpenses) {
 
 		println!("This year's summary:");
 		menu_utils::display_expense_summary(&current_year, all_data, &"");
+
+		all_years.merge(current_year);
 	}
+
+	println!("Total history:");
+	menu_utils::display_expense_summary(&all_years, all_data, &"");
 }
 
 fn print_statistics_menu() {
