@@ -128,14 +128,17 @@ fn statistics_by_place(all_data: &AllExpenses) {
 			current_year.merge(current_month);
 		}
 
-		println!("This year's summary:");
-		menu_utils::display_expense_summary(&current_year, all_data, &"");
-
-		all_years.merge(current_year);
+		if current_year.has_data() {
+			println!("This year's summary:");
+			menu_utils::display_expense_summary(&current_year, all_data, &"");
+			all_years.merge(current_year);
+		}
 	}
 
-	println!("Total history:");
-	menu_utils::display_expense_summary(&all_years, all_data, &"");
+	if all_years.has_data() {
+		println!("Total history:");
+		menu_utils::display_expense_summary(&all_years, all_data, &"");
+	}
 }
 
 fn statistics_by_place_substring(all_data: &AllExpenses) {
