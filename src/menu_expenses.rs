@@ -28,7 +28,7 @@ fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyExpenses)
 -> ExpenseSummary
 {
 	println!("Data from year: {}", year_data.year);
-	println!("====================");
+	println!("--------------------");
 	
 	let mut total_entries = 0;
 	for month_data in year_data.expenses.iter() {
@@ -59,6 +59,7 @@ fn print_expense_data_all(all_data: &AllExpenses) {
 	}
 
 	println!("Total history:");
+	println!("==============");
 	menu_utils::display_expense_summary(&all_years, all_data, &"");
 }
 
