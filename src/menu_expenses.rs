@@ -24,7 +24,9 @@ fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses
 	menu_utils::display_and_accounting(all_data, month_data, |_| true)
 }
 
-fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyExpenses) {
+fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyExpenses)
+-> ExpenseSummary
+{
 	println!("Data from year: {}", year_data.year);
 	println!("====================");
 	
@@ -44,12 +46,20 @@ fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyExpenses) {
 
 	println!("This year's summary:");
 	menu_utils::display_expense_summary(&current_year, all_data, &"");
+
+	current_year
 }
 
 fn print_expense_data_all(all_data: &AllExpenses) {
+	let mut all_years = ExpenseSummary::new();
+
 	for year_expense in all_data.expenses.iter() {
-		print_expense_data_year(all_data, &year_expense);
+		let current_year = print_expense_data_year(all_data, &year_expense);
+		all_years.merge(current_year);
 	}
+
+	println!("Total history:");
+	menu_utils::display_expense_summary(&all_years, all_data, &"");
 }
 
 fn print_expense_data_year_user(all_data: &AllExpenses) {
