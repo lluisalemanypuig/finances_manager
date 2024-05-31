@@ -134,7 +134,13 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 	let month_data = year_data.add_month(&month);
 
 	println!("Price:");
-	let price: f32 = io::read_input_string().parse().unwrap();
+	let price: f32 = loop {
+		let str = io::read_input_string();
+		let num: Result<f32, std::num::ParseFloatError> = str.parse();
+		if num.is_ok() {
+			break num.unwrap();
+		}
+	};
 	
 	println!("Place:");
 	let place = io::read_input_string();
