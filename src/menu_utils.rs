@@ -174,6 +174,32 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	summary
 }
 
+pub fn display_full_summary(
+	vec_summary: &Vec<(String, (u32,f32))>,
+	title: String
+)
+{
+	let title_width =
+	std::cmp::max(
+		title.len(),
+		vec_summary
+		.iter()
+		.fold(0, |max, val| if val.0.len() > max { val.0.len() } else { max })
+	);
+	let title_main_divider = std::iter::repeat("—").take(title_width).collect::<String>();
+	let title_header = center_string(&title, title_width);
+
+	let tab = "    ";
+	println!("{tab}+—{title_main_divider}—+—————————————+———————————————————+");
+	println!("{tab}| {title_header} | Times found | Total money spent |");
+	println!("{tab}+—{title_main_divider}—+—————————————+———————————————————+");
+	for (thing, (num_times, total_value)) in vec_summary.iter() {
+		let thing_text = center_string( thing, title_width);
+		println!("{tab}| {thing_text} | {num_times:>11} | {total_value:>17.2} |");
+	}
+	println!("{tab}+—{title_main_divider}—+—————————————+———————————————————+");
+}
+
 pub fn read_correct_month() -> Option<date::Month> {
 	let mut month_str = io::read_input_string();
 	loop {
