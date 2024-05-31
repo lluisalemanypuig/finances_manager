@@ -212,16 +212,17 @@ fn print_statistics_menu() {
 	println!("    3.     History of expenses (sorted by value)");
 	println!("    4. By price");
 	println!("    5. By place");
-	println!("    6.     History of places (sorted by times)");
-	println!("    7.     History of places (sorted by value)");
-	println!("    8.     By substring");
+	println!("    6.     History of places (sorted alphabetically)");
+	println!("    7.     History of places (sorted by times)");
+	println!("    8.     History of places (sorted by value)");
+	println!("    9.     By substring");
 	println!("    0. Leave");
 }
 
 pub fn menu(all_data: &AllExpenses) {
 	let print_function = print_statistics_menu;
 	let min_option = 0;
-	let max_option = 8;
+	let max_option = 9;
 
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -232,9 +233,10 @@ pub fn menu(all_data: &AllExpenses) {
 			3 => history_of_expenses(&all_data, |a, b| b.1.1.total_cmp(&a.1.1)),
 			4 => statistics_by_price(&all_data),
 			5 => statistics_by_place(&all_data),
-			6 => history_of_places(&all_data, |a, b| b.1.0.cmp(&a.1.0)),
-			7 => history_of_places(&all_data, |a, b| b.1.1.total_cmp(&a.1.1)),
-			8 => statistics_by_place_substring(&all_data),
+			6 => history_of_places(&all_data, |a, b| a.0.cmp(&b.0)),
+			7 => history_of_places(&all_data, |a, b| b.1.0.cmp(&a.1.0)),
+			8 => history_of_places(&all_data, |a, b| b.1.1.total_cmp(&a.1.1)),
+			9 => statistics_by_place_substring(&all_data),
 			_ => println!("Nothing to do..."),
 		}
 		
