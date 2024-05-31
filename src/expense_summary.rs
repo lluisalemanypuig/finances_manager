@@ -30,4 +30,6 @@ impl ExpenseSummary {
         self.total_spent += other.total_spent;
         self.total_income += other.total_income;
     }
+
+    pub fn has_data(&self) -> bool { self.expense_to_price.len() > 0 }
 }
