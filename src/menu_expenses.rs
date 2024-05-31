@@ -251,10 +251,16 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	}
 
 	println!("Price: {} (leave blank to keep the value)", expense.price);
-	let price_str = io::read_input_string();
-	if price_str != "" {
-		expense.price = price_str.parse().unwrap();
-	}
+	expense.price = loop {
+		let str = io::read_input_string();
+		if str == "" {
+			break expense.price;
+		}
+		let num: Result<f32, std::num::ParseFloatError> = str.parse();
+		if num.is_ok() {
+			break num.unwrap();
+		}
+	};
 
 	println!("Place: {} (leave blank to keep the value)", expense.place);
 	let place = io::read_input_string();
