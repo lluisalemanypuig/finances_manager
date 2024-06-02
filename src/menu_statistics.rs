@@ -13,7 +13,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 	let expense_type = expense_type_opt.unwrap();
 
 	if !all_data.expense_types.has_expense_type(&expense_type) {
-		println!("Non existent data type '{expense_type}'.");
+		println!("Non existent expense type '{expense_type}'.");
 		return;
 	}
 
@@ -35,14 +35,18 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 			current_year.merge(current_month);
 		}
 
-		println!("This year's summary:");
-		menu_utils::display_expense_summary(&current_year, all_data, &"");
+		if current_year.has_data() {
+			println!("This year's summary:");
+			menu_utils::display_expense_summary(&current_year, all_data, &"");
 
-		all_years.merge(current_year);
+			all_years.merge(current_year);
+		}
 	}
 
-	println!("Total history:");
-	menu_utils::display_expense_summary(&all_years, all_data, &"");
+	if all_years.has_data() {
+		println!("Total history:");
+		menu_utils::display_expense_summary(&all_years, all_data, &"");
+	}
 }
 
 fn history_of_expenses<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> std::cmp::Ordering>
@@ -97,14 +101,17 @@ fn statistics_by_price(all_data: &AllExpenses) {
 			current_year.merge(current_month);
 		}
 
-		println!("This year's summary:");
-		menu_utils::display_expense_summary(&current_year, all_data, &"");
-
-		all_years.merge(current_year);
+		if current_year.has_data() {
+			println!("This year's summary:");
+			menu_utils::display_expense_summary(&current_year, all_data, &"");
+			all_years.merge(current_year);
+		}
 	}
 
-	println!("Total history:");
-	menu_utils::display_expense_summary(&all_years, all_data, &"");
+	if all_years.has_data() {
+		println!("Total history:");
+		menu_utils::display_expense_summary(&all_years, all_data, &"");
+	}
 }
 
 fn statistics_by_place(all_data: &AllExpenses) {
