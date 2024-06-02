@@ -242,6 +242,12 @@ fn edit_expense(all_data: &mut AllExpenses) {
 		return;
 	}
 
+	(|| {
+		let year_data = all_data.get_year(&year).unwrap();
+		let month_data = year_data.get_month(&month).unwrap();
+		menu_utils::display_and_accounting(all_data, month_data, |_| true);
+	})();
+
 	println!("Id of expense to be edited.");
 	let id_expense: usize = io::read_input_string().parse().unwrap();
 
