@@ -12,7 +12,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
 
-	if !all_data.expense_types.has_expense_type(&expense_type) {
+	if !all_data.expense_types.is_expense_type_ok(&expense_type) {
 		println!("Non existent expense type '{expense_type}'.");
 		return;
 	}
