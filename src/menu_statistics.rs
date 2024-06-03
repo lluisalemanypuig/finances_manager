@@ -243,9 +243,28 @@ pub fn menu(all_data: &AllExpenses) {
 			3 => history_of_expenses(&all_data, |a, b| b.1.1.total_cmp(&a.1.1)),
 			4 => statistics_by_price(&all_data),
 			5 => statistics_by_place(&all_data),
-			6 => history_of_places(&all_data, |a, b| a.0.cmp(&b.0)),
-			7 => history_of_places(&all_data, |a, b| b.1.0.cmp(&a.1.0)),
-			8 => history_of_places(&all_data, |a, b| b.1.1.total_cmp(&a.1.1)),
+			6 => history_of_places(
+				&all_data, 
+				|a, b| a.0.cmp(&b.0)
+			),
+			7 => history_of_places(
+				&all_data,
+				|a, b| {
+					if b.1.0 == a.1.0 {
+						return a.0.cmp(&b.0);
+					}
+					b.1.0.cmp(&a.1.0)
+				}
+			),
+			8 => history_of_places(
+				&all_data,
+				|a, b| {
+					if b.1.1 == a.1.1 {
+						return a.0.cmp(&b.0);
+					}
+					b.1.1.total_cmp(&a.1.1)
+				}
+			),
 			9 => statistics_by_place_substring(&all_data),
 			_ => println!("Nothing to do..."),
 		}
