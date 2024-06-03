@@ -56,10 +56,7 @@ fn remove_expense_type(all_data: &mut AllExpenses) {
 	println!("Enter the type of expense to remove:");
 	let expense_to_remove = io::read_string();
 
-	let idx_expense =
-		all_data.expense_types.position_expense_type(&expense_to_remove);
-
-	if let Some(idx) = idx_expense {
+	if let Some(idx) = all_data.expense_types.position_expense_type(&expense_to_remove) {
 		all_data.expense_types.remove_element(idx);
 	}
 	else {

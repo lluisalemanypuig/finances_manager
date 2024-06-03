@@ -268,20 +268,18 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	}
 
 	println!("Price: {} (leave blank to keep the value)", expense.price);
-	match read_float_or_empty::<f32>() {
-		Some(price) => expense.price = price,
-		None => {}
+	if let Some(price) = read_float_or_empty::<f32>() {
+		expense.price = price;
 	}
 
 	println!("Place: {} (leave blank to keep the value)", expense.place);
-	match io::read_string_or_empty() {
-		Some(value) => expense.place = value,
-		None => {}
+	if let Some(place) = io::read_string_or_empty() {
+		expense.place = place;
 	}
+
 	println!("Description: {} (leave blank to keep the value)", expense.description);
-	match io::read_string_or_empty() {
-		Some(value) => expense.description = value,
-		None => {}
+	if let Some(value) = io::read_string_or_empty() {
+		expense.description = value;
 	}
 	
 	year_data.set_changes(true);
@@ -306,16 +304,13 @@ fn remove_expense(all_data: &mut AllExpenses) {
 	}
 
 	println!("Id of expense to be deleted.");
-	let id_expense_opt = io::read_int_or_empty::<usize>();
-	if id_expense_opt.is_none() {
-		return;
+	if let Some(id_expense) = io::read_int_or_empty::<usize>() {
+		let year_data = all_data.add_year(&year);
+		let month_data = year_data.add_month(&month);
+
+		month_data.remove_expense(id_expense);
+		year_data.set_changes(true);
 	}
-
-	let year_data = all_data.add_year(&year);
-	let month_data = year_data.add_month(&month);
-
-	month_data.remove_expense(id_expense_opt.unwrap());
-	year_data.set_changes(true);
 }
 
 fn print_expenses_menu() {
