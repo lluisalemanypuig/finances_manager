@@ -24,9 +24,8 @@ pub fn read_string_or_empty() -> Option<String> {
 
 pub fn read_string() -> String {
 	loop {
-		match read_string_or_empty() {
-			Some(str) => break str,
-			None => {}
+		if let Some(str) = read_string_or_empty() {
+			break str;
 		}
 	}
 }
@@ -46,22 +45,21 @@ impl Numeric for f64 {}
 
 pub fn read_num_or_empty<T>() -> Option<T> where T: Numeric {
 	loop {
-		let str = read_string();
-		if str == "".to_string() {
-			break None;
+		if let Some(str) = read_string_or_empty() {
+			if let Ok(value) = str.parse::<T>() {
+				break Some(value);
+			}
 		}
-		match str.parse::<T>() {
-			Ok(value) => break Some(value),
-			Err(_) => {}
+		else {
+			break None;
 		}
 	}
 }
 
 pub fn read_num<T: FromStr>() -> T where T: Numeric {
 	loop {
-		let str = read_num_or_empty::<T>();
-		if str.is_some() {
-			break str.unwrap();
+		if let Ok(value) = read_string().parse::<T>() {
+			return value;
 		}
 	}
 }

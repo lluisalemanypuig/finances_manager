@@ -192,14 +192,14 @@ pub fn display_full_summary(
 }
 
 pub fn read_correct_expense_type(expense_types: &ExpenseTypes) -> Option<String> {
-	let mut expense_str = io::read_string();
 	loop {
-		if expense_str == "".to_string() {
+		if let Some(str) = io::read_string_or_empty() {
+			if expense_types.is_expense_type_ok(&str) {
+				return Some(str);
+			}
+		}
+		else {
 			return None;
 		}
-		if expense_types.is_expense_type_ok(&expense_str) {
-			return Some(expense_str);
-		}
-		expense_str = io::read_string();
 	}
 }

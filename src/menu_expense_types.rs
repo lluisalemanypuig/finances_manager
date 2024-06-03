@@ -17,7 +17,7 @@ fn add_expense_type(all_data: &mut AllExpenses) {
 	println!("Enter the new type of expense:");
 	let new_expense = io::read_string();
 
-	if all_data.expense_types.has_expense_type(&new_expense) {
+	if all_data.expense_types.is_expense_type_ok(&new_expense) {
 		println!("Expense type '{new_expense}' already exists.")
 	}
 	else {
