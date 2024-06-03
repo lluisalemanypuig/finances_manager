@@ -242,22 +242,22 @@ fn edit_expense(all_data: &mut AllExpenses) {
 		return;
 	}
 
-	(|| {
+	{
 		let year_data = all_data.get_year(&year).unwrap();
 		let month_data = year_data.get_month(&month).unwrap();
 		menu_utils::display_and_accounting(all_data, month_data, |_| true);
-	})();
+	}
 
 	println!("Id of expense to be edited.");
 	let id_expense: usize = io::read_input_string().parse().unwrap();
 
-	let expense_type_opt = || -> Option<String> {
+	let expense_type_opt: Option<String>;
+	{
 		let month_data = all_data.get_month(&year, &month).expect("Expected month data");
 		let expense = month_data.get_expense(id_expense);
-		
 		println!("Expense Type: {} (leave blank to keep the value)", expense.expense_type);
-		menu_utils::read_correct_expense_type(&all_data.expense_types)
-	}();
+		expense_type_opt = menu_utils::read_correct_expense_type(&all_data.expense_types)
+	}
 	
 	let year_data = all_data.add_year(&year);
 	let month_data = year_data.add_month(&month);
