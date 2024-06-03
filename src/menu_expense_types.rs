@@ -15,7 +15,7 @@ fn print_expense_types_all(all_data: &AllExpenses) {
 
 fn add_expense_type(all_data: &mut AllExpenses) {
 	println!("Enter the new type of expense:");
-	let new_expense = io::read_input_string();
+	let new_expense = io::read_string();
 
 	if all_data.expense_types.has_expense_type(&new_expense) {
 		println!("Expense type '{new_expense}' already exists.")
@@ -27,13 +27,13 @@ fn add_expense_type(all_data: &mut AllExpenses) {
 
 fn rename_expense_type(all_data: &mut AllExpenses) {
 	println!("Enter the type of expense to rename:");
-	let old_expense = io::read_input_string();
+	let old_expense = io::read_string();
 
 	let idx_old_expense = all_data.expense_types.position_expense_type(&old_expense);
 	
 	if let Some(idx_old) = idx_old_expense {
 		println!("Enter the new type of expense:");
-		let new_expense = io::read_input_string();
+		let new_expense = io::read_string();
 
 		all_data.expense_types.replace_element(idx_old, new_expense.clone());
 
@@ -54,7 +54,7 @@ fn rename_expense_type(all_data: &mut AllExpenses) {
 
 fn remove_expense_type(all_data: &mut AllExpenses) {
 	println!("Enter the type of expense to remove:");
-	let expense_to_remove = io::read_input_string();
+	let expense_to_remove = io::read_string();
 
 	let idx_expense =
 		all_data.expense_types.position_expense_type(&expense_to_remove);

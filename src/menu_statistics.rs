@@ -80,8 +80,8 @@ fn history_of_expenses<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> s
 }
 
 fn statistics_by_price(all_data: &AllExpenses) {
-	let lower: f32 = io::read_input_string().parse().unwrap();
-	let upper: f32 = io::read_input_string().parse().unwrap();
+	let lower: f32 = io::read_float();
+	let upper: f32 = io::read_float();
 
 	let mut all_years = ExpenseSummary::new();
 	for year_data in all_data.expenses.iter() {
@@ -115,7 +115,7 @@ fn statistics_by_price(all_data: &AllExpenses) {
 }
 
 fn statistics_by_place(all_data: &AllExpenses) {
-	let place: String = io::read_input_string();
+	let place: String = io::read_string();
 
 	let mut all_years = ExpenseSummary::new();
 	for year_data in all_data.expenses.iter() {
@@ -149,7 +149,7 @@ fn statistics_by_place(all_data: &AllExpenses) {
 }
 
 fn statistics_by_place_substring(all_data: &AllExpenses) {
-	let substring: String = io::read_input_string();
+	let substring: String = io::read_string();
 
 	let mut all_years = ExpenseSummary::new();
 	for year_data in all_data.expenses.iter() {

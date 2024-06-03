@@ -14,22 +14,13 @@ type AllExpenses = all_expenses::AllExpenses;
 type ExpenseSummary = expense_summary::ExpenseSummary;
 
 pub fn read_option<F: Fn()>(f: F, min_valid: u32, max_valid: u32) -> u32 {
-	f();
-	
-	let mut option = io::read_input_string();
-	
-	while option == "" {  option = io::read_input_string(); }
-	let mut option_int: u32 = option.parse().unwrap();
-	
-	while !(min_valid <= option_int && option_int <= max_valid) {
+	loop {
 		f();
-		
-		option = io::read_input_string();
-		while option == "" {  option = io::read_input_string(); }
-		option_int = option.parse().unwrap();
+		let option = io::read_int();
+		if min_valid <= option && option <= max_valid {
+			break option;
+		}
 	}
-	
-	option_int
 }
 
 fn center_string(s: &String, width: usize) -> String {
@@ -200,22 +191,8 @@ pub fn display_full_summary(
 	println!("{tab}+—{title_main_divider}—+—————————————+———————————————————+");
 }
 
-pub fn read_correct_month() -> Option<date::Month> {
-	let mut month_str = io::read_input_string();
-	loop {
-		if month_str == "".to_string() {
-			return None;
-		}
-		let month_res = month_str.parse::<date::Month>();
-		if let Ok(m) = month_res {
-			return Some(m);
-		}
-		month_str = io::read_input_string();
-	}
-}
-
 pub fn read_correct_expense_type(expense_types: &ExpenseTypes) -> Option<String> {
-	let mut expense_str = io::read_input_string();
+	let mut expense_str = io::read_string();
 	loop {
 		if expense_str == "".to_string() {
 			return None;
@@ -223,6 +200,6 @@ pub fn read_correct_expense_type(expense_types: &ExpenseTypes) -> Option<String>
 		if expense_types.is_expense_type_ok(&expense_str) {
 			return Some(expense_str);
 		}
-		expense_str = io::read_input_string();
+		expense_str = io::read_string();
 	}
 }

@@ -1,4 +1,4 @@
-use crate::date::Month;
+use crate::date;
 
 use crate::expense::Expense;
 use crate::monthly_expenses::MonthlyExpenses;
@@ -16,6 +16,99 @@ pub fn read_input_string() -> String {
 	s.trim().to_string()
 }
 
+pub fn read_string_or_empty() -> Option<String> {
+	let str = read_input_string();
+	if str == "".to_string() { return None; }
+	Some(str)
+}
+
+pub fn read_string() -> String {
+	loop {
+		match read_string_or_empty() {
+			Some(str) => break str,
+			None => {}
+		}
+	}
+}
+
+pub trait Numeric: FromStr {}
+impl Numeric for u8 {}
+impl Numeric for u16 {}
+impl Numeric for u32 {}
+impl Numeric for u64 {}
+impl Numeric for i8 {}
+impl Numeric for i16 {}
+impl Numeric for i32 {}
+impl Numeric for i64 {}
+impl Numeric for usize {}
+impl Numeric for f32 {}
+impl Numeric for f64 {}
+
+pub fn read_num_or_empty<T>() -> Option<T> where T: Numeric {
+	loop {
+		let str = read_string();
+		if str == "".to_string() {
+			break None;
+		}
+		match str.parse::<T>() {
+			Ok(value) => break Some(value),
+			Err(_) => {}
+		}
+	}
+}
+
+pub fn read_num<T: FromStr>() -> T where T: Numeric {
+	loop {
+		let str = read_num_or_empty::<T>();
+		if str.is_some() {
+			break str.unwrap();
+		}
+	}
+}
+
+pub trait Integral: Numeric {}
+impl Integral for u8 {}
+impl Integral for u16 {}
+impl Integral for u32 {}
+impl Integral for u64 {}
+impl Integral for usize {}
+
+pub fn read_int_or_empty<T: FromStr>() -> Option<T> where T: Integral {
+	read_num_or_empty::<T>()
+}
+
+pub fn read_int<T: FromStr>() -> T where T: Integral {
+	read_num::<T>()
+}
+
+pub trait Decimal: Numeric {}
+impl Decimal for f32 {}
+impl Decimal for f64 {}
+
+pub fn read_float_or_empty<T: FromStr>() -> Option<T> where T: Decimal {
+	read_num_or_empty::<T>()
+}
+
+pub fn read_float<T: FromStr>() -> T where T: Decimal {
+	read_num::<T>()
+}
+
+/* ------------------------------------------------------------------------- */
+
+pub fn read_correct_month() -> Option<date::Month> {
+	loop {
+		match read_string_or_empty() {
+			Some(str) => {
+				let month_res = str.parse::<date::Month>();
+				if let Ok(m) = month_res {
+					return Some(m);
+				}
+			},
+			None => {}
+		}
+	}
+}
+
 /* ------------------------------------------------------------------------- */
 
 pub fn read_expense_file(p: &std::path::PathBuf) -> YearlyExpenses {
@@ -28,10 +121,10 @@ pub fn read_expense_file(p: &std::path::PathBuf) -> YearlyExpenses {
 	}
 	
 	let mut monthly_expenses = MonthlyExpenses {
-		month: Month::January,
+		month: date::Month::January,
 		expenses : Vec::new()
 	};
-	let mut previous_month = Month::January;
+	let mut previous_month = date::Month::January;
 	
 	let file = std::fs::File::open(p).expect("Failed to open file");
 	let reader = std::io::BufReader::new(file);

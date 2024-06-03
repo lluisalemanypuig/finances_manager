@@ -3,6 +3,7 @@ use chrono::prelude::*;
 
 use crate::date;
 use crate::io;
+use crate::io::read_float_or_empty;
 use crate::menu_utils;
 
 use crate::expense;
@@ -65,7 +66,7 @@ fn print_expense_data_all(all_data: &AllExpenses) {
 
 fn print_expense_data_year_user(all_data: &AllExpenses) {
 	println!("What year do you want to see?");
-	let year: u32 = io::read_input_string().parse().unwrap();
+	let year: u32 = io::read_int();
 	
 	let res = all_data.get_year(&year);
 	if let Some(year) = res {
@@ -93,13 +94,13 @@ fn print_expense_data_year_current(all_data: &AllExpenses) {
 
 fn print_expense_data_month_user(all_data: &AllExpenses) {
 	println!("What year and month do you want to see? Year -> Month");
-	let year: u32 = io::read_input_string().parse().unwrap();
+	let year: u32 = io::read_int();
 	if !all_data.has_year(&year) {
 		println!("Year '{year}' does not exist.");
 		return;
 	}
 	
-	let month_opt = menu_utils::read_correct_month();
+	let month_opt = io::read_correct_month();
 	if month_opt.is_none() { return; }
 	let month = month_opt.unwrap();
 	
@@ -145,19 +146,13 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 	let month_data = year_data.add_month(&month);
 
 	println!("Price:");
-	let price: f32 = loop {
-		let str = io::read_input_string();
-		let num: Result<f32, std::num::ParseFloatError> = str.parse();
-		if num.is_ok() {
-			break num.unwrap();
-		}
-	};
+	let price: f32 = io::read_float();
 	
 	println!("Place:");
-	let place = io::read_input_string();
+	let place = io::read_string();
 
 	println!("Description:");
-	let description = io::read_input_string();
+	let description = io::read_string();
 
 	month_data.add_expense(Expense {
 		day_of_year : date::Date { year, month, day},
@@ -171,15 +166,15 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 
 fn add_new_expense(all_data: &mut AllExpenses) {
 	println!("Year:");
-	let year: u32 = io::read_input_string().parse().unwrap();
+	let year: u32 = io::read_int();
 
 	println!("Month:");
-	let month_opt = menu_utils::read_correct_month();
+	let month_opt = io::read_correct_month();
 	if month_opt.is_none() { return; }
 	let month = month_opt.unwrap();
 
 	println!("Day:");
-	let day: u8 = io::read_input_string().parse().unwrap();
+	let day: u8 = io::read_int();
 
 	add_new_expense_with_date(all_data, year, month, day);
 }
@@ -202,23 +197,26 @@ fn add_new_expense_today(all_data: &mut AllExpenses) {
 
 fn add_new_expense_to_year_month(all_data: &mut AllExpenses) {
 	println!("Year:");
-	let year: u32 = io::read_input_string().parse().unwrap();
+	let year: u32 = io::read_int();
 
 	println!("Month:");
-	let month_opt = menu_utils::read_correct_month();
+	let month_opt = io::read_correct_month();
 	if month_opt.is_none() { return; }
 	let month = month_opt.unwrap();
 
 	let mut changes: bool = false;
 	loop {
 		println!("Day:");
-		let day_str = io::read_input_string();
-		if day_str == "" { break; }
-		let day: u8 = day_str.parse().unwrap();
-
-		add_new_expense_with_date(all_data, year, month.clone(), day);
-		changes = true;
-		println!("");
+		match io::read_int_or_empty::<u8>() {
+			Some(day) => {
+				add_new_expense_with_date(all_data, year, month.clone(), day);
+				changes = true;
+				println!("");
+			},
+			None => {
+				break;
+			}
+		}
 	}
 
 	all_data.get_year_mut(&year).unwrap().set_changes(changes);
@@ -226,14 +224,14 @@ fn add_new_expense_to_year_month(all_data: &mut AllExpenses) {
 
 fn edit_expense(all_data: &mut AllExpenses) {
 	println!("Select year:");
-	let year: u32 = io::read_input_string().parse().unwrap();
+	let year: u32 = io::read_int();
 	if !all_data.has_year(&year) {
 		println!("Year '{year}' does not exist.");
 		return;
 	}
 	
 	println!("Select month:");
-	let month_opt = menu_utils::read_correct_month();
+	let month_opt = io::read_correct_month();
 	if month_opt.is_none() { return; }
 	let month = month_opt.unwrap();
 
@@ -243,13 +241,15 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	}
 
 	{
-		let year_data = all_data.get_year(&year).unwrap();
-		let month_data = year_data.get_month(&month).unwrap();
-		menu_utils::display_and_accounting(all_data, month_data, |_| true);
+	let year_data = all_data.get_year(&year).unwrap();
+	let month_data = year_data.get_month(&month).unwrap();
+	menu_utils::display_and_accounting(all_data, month_data, |_| true);
 	}
 
 	println!("Id of expense to be edited.");
-	let id_expense: usize = io::read_input_string().parse().unwrap();
+	let id_expense_opt = io::read_int_or_empty::<usize>();
+	if id_expense_opt.is_none() { return; }
+	let id_expense = id_expense_opt.unwrap();
 
 	let expense_type_opt: Option<String>;
 	{
@@ -268,41 +268,35 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	}
 
 	println!("Price: {} (leave blank to keep the value)", expense.price);
-	expense.price = loop {
-		let str = io::read_input_string();
-		if str == "" {
-			break expense.price;
-		}
-		let num: Result<f32, std::num::ParseFloatError> = str.parse();
-		if num.is_ok() {
-			break num.unwrap();
-		}
-	};
+	match read_float_or_empty::<f32>() {
+		Some(price) => expense.price = price,
+		None => {}
+	}
 
 	println!("Place: {} (leave blank to keep the value)", expense.place);
-	let place = io::read_input_string();
-	if place != "" {
-		expense.place = place;
+	match io::read_string_or_empty() {
+		Some(value) => expense.place = value,
+		None => {}
 	}
 	println!("Description: {} (leave blank to keep the value)", expense.description);
-	let description = io::read_input_string();
-	if description != "" {
-		expense.description = description;
+	match io::read_string_or_empty() {
+		Some(value) => expense.description = value,
+		None => {}
 	}
-
+	
 	year_data.set_changes(true);
 }
 
 fn remove_expense(all_data: &mut AllExpenses) {
 	println!("Select year:");
-	let year: u32 = io::read_input_string().parse().unwrap();
+	let year: u32 = io::read_int();
 	if !all_data.has_year(&year) {
 		println!("Year '{year}' does not exist.");
 		return;
 	}
 	
 	println!("Select month:");
-	let month_opt = menu_utils::read_correct_month();
+	let month_opt = io::read_correct_month();
 	if month_opt.is_none() { return; }
 	let month = month_opt.unwrap();
 
@@ -312,12 +306,15 @@ fn remove_expense(all_data: &mut AllExpenses) {
 	}
 
 	println!("Id of expense to be deleted.");
-	let id_expense: usize = io::read_input_string().parse().unwrap();
+	let id_expense_opt = io::read_int_or_empty::<usize>();
+	if id_expense_opt.is_none() {
+		return;
+	}
 
 	let year_data = all_data.add_year(&year);
 	let month_data = year_data.add_month(&month);
 
-	month_data.remove_expense(id_expense);
+	month_data.remove_expense(id_expense_opt.unwrap());
 	year_data.set_changes(true);
 }
 
