@@ -184,7 +184,10 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 	let place = io::read_string();
 
 	println!("Description:");
-	let description = io::read_string();
+	let description = match io::read_string_or_empty() {
+		Some(str) => str,
+		None => "".to_string()
+	};
 
 	month_data.add_expense(Expense {
 		day_of_year : date::Date { year, month, day},
