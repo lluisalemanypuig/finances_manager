@@ -108,7 +108,7 @@ impl std::str::FromStr for Income {
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		let parts: Vec<String> = split_string_data(s);
 		let [d, pr, co, fr, pl, descr] = parts.as_slice() else {
-			panic!("Can't segment string '{s}' into five parts")
+			panic!("Can't segment string '{s}' into six parts")
 		};
 		
 		let date_fromstr = d.parse::<date::Date>().map_err(|_| ParseIncomeError)?;

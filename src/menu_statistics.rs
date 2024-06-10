@@ -36,7 +36,7 @@ use crate::menu_utils;
 use crate::all_activities;
 use crate::expense_summary;
 
-type AllExpenses = all_activities::AllExpenses;
+type AllExpenses = all_activities::AllActivities;
 type ExpenseSummary = expense_summary::ExpenseSummary;
 
 fn statistics_by_expense_type(all_data: &AllExpenses) {
@@ -50,17 +50,16 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 	}
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.expenses.iter() {
+	for year_data in all_data.activities.iter() {
 		println!("Data from year: {}", year_data.year);
 		println!("====================");
 		println!("");
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.expenses.iter() {
+		for month_data in year_data.activities.iter() {
 
 			let current_month = menu_utils::display_and_accounting(
-				all_data,
 				month_data,
 				|e| e.expense_type == expense_type
 			);
@@ -69,7 +68,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 
 		if current_year.has_data() {
 			println!("This year's summary:");
-			menu_utils::display_expense_summary(&current_year, all_data, &"");
+			menu_utils::display_expense_summary(&current_year, &"");
 
 			all_years.merge(current_year);
 		}
@@ -77,7 +76,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 
 	if all_years.has_data() {
 		println!("Total history:");
-		menu_utils::display_expense_summary(&all_years, all_data, &"");
+		menu_utils::display_expense_summary(&all_years, &"");
 	}
 }
 
@@ -87,9 +86,9 @@ fn history_of_expenses<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> s
 
 	let mut summary: std::collections::BTreeMap<String, (u32, f32)> = std::collections::BTreeMap::new();
 
-	for year in all_data.expenses.iter() {
-		for month in year.expenses.iter() {
-			for exp in month.expenses.iter().filter(|e| e.expense_type != all_data.expense_types.income_name) {
+	for year in all_data.activities.iter() {
+		for month in year.activities.iter() {
+			for exp in month.expenses.iter().filter(|e| e.expense_type != "Income") {
 
 				match summary.get_mut(&exp.expense_type) {
 					Some( (num_times, total_value) ) => {
@@ -116,17 +115,16 @@ fn statistics_by_price(all_data: &AllExpenses) {
 	let upper: f32 = io::read_float();
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.expenses.iter() {
+	for year_data in all_data.activities.iter() {
 		println!("Data from year: {}", year_data.year);
 		println!("====================");
 		println!("");
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.expenses.iter() {
+		for month_data in year_data.activities.iter() {
 
 			let current_month = menu_utils::display_and_accounting(
-				all_data,
 				month_data,
 				|e| lower <= e.price && e.price <= upper
 			);
@@ -135,14 +133,14 @@ fn statistics_by_price(all_data: &AllExpenses) {
 
 		if current_year.has_data() {
 			println!("This year's summary:");
-			menu_utils::display_expense_summary(&current_year, all_data, &"");
+			menu_utils::display_expense_summary(&current_year, &"");
 			all_years.merge(current_year);
 		}
 	}
 
 	if all_years.has_data() {
 		println!("Total history:");
-		menu_utils::display_expense_summary(&all_years, all_data, &"");
+		menu_utils::display_expense_summary(&all_years, &"");
 	}
 }
 
@@ -150,17 +148,16 @@ fn statistics_by_place(all_data: &AllExpenses) {
 	let place: String = io::read_string();
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.expenses.iter() {
+	for year_data in all_data.activities.iter() {
 		println!("Data from year: {}", year_data.year);
 		println!("====================");
 		println!("");
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.expenses.iter() {
+		for month_data in year_data.activities.iter() {
 
-			let current_month = menu_utils::display_and_accounting(
-				all_data,
+			let current_month: expense_summary::ExpenseSummary = menu_utils::display_and_accounting(
 				month_data,
 				|e| e.place == place
 			);
@@ -169,14 +166,14 @@ fn statistics_by_place(all_data: &AllExpenses) {
 
 		if current_year.has_data() {
 			println!("This year's summary:");
-			menu_utils::display_expense_summary(&current_year, all_data, &"");
+			menu_utils::display_expense_summary(&current_year, &"");
 			all_years.merge(current_year);
 		}
 	}
 
 	if all_years.has_data() {
 		println!("Total history:");
-		menu_utils::display_expense_summary(&all_years, all_data, &"");
+		menu_utils::display_expense_summary(&all_years, &"");
 	}
 }
 
@@ -184,17 +181,16 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 	let substring: String = io::read_string();
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.expenses.iter() {
+	for year_data in all_data.activities.iter() {
 		println!("Data from year: {}", year_data.year);
 		println!("--------------------");
 		println!("");
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.expenses.iter() {
+		for month_data in year_data.activities.iter() {
 
 			let current_month = menu_utils::display_and_accounting(
-				all_data,
 				month_data,
 				|e| e.place.contains(&substring)
 			);
@@ -203,7 +199,7 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 
 		if current_year.has_data() {
 			println!("This year's summary:");
-			menu_utils::display_expense_summary(&current_year, all_data, &"");
+			menu_utils::display_expense_summary(&current_year, &"");
 
 			all_years.merge(current_year);
 		}
@@ -212,7 +208,7 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 	if all_years.has_data() {
 		println!("Total history:");
 		println!("==============");
-		menu_utils::display_expense_summary(&all_years, all_data, &"");
+		menu_utils::display_expense_summary(&all_years, &"");
 	}
 }
 
@@ -222,9 +218,9 @@ fn history_of_places<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> std
 
 	let mut summary: std::collections::BTreeMap<String, (u32, f32)> = std::collections::BTreeMap::new();
 
-	for year in all_data.expenses.iter() {
-		for month in year.expenses.iter() {
-			for exp in month.expenses.iter().filter(|e| e.expense_type != all_data.expense_types.income_name) {
+	for year in all_data.activities.iter() {
+		for month in year.activities.iter() {
+			for exp in month.expenses.iter().filter(|e| e.expense_type != "Income") {
 
 				match summary.get_mut(&exp.place) {
 					Some( (num_times, total_value) ) => {

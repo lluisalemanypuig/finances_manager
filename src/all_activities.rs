@@ -38,22 +38,22 @@ use crate::monthly_activities::MonthlyActivities;
 use crate::yearly_activities::YearlyActivities;
 
 #[derive(Debug)]
-pub struct AllExpenses {
+pub struct AllActivities {
 	pub min_year: u32,
 	pub max_year: u32,
 	pub expense_types: ConceptTypes,
 	pub income_types: ConceptTypes,
-	pub expenses: Vec<YearlyActivities>
+	pub activities: Vec<YearlyActivities>
 }
 
-impl AllExpenses {
-	pub fn new() -> AllExpenses {
-		AllExpenses {
+impl AllActivities {
+	pub fn new() -> AllActivities {
+		AllActivities {
 			min_year: 9999,
 			max_year: 0,
-			expense_types: ConceptTypes::new("".to_string()),
-			income_types: ConceptTypes::new("".to_string()),
-			expenses: Vec::new()
+			expense_types: ConceptTypes::new(),
+			income_types: ConceptTypes::new(),
+			activities: Vec::new()
 		}
 	}
 
@@ -67,9 +67,9 @@ impl AllExpenses {
 			return None;
 		}
 		
-		let res = self.expenses.binary_search_by(|e| e.year.cmp(&y));
+		let res = self.activities.binary_search_by(|e| e.year.cmp(&y));
 		if let Ok(idx) = res {
-			Some( self.expenses[idx].convert() )
+			Some( self.activities[idx].convert() )
 		}
 		else {
 			None
@@ -86,7 +86,7 @@ impl AllExpenses {
 	}
 
 	pub fn has_year(&self, y: &u32) -> bool {
-		let res = self.expenses.binary_search_by(|e| e.year.cmp(&y));
+		let res = self.activities.binary_search_by(|e| e.year.cmp(&y));
 		match res {
 			Ok(_) => true,
 			Err(_) => false,
@@ -94,15 +94,15 @@ impl AllExpenses {
 	}
 
 	pub fn add_year(&mut self, y: &u32) -> &mut YearlyActivities {
-		let res = self.expenses.binary_search_by(|e| e.year.cmp(&y));
+		let res = self.activities.binary_search_by(|e| e.year.cmp(&y));
 		match res {
 			Ok(pos) => {
 				// year already exists
-				&mut self.expenses[pos]
+				&mut self.activities[pos]
 			},
 			Err(pos) => {
 				// year does not exist
-				self.expenses.insert(pos,
+				self.activities.insert(pos,
 					YearlyActivities::new_year(y, true)
 				);
 				if self.min_year > *y {
@@ -111,8 +111,21 @@ impl AllExpenses {
 				if self.max_year < *y {
 					self.max_year = *y;
 				}
-				&mut self.expenses[pos]
+				&mut self.activities[pos]
 			}
+		}
+	}
+
+	pub fn push_year(&mut self, y: YearlyActivities) {
+		self.activities.push(y);
+	}
+
+	pub fn merge(&mut self, year_acts: YearlyActivities) {
+		if !self.has_year(&year_acts.year) {
+			self.push_year(year_acts);
+		}
+		else {
+			self.get_year_mut(&year_acts.year).unwrap().merge(year_acts);
 		}
 	}
 

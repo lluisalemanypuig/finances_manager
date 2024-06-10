@@ -33,9 +33,10 @@
 use crate::date;
 
 use crate::expense::Expense;
+use crate::income::Income;
 use crate::monthly_activities::MonthlyActivities;
 use crate::yearly_activities::YearlyActivities;
-use crate::all_activities::AllExpenses;
+use crate::all_activities::AllActivities;
 
 use std::io::{BufRead, Write, Result};
 use std::str::FromStr;
@@ -165,7 +166,7 @@ pub fn read_expense_file(p: &std::path::PathBuf) -> YearlyActivities {
 		}
 		else {
 			if monthly_expenses.expenses.len() > 0 {
-				yearly_expenses.expenses.push(monthly_expenses);
+				yearly_expenses.activities.push(monthly_expenses);
 			}
 			
 			monthly_expenses = MonthlyActivities {
@@ -179,15 +180,58 @@ pub fn read_expense_file(p: &std::path::PathBuf) -> YearlyActivities {
 		}
 	}
 	
-	yearly_expenses.expenses.push(monthly_expenses);
+	yearly_expenses.activities.push(monthly_expenses);
 	return yearly_expenses;
 }
 
-pub fn read_all_expense_data(data_dir: &String) -> AllExpenses {
-	let mut all_data = AllExpenses::new();
+pub fn read_income_file(p: &std::path::PathBuf) -> YearlyActivities {
+	let mut yearly_income = YearlyActivities::new();
 	
-	// all files
-	let paths = std::fs::read_dir(data_dir.to_owned() + &"/expenses").unwrap();
+	if let Some(file_name) = p.file_name() {
+		if let Some(file_str) = file_name.to_str() {
+			yearly_income.year = file_str[..4].parse::<u32>().unwrap();
+		}
+	}
+	
+	let mut monthly_income = MonthlyActivities::new();
+	let mut previous_month = date::Month::January;
+	
+	let file = std::fs::File::open(p).expect("Failed to open file");
+	let reader = std::io::BufReader::new(file);
+	for line in reader.lines() {
+		let l = line.unwrap();
+		if l == "" { continue; }
+		
+		let e = Income::from_str(&l).expect("Expected expense");
+		
+		if e.day_of_year.month == previous_month {
+			monthly_income.incomes.push(e);
+		}
+		else {
+			if monthly_income.incomes.len() > 0 {
+				yearly_income.activities.push(monthly_income);
+			}
+			
+			monthly_income = MonthlyActivities {
+				month: e.day_of_year.month.clone(),
+				expenses : Vec::new(),
+				incomes: Vec::new()
+			};
+			
+			previous_month = e.day_of_year.month.clone();
+			monthly_income.incomes.push(e);
+		}
+	}
+	
+	yearly_income.activities.push(monthly_income);
+	return yearly_income;
+}
+
+pub fn read_all_activities_data(data_dir: &String) -> AllActivities {
+	let mut all_data = AllActivities::new();
+	
+	{
+	let paths = std::fs::read_dir(data_dir.to_owned() + &"expenses").unwrap();
 	for path in paths {
 		let path = path.unwrap().path();
 		
@@ -201,17 +245,36 @@ pub fn read_all_expense_data(data_dir: &String) -> AllExpenses {
 		if all_data.max_year < r.year {
 			all_data.max_year = r.year;
 		}
-		all_data.expenses.push(r);
+		all_data.activities.push(r);
 	}
-	all_data.expenses.sort();
+	}
+	{
+	let paths = std::fs::read_dir(data_dir.to_owned() + &"incomes").unwrap();
+	for path in paths {
+		let path = path.unwrap().path();
+		
+		println!("        Reading '{}'...", path.display());
+		
+		let r = read_income_file(&path);
+		
+		if all_data.min_year > r.year {
+			all_data.min_year = r.year;
+		}
+		if all_data.max_year < r.year {
+			all_data.max_year = r.year;
+		}
+		all_data.merge(r);
+	}
+	}
+	all_data.activities.sort();
 	
 	all_data
 }
 
-pub fn read_expense_types(data_dir: &String) -> Vec<String> {
-	let mut expense_types = Vec::new();
+fn read_types(data_dir: &String, filename: String) -> Vec<String> {
+	let mut types = Vec::new();
 
-	let path = data_dir.to_owned() + &"/expense_types.txt";
+	let path = data_dir.to_owned() + &filename;
 	let file = std::fs::File::open( path.clone() ).expect("Failed to open file");
 
 	println!("        Reading '{path}'...");
@@ -220,26 +283,30 @@ pub fn read_expense_types(data_dir: &String) -> Vec<String> {
 	for line in reader.lines() {
 		let l = line.unwrap();
 		if l == "" { continue; }
-		
-		expense_types.push( l.trim().to_string() );
+		types.push( l.trim().to_string() );
 	}
+	types
+}
 
-	expense_types
+pub fn read_expense_types(data_dir: &String) -> Vec<String> {
+	read_types(data_dir, "expense_types.txt".to_string())
+}
+
+pub fn read_income_types(data_dir: &String) -> Vec<String> {
+	read_types(data_dir, "income_types.txt".to_string())
 }
 
 /* ------------------------------------------------------------------------- */
 
-pub fn write_all_expense_data(data_dir: &String, all_data: &AllExpenses) -> Result<()> {
-	for ye in all_data.expenses.iter() {
+pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()> {
+	for ye in all_data.activities.iter() {
 		if !ye.has_changes() { continue; }
 		
-		let filename = data_dir.to_owned() + &format!("/expenses/{}.txt", ye.year).to_string();
-		println!("Writing into '{filename}'...");
-		
-		let mut file = std::fs::File::create(filename).expect("I wanted to create a file");
-		
-		for me in ye.expenses.iter() {
-			
+		{
+		let expense_filename = data_dir.to_owned() + &format!("/expenses/{}.txt", ye.year).to_string();
+		println!("Writing into '{expense_filename}'...");
+		let mut expense_file = std::fs::File::create(expense_filename).expect("I wanted to create a file");
+		for me in ye.activities.iter() {
 			for Expense {
 				day_of_year: d,
 				price: pr,
@@ -249,17 +316,44 @@ pub fn write_all_expense_data(data_dir: &String, all_data: &AllExpenses) -> Resu
 			}
 			in me.expenses.iter()
 			{
-				writeln!(file, "{d} {pr} \"{et}\" \"{pl}\" \"{descr}\"")?;
+				writeln!(expense_file, "{d} {pr} \"{et}\" \"{pl}\" \"{descr}\"")?;
 			}
+		}
+		}
+
+		{
+		let income_filename = data_dir.to_owned() + &format!("/incomes/{}.txt", ye.year).to_string();
+		println!("Writing into '{income_filename}'...");
+		let mut income_file = std::fs::File::create(income_filename).expect("I wanted to create a file");
+		for me in ye.activities.iter() {
+			for Income {
+				day_of_year: d,
+				price: pr,
+				concept: ct,
+				from: fr,
+				place: pl,
+				description: descr
+			}
+			in me.incomes.iter()
+			{
+				writeln!(income_file, "{d} {pr} \"{ct}\" \"{fr}\" \"{pl}\" \"{descr}\"")?;
+			}
+		}
 		}
 	}
 	if all_data.expense_types.has_changes() {
 		let filename = data_dir.to_owned() + &"/expense_types.txt".to_string();
 		println!("Writing into '{filename}'...");
-		
 		let mut file = std::fs::File::create(filename).expect("I wanted to create a file");
-		
 		for et in all_data.expense_types.types.iter() {
+			writeln!(file, "{et}")?;
+		}
+	}
+	if all_data.income_types.has_changes() {
+		let filename = data_dir.to_owned() + &"/income_types.txt".to_string();
+		println!("Writing into '{filename}'...");
+		let mut file = std::fs::File::create(filename).expect("I wanted to create a file");
+		for et in all_data.income_types.types.iter() {
 			writeln!(file, "{et}")?;
 		}
 	}

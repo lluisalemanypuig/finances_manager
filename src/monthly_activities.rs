@@ -104,4 +104,20 @@ impl MonthlyActivities {
 	pub fn num_incomes(&self) -> usize {
 		self.incomes.len()
 	}
+
+	fn merge_expenses(&mut self, v: Vec<Expense>) {
+		for e in v.into_iter() {
+			add_to_vector(&mut self.expenses, e);
+		}
+	}
+	fn merge_incomes(&mut self, v: Vec<Income>) {
+		for i in v.into_iter() {
+			add_to_vector(&mut self.incomes, i);
+		}
+	}
+
+	pub fn merge(&mut self, month: MonthlyActivities) {
+		self.merge_expenses(month.expenses);
+		self.merge_incomes(month.incomes);
+	}
 }

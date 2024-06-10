@@ -47,24 +47,24 @@ use crate::expense_summary;
 type Expense = expense::Expense;
 type MonthlyActivities = monthly_activities::MonthlyActivities;
 type YearlyActivities = yearly_activities::YearlyActivities;
-type AllExpenses = all_activities::AllExpenses;
+type AllExpenses = all_activities::AllActivities;
 
 type ExpenseSummary = expense_summary::ExpenseSummary;
 
-fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyActivities)
+fn print_expense_data_month(month_data: &MonthlyActivities)
 -> ExpenseSummary
 {
-	menu_utils::display_and_accounting(all_data, month_data, |_| true)
+	menu_utils::display_and_accounting(month_data, |_| true)
 }
 
-fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyActivities)
+fn print_expense_data_year(year_data: &YearlyActivities)
 -> ExpenseSummary
 {
 	println!("Data from year: {}", year_data.year);
 	println!("--------------------");
 	
 	let mut total_entries = 0;
-	for month_data in year_data.expenses.iter() {
+	for month_data in year_data.activities.iter() {
 		total_entries += month_data.expenses.len();
 	}
 	
@@ -72,13 +72,13 @@ fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyActivities)
 
 	println!("    Found {} entries", total_entries);
 	println!("");
-	for month_data in year_data.expenses.iter() {
-		let current_month = print_expense_data_month(all_data, month_data);
+	for month_data in year_data.activities.iter() {
+		let current_month = print_expense_data_month(month_data);
 		current_year.merge(current_month);
 	}
 
 	println!("This year's summary:");
-	menu_utils::display_expense_summary(&current_year, all_data, &"");
+	menu_utils::display_expense_summary(&current_year, &"");
 
 	current_year
 }
@@ -86,14 +86,14 @@ fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyActivities)
 fn print_expense_data_all(all_data: &AllExpenses) {
 	let mut all_years = ExpenseSummary::new();
 
-	for year_expense in all_data.expenses.iter() {
-		let current_year = print_expense_data_year(all_data, &year_expense);
+	for year_expense in all_data.activities.iter() {
+		let current_year = print_expense_data_year(&year_expense);
 		all_years.merge(current_year);
 	}
 
 	println!("Total history:");
 	println!("==============");
-	menu_utils::display_expense_summary(&all_years, all_data, &"");
+	menu_utils::display_expense_summary(&all_years, &"");
 }
 
 fn print_expense_data_year_user(all_data: &AllExpenses) {
@@ -102,7 +102,7 @@ fn print_expense_data_year_user(all_data: &AllExpenses) {
 	
 	let res = all_data.get_year(&year);
 	if let Some(year) = res {
-		print_expense_data_year(all_data, year);
+		print_expense_data_year(year);
 	}
 	else {
 		println!("Year '{year}' does not exist!");
@@ -117,7 +117,7 @@ fn print_expense_data_year_current(all_data: &AllExpenses) {
 
 	let res = all_data.get_year(&year);
 	if let Some(year) = res {
-		print_expense_data_year(all_data, year);
+		print_expense_data_year(year);
 	}
 	else {
 		println!("Year '{year}' does not exist!");
@@ -138,7 +138,7 @@ fn print_expense_data_month_user(all_data: &AllExpenses) {
 	
 	let res = all_data.get_month(&year, &month);
 	if let Some(&ref month_data) = res {
-		print_expense_data_month(all_data, &month_data);
+		print_expense_data_month(&month_data);
 	}
 	else {
 		println!("Month '{month}' does not exist in year '{year}'.");
@@ -159,7 +159,7 @@ fn print_expense_data_month_current(all_data: &AllExpenses) {
 	
 	let res = all_data.get_month(&year, &month);
 	if let Some(&ref month_data) = res {
-		print_expense_data_month(all_data, &month_data);
+		print_expense_data_month(&month_data);
 	}
 	else {
 		println!("Month '{month}' does not exist in year '{year}'.");
@@ -278,7 +278,7 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	{
 	let year_data = all_data.get_year(&year).unwrap();
 	let month_data = year_data.get_month(&month).unwrap();
-	menu_utils::display_and_accounting(all_data, month_data, |_| true);
+	menu_utils::display_and_accounting(month_data, |_| true);
 	}
 
 	println!("Id of expense to be edited.");

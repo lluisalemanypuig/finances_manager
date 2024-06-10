@@ -34,23 +34,20 @@
 pub struct ConceptTypes {
 	changes: bool,
 
-	pub types: Vec<String>,
-	pub income_name: String
+	pub types: Vec<String>
 }
 
 impl ConceptTypes {
-	pub fn new(income_name: String) -> ConceptTypes {
+	pub fn new() -> ConceptTypes {
 		ConceptTypes {
 			changes: false,
-			types: Vec::new(),
-			income_name
+			types: Vec::new()
 		}
 	}
-	pub fn new_vec(ts: Vec<String>, income_name: String) -> ConceptTypes {
+	pub fn new_vec(ts: Vec<String>) -> ConceptTypes {
 		ConceptTypes {
 			changes: false,
-			types: ts,
-			income_name
+			types: ts
 		}
 	}
 
@@ -83,9 +80,7 @@ impl ConceptTypes {
 	}
 
 	pub fn is_type_ok(&self, expense_type: &String) -> bool {
-		let is_expense = self.has_type(expense_type);
-		let is_income = self.income_name == *expense_type;
-		is_expense || is_income
+		self.has_type(expense_type)
 	}
 
 }

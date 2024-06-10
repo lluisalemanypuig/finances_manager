@@ -38,7 +38,7 @@ pub struct YearlyActivities {
 	changes: bool,
 
 	pub year: u32,
-	pub expenses: Vec<MonthlyActivities>
+	pub activities: Vec<MonthlyActivities>
 }
 
 impl Eq for YearlyActivities {}
@@ -85,13 +85,13 @@ impl YearlyActivities {
 		YearlyActivities {
 			changes: false,
 			year: 0,
-			expenses: Vec::new()
+			activities: Vec::new()
 		}
 	}
 	pub fn new_year(y: &u32, changes: bool) -> YearlyActivities {
 		YearlyActivities {
 			year: *y,
-			expenses: Vec::new(),
+			activities: Vec::new(),
 			changes
 		}
 	}
@@ -105,7 +105,7 @@ impl YearlyActivities {
 	}
 
 	pub fn has_month(&self, m: &Month) -> bool {
-		let res = self.expenses.binary_search_by(|e| e.month.cmp(&m));
+		let res = self.activities.binary_search_by(|e| e.month.cmp(&m));
 		match res {
 			Ok(_) => true,
 			Err(_) => false
@@ -118,30 +118,39 @@ impl YearlyActivities {
 		[get_month_mut]  [as_mut]  [&mut type]    ;
 	)]
 	pub fn method(self: reference([Self]), m: &Month) -> Option<reference([MonthlyActivities])> {
-		let res = self.expenses.binary_search_by(|e| e.month.cmp(&m));
+		let res = self.activities.binary_search_by(|e| e.month.cmp(&m));
 		match res {
-			Ok(idx) => Some(self.expenses[idx].convert()),
+			Ok(idx) => Some(self.activities[idx].convert()),
 			Err(_) => None
 		}
 	}
 
 	pub fn add_month(&mut self, m: &Month) -> &mut MonthlyActivities {
-		let res = self.expenses.binary_search_by(|e| e.month.cmp(&m));
+		let res = self.activities.binary_search_by(|e| e.month.cmp(&m));
 		match res {
 			Ok(pos) => {
 				// month already exists
-				&mut self.expenses[pos]
+				&mut self.activities[pos]
 			},
 			Err(pos) => {
 				// month does not exist
-				self.expenses.insert(pos, 
-					MonthlyActivities {
-						month: m.clone(),
-						expenses: Vec::new(),
-						incomes: Vec::new()
-					}
-				);
-				&mut self.expenses[pos]
+				self.activities.insert(pos, MonthlyActivities::new());
+				&mut self.activities[pos]
+			}
+		}
+	}
+
+	pub fn push_month(&mut self, m: MonthlyActivities) {
+		self.activities.push(m);
+	}
+
+	pub fn merge(&mut self, year_acts: YearlyActivities) {
+		for month in year_acts.activities.into_iter() {
+			if !self.has_month(&month.month) {
+				self.push_month(month);
+			}
+			else {
+				self.get_month_mut(&month.month).unwrap().merge(month);
 			}
 		}
 	}

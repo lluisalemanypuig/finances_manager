@@ -36,13 +36,11 @@ use crate::date;
 use crate::expense;
 use crate::concept_types;
 use crate::monthly_activities;
-use crate::all_activities;
 use crate::expense_summary;
 
 type Expense = expense::Expense;
-type ExpenseTypes = concept_types::ConceptTypes;
+type ConecptTypes = concept_types::ConceptTypes;
 type MonthlyActivities = monthly_activities::MonthlyActivities;
-type AllExpenses = all_activities::AllExpenses;
 type ExpenseSummary = expense_summary::ExpenseSummary;
 
 pub fn read_option<F: Fn()>(f: F, min_valid: u32, max_valid: u32) -> u32 {
@@ -70,7 +68,7 @@ static EXPENSE_TYPE_WIDTH: usize = 15;
 static PRICE_WIDTH: usize = 8;
 static DATE_WIDTH: usize = 17;
 
-pub fn display_expense_summary(summary: &ExpenseSummary, all_data: &AllExpenses, pre_tab: &str) {
+pub fn display_expense_summary(summary: &ExpenseSummary, pre_tab: &str) {
 	let expense_type_main_divider = std::iter::repeat("—").take(EXPENSE_TYPE_WIDTH).collect::<String>();
 	let expense_type_header = center_string(&"Expense type".to_string(), EXPENSE_TYPE_WIDTH);
 
@@ -93,7 +91,7 @@ pub fn display_expense_summary(summary: &ExpenseSummary, all_data: &AllExpenses,
 	println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
 	let total_spent_msg: String = "Total spent".to_string();
 	println!("{tab}| {:<EXPENSE_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} |            |", total_spent_msg, summary.total_spent);
-	println!("{tab}| {:<EXPENSE_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} |            |", all_data.expense_types.income_name, summary.total_income);
+	println!("{tab}| {:<EXPENSE_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} |            |", "Income", summary.total_income);
 	println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
 	let balance_msg: String = "Balance".to_string();
 	println!("{tab}| {:<EXPENSE_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} |            |", balance_msg, summary.total_spent - summary.total_income);
@@ -103,7 +101,6 @@ pub fn display_expense_summary(summary: &ExpenseSummary, all_data: &AllExpenses,
 }
 
 pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
-	all_data: &AllExpenses,
 	month_data: &MonthlyActivities,
 	func: F
 )
@@ -148,18 +145,14 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	in month_data.expenses.iter().filter(|e| func(e)).enumerate()
 	{
 		some_data = true;
-		if et == &all_data.expense_types.income_name {
-			summary.total_income += pr;
-		}
-		else {
-			summary.total_spent += pr;
-			match summary.expense_to_price.get_mut(et) {
-				Some(value) => {
-					*value += *pr;
-				},
-				None => {
-					summary.expense_to_price.insert(et.clone(), *pr);
-				}
+		
+		summary.total_spent += pr;
+		match summary.expense_to_price.get_mut(et) {
+			Some(value) => {
+				*value += *pr;
+			},
+			None => {
+				summary.expense_to_price.insert(et.clone(), *pr);
 			}
 		}
 
@@ -191,7 +184,7 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	}
 
 	if some_data {
-		display_expense_summary(&summary, all_data, &"    ");
+		display_expense_summary(&summary, &"    ");
 	}
 
 	summary
@@ -223,7 +216,7 @@ pub fn display_full_summary(
 	println!("{tab}+—{title_main_divider}—+—————————————+———————————————————+");
 }
 
-pub fn read_correct_expense_type(expense_types: &ExpenseTypes) -> Option<String> {
+pub fn read_correct_expense_type(expense_types: &ConecptTypes) -> Option<String> {
 	loop {
 		if let Some(str) = io::read_string_or_empty() {
 			if expense_types.is_type_ok(&str) {

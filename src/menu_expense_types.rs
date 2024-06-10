@@ -35,7 +35,7 @@ use crate::menu_utils;
 
 use crate::all_activities;
 
-type AllExpenses = all_activities::AllExpenses;
+type AllExpenses = all_activities::AllActivities;
 
 fn print_expense_types_all(all_data: &AllExpenses) {
 	println!("");
@@ -70,9 +70,9 @@ fn rename_expense_type(all_data: &mut AllExpenses) {
 		all_data.expense_types.replace(idx_old, new_expense.clone());
 
 		// replace the old expense type throughout the entire list of expenses
-		for ye in all_data.expenses.iter_mut() {
+		for ye in all_data.activities.iter_mut() {
 			ye.set_changes(true);
-			for me in ye.expenses.iter_mut() {
+			for me in ye.activities.iter_mut() {
 				for e in me.expenses.iter_mut().filter(|e| e.expense_type == old_expense) {
 					e.expense_type = new_expense.clone();
 				}
