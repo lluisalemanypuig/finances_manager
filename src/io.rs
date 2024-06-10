@@ -303,7 +303,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 		if !ye.has_changes() { continue; }
 		
 		{
-		let expense_filename = data_dir.to_owned() + &format!("/expenses/{}.txt", ye.year).to_string();
+		let expense_filename = data_dir.to_owned() + &format!("expenses/{}.txt", ye.year).to_string();
 		println!("Writing into '{expense_filename}'...");
 		let mut expense_file = std::fs::File::create(expense_filename).expect("I wanted to create a file");
 		for me in ye.activities.iter() {
@@ -322,7 +322,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 		}
 
 		{
-		let income_filename = data_dir.to_owned() + &format!("/incomes/{}.txt", ye.year).to_string();
+		let income_filename = data_dir.to_owned() + &format!("incomes/{}.txt", ye.year).to_string();
 		println!("Writing into '{income_filename}'...");
 		let mut income_file = std::fs::File::create(income_filename).expect("I wanted to create a file");
 		for me in ye.activities.iter() {
