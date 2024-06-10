@@ -33,26 +33,36 @@
 extern crate duplicate;
 
 use crate::date::Month;
-use crate::expense_types::ExpenseTypes;
-use crate::monthly_expenses::MonthlyExpenses;
-use crate::yearly_expenses::YearlyExpenses;
+use crate::concept_types::ConceptTypes;
+use crate::monthly_activities::MonthlyActivities;
+use crate::yearly_activities::YearlyActivities;
 
 #[derive(Debug)]
 pub struct AllExpenses {
 	pub min_year: u32,
 	pub max_year: u32,
-	pub expense_types: ExpenseTypes,
-	pub expenses: Vec<YearlyExpenses>
+	pub expense_types: ConceptTypes,
+	pub income_types: ConceptTypes,
+	pub expenses: Vec<YearlyActivities>
 }
 
 impl AllExpenses {
+	pub fn new() -> AllExpenses {
+		AllExpenses {
+			min_year: 9999,
+			max_year: 0,
+			expense_types: ConceptTypes::new("".to_string()),
+			income_types: ConceptTypes::new("".to_string()),
+			expenses: Vec::new()
+		}
+	}
 
 	#[duplicate::duplicate_item(
 		method          convert   reference(type);
 		[get_year]      [as_ref]  [& type]       ;
 		[get_year_mut]  [as_mut]  [&mut type]    ;
 	)]
-	pub fn method(self: reference([Self]), y: &u32) -> Option<reference([YearlyExpenses])> {
+	pub fn method(self: reference([Self]), y: &u32) -> Option<reference([YearlyActivities])> {
 		if !(self.min_year <= *y && *y <= self.max_year) {
 			return None;
 		}
@@ -66,7 +76,7 @@ impl AllExpenses {
 		}
 	}
 
-	pub fn get_month(&self, y: &u32, m: &Month) -> Option<&MonthlyExpenses> {
+	pub fn get_month(&self, y: &u32, m: &Month) -> Option<&MonthlyActivities> {
 		if let Some(year) = self.get_year(y) {
 			year.get_month(m)
 		}
@@ -83,7 +93,7 @@ impl AllExpenses {
 		}
 	}
 
-	pub fn add_year(&mut self, y: &u32) -> &mut YearlyExpenses {
+	pub fn add_year(&mut self, y: &u32) -> &mut YearlyActivities {
 		let res = self.expenses.binary_search_by(|e| e.year.cmp(&y));
 		match res {
 			Ok(pos) => {
@@ -93,7 +103,7 @@ impl AllExpenses {
 			Err(pos) => {
 				// year does not exist
 				self.expenses.insert(pos,
-					YearlyExpenses::new_year(y, true)
+					YearlyActivities::new_year(y, true)
 				);
 				if self.min_year > *y {
 					self.min_year = *y;

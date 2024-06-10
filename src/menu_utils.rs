@@ -34,15 +34,15 @@ use crate::io;
 
 use crate::date;
 use crate::expense;
-use crate::expense_types;
-use crate::monthly_expenses;
-use crate::all_expenses;
+use crate::concept_types;
+use crate::monthly_activities;
+use crate::all_activities;
 use crate::expense_summary;
 
 type Expense = expense::Expense;
-type ExpenseTypes = expense_types::ExpenseTypes;
-type MonthlyExpenses = monthly_expenses::MonthlyExpenses;
-type AllExpenses = all_expenses::AllExpenses;
+type ExpenseTypes = concept_types::ConceptTypes;
+type MonthlyActivities = monthly_activities::MonthlyActivities;
+type AllExpenses = all_activities::AllExpenses;
 type ExpenseSummary = expense_summary::ExpenseSummary;
 
 pub fn read_option<F: Fn()>(f: F, min_valid: u32, max_valid: u32) -> u32 {
@@ -104,7 +104,7 @@ pub fn display_expense_summary(summary: &ExpenseSummary, all_data: &AllExpenses,
 
 pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	all_data: &AllExpenses,
-	month_data: &MonthlyExpenses,
+	month_data: &MonthlyActivities,
 	func: F
 )
 -> ExpenseSummary
@@ -226,7 +226,7 @@ pub fn display_full_summary(
 pub fn read_correct_expense_type(expense_types: &ExpenseTypes) -> Option<String> {
 	loop {
 		if let Some(str) = io::read_string_or_empty() {
-			if expense_types.is_expense_type_ok(&str) {
+			if expense_types.is_type_ok(&str) {
 				return Some(str);
 			}
 		}

@@ -33,10 +33,10 @@
 use crate::io;
 use crate::menu_utils;
 
-use crate::all_expenses;
+use crate::all_activities;
 use crate::expense_summary;
 
-type AllExpenses = all_expenses::AllExpenses;
+type AllExpenses = all_activities::AllExpenses;
 type ExpenseSummary = expense_summary::ExpenseSummary;
 
 fn statistics_by_expense_type(all_data: &AllExpenses) {
@@ -44,7 +44,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
 
-	if !all_data.expense_types.is_expense_type_ok(&expense_type) {
+	if !all_data.expense_types.is_type_ok(&expense_type) {
 		println!("Non existent expense type '{expense_type}'.");
 		return;
 	}

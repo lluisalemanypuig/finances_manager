@@ -33,10 +33,9 @@
 use crate::date;
 
 use crate::expense::Expense;
-use crate::monthly_expenses::MonthlyExpenses;
-use crate::yearly_expenses::YearlyExpenses;
-use crate::all_expenses::AllExpenses;
-use crate::expense_types::ExpenseTypes;
+use crate::monthly_activities::MonthlyActivities;
+use crate::yearly_activities::YearlyActivities;
+use crate::all_activities::AllExpenses;
 
 use std::io::{BufRead, Write, Result};
 use std::str::FromStr;
@@ -141,8 +140,8 @@ pub fn read_correct_month() -> Option<date::Month> {
 
 /* ------------------------------------------------------------------------- */
 
-pub fn read_expense_file(p: &std::path::PathBuf) -> YearlyExpenses {
-	let mut yearly_expenses = YearlyExpenses::new();
+pub fn read_expense_file(p: &std::path::PathBuf) -> YearlyActivities {
+	let mut yearly_expenses = YearlyActivities::new();
 	
 	if let Some(file_name) = p.file_name() {
 		if let Some(file_str) = file_name.to_str() {
@@ -150,10 +149,7 @@ pub fn read_expense_file(p: &std::path::PathBuf) -> YearlyExpenses {
 		}
 	}
 	
-	let mut monthly_expenses = MonthlyExpenses {
-		month: date::Month::January,
-		expenses : Vec::new()
-	};
+	let mut monthly_expenses = MonthlyActivities::new();
 	let mut previous_month = date::Month::January;
 	
 	let file = std::fs::File::open(p).expect("Failed to open file");
@@ -172,9 +168,10 @@ pub fn read_expense_file(p: &std::path::PathBuf) -> YearlyExpenses {
 				yearly_expenses.expenses.push(monthly_expenses);
 			}
 			
-			monthly_expenses = MonthlyExpenses {
+			monthly_expenses = MonthlyActivities {
 				month: e.day_of_year.month.clone(),
-				expenses : vec![]
+				expenses : vec![],
+				incomes: Vec::new()
 			};
 			
 			previous_month = e.day_of_year.month.clone();
@@ -187,12 +184,7 @@ pub fn read_expense_file(p: &std::path::PathBuf) -> YearlyExpenses {
 }
 
 pub fn read_all_expense_data(data_dir: &String) -> AllExpenses {
-	let mut all_data = AllExpenses {
-		min_year: 9999,
-		max_year: 0,
-		expense_types: ExpenseTypes::new("".to_string()),
-		expenses: Vec::new()
-	};
+	let mut all_data = AllExpenses::new();
 	
 	// all files
 	let paths = std::fs::read_dir(data_dir.to_owned() + &"/expenses").unwrap();

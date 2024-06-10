@@ -33,28 +33,45 @@
 extern crate duplicate;
 
 use crate::expense::Expense;
+use crate::income::Income;
 use crate::date::Month;
 
 #[derive(Debug)]
-pub struct MonthlyExpenses {
+pub struct MonthlyActivities {
 	pub month: Month,
-	pub expenses: Vec<Expense>
+	pub expenses: Vec<Expense>,
+	pub incomes: Vec<Income>,
 }
 
-impl MonthlyExpenses {
-	pub fn as_ref(&self) -> &MonthlyExpenses { self }
-	pub fn as_mut(&mut self) -> &mut MonthlyExpenses { self }
+fn add_to_vector<T: Ord>(v: &mut Vec<T>, d: T) {
+	let pos = v.binary_search(&d);
+	match pos {
+		Ok(idx) => {
+			v.insert(idx, d);
+		},
+		Err(idx) => {
+			v.insert(idx, d);
+		}
+	}
+}
+
+impl MonthlyActivities {
+	pub fn new() -> MonthlyActivities {
+		MonthlyActivities {
+			month: Month::January,
+			expenses : Vec::new(),
+			incomes: Vec::new()
+		}
+	}
+
+	pub fn as_ref(&self) -> &MonthlyActivities { self }
+	pub fn as_mut(&mut self) -> &mut MonthlyActivities { self }
 
 	pub fn add_expense(&mut self, exp: Expense) {
-		let pos = self.expenses.binary_search(&exp);
-		match pos {
-			Ok(idx) => {
-				self.expenses.insert(idx, exp);
-			},
-			Err(idx) => {
-				self.expenses.insert(idx, exp);
-			}
-		}
+		add_to_vector(&mut self.expenses, exp);
+	}
+	pub fn add_income(&mut self, inc: Income) {
+		add_to_vector(&mut self.incomes, inc);
 	}
 
 	#[duplicate::duplicate_item(
@@ -65,12 +82,26 @@ impl MonthlyExpenses {
 	pub fn method(self: reference([Self]), i: usize) -> reference([Expense]) {
 		self.expenses[i].convert()
 	}
+	#[duplicate::duplicate_item(
+		method             convert   reference(type);
+		[get_income]      [as_ref]  [& type]       ;
+		[get_income_mut]  [as_mut]  [&mut type]    ;
+	)]
+	pub fn method(self: reference([Self]), i: usize) -> reference([Income]) {
+		self.incomes[i].convert()
+	}
 
 	pub fn remove_expense(&mut self, i: usize) {
 		self.expenses.remove(i);
 	}
+	pub fn remove_income(&mut self, i: usize) {
+		self.incomes.remove(i);
+	}
 
 	pub fn num_expenses(&self) -> usize {
 		self.expenses.len()
+	}
+	pub fn num_incomes(&self) -> usize {
+		self.incomes.len()
 	}
 }

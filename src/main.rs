@@ -38,11 +38,13 @@ use std::io::Read;
 mod date;
 mod io;
 
+mod income;
 mod expense;
-mod monthly_expenses;
-mod yearly_expenses;
-mod all_expenses;
-mod expense_types;
+
+mod monthly_activities;
+mod yearly_activities;
+mod all_activities;
+mod concept_types;
 mod expense_summary;
 
 mod menu_utils;
@@ -50,8 +52,8 @@ mod menu_expenses;
 mod menu_expense_types;
 mod menu_statistics;
 
-type ExpenseTypes = expense_types::ExpenseTypes;
-type AllExpenses = all_expenses::AllExpenses;
+type ConceptTypes = concept_types::ConceptTypes;
+type AllExpenses = all_activities::AllExpenses;
 
 fn print_main_menu() {
 	println!("What menu do you want to access?");
@@ -113,7 +115,7 @@ fn main() {
 	let mut all_data = io::read_all_expense_data(&data_dir);
 	
 	println!("    Reading expense types...");
-	all_data.expense_types = ExpenseTypes::new_vec(
+	all_data.expense_types = ConceptTypes::new_vec(
 		io::read_expense_types(&data_dir),
 		json.income_name
 	);

@@ -39,25 +39,25 @@ use crate::io::read_float_or_empty;
 use crate::menu_utils;
 
 use crate::expense;
-use crate::monthly_expenses;
-use crate::yearly_expenses;
-use crate::all_expenses;
+use crate::monthly_activities;
+use crate::yearly_activities;
+use crate::all_activities;
 use crate::expense_summary;
 
 type Expense = expense::Expense;
-type MonthlyExpenses = monthly_expenses::MonthlyExpenses;
-type YearlyExpenses = yearly_expenses::YearlyExpenses;
-type AllExpenses = all_expenses::AllExpenses;
+type MonthlyActivities = monthly_activities::MonthlyActivities;
+type YearlyActivities = yearly_activities::YearlyActivities;
+type AllExpenses = all_activities::AllExpenses;
 
 type ExpenseSummary = expense_summary::ExpenseSummary;
 
-fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyExpenses)
+fn print_expense_data_month(all_data: &AllExpenses, month_data: &MonthlyActivities)
 -> ExpenseSummary
 {
 	menu_utils::display_and_accounting(all_data, month_data, |_| true)
 }
 
-fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyExpenses)
+fn print_expense_data_year(all_data: &AllExpenses, year_data: &YearlyActivities)
 -> ExpenseSummary
 {
 	println!("Data from year: {}", year_data.year);

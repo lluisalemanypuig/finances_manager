@@ -31,23 +31,23 @@
  ********************************************************************/
 
 #[derive(Debug)]
-pub struct ExpenseTypes {
+pub struct ConceptTypes {
 	changes: bool,
 
 	pub types: Vec<String>,
 	pub income_name: String
 }
 
-impl ExpenseTypes {
-	pub fn new(income_name: String) -> ExpenseTypes {
-		ExpenseTypes {
+impl ConceptTypes {
+	pub fn new(income_name: String) -> ConceptTypes {
+		ConceptTypes {
 			changes: false,
 			types: Vec::new(),
 			income_name
 		}
 	}
-	pub fn new_vec(ts: Vec<String>, income_name: String) -> ExpenseTypes {
-		ExpenseTypes {
+	pub fn new_vec(ts: Vec<String>, income_name: String) -> ConceptTypes {
+		ConceptTypes {
 			changes: false,
 			types: ts,
 			income_name
@@ -59,31 +59,31 @@ impl ExpenseTypes {
 		self.changes = c;
 	}
 
-	pub fn has_expense_type(&self, expense_type: &String) -> bool {
+	pub fn has_type(&self, expense_type: &String) -> bool {
 		self.types.iter().position(|e| e == expense_type).is_some()
 	}
 
-	pub fn position_expense_type(&self, expense_type: &String) -> Option<usize> {
+	pub fn position_type(&self, expense_type: &String) -> Option<usize> {
 		self.types.iter().position(|e| e == expense_type)
 	}
 
-	pub fn remove_element(&mut self, idx: usize) {
+	pub fn remove(&mut self, idx: usize) {
 		self.types.remove(idx);
 		self.changes = true;
 	}
 
-	pub fn replace_element(&mut self, idx: usize, new_elem: String) {
+	pub fn replace(&mut self, idx: usize, new_elem: String) {
 		self.types[idx] = new_elem;
 		self.changes = true;
 	}
 
-	pub fn add_element(&mut self, new_elem: String) {
+	pub fn add(&mut self, new_elem: String) {
 		self.types.push(new_elem);
 		self.changes = true;
 	}
 
-	pub fn is_expense_type_ok(&self, expense_type: &String) -> bool {
-		let is_expense = self.has_expense_type(expense_type);
+	pub fn is_type_ok(&self, expense_type: &String) -> bool {
+		let is_expense = self.has_type(expense_type);
 		let is_income = self.income_name == *expense_type;
 		is_expense || is_income
 	}

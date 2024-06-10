@@ -31,73 +31,73 @@
  ********************************************************************/
 
 use crate::date::Month;
-use crate::monthly_expenses::MonthlyExpenses;
+use crate::monthly_activities::MonthlyActivities;
 
 #[derive(Debug)]
-pub struct YearlyExpenses {
+pub struct YearlyActivities {
 	changes: bool,
 
 	pub year: u32,
-	pub expenses: Vec<MonthlyExpenses>
+	pub expenses: Vec<MonthlyActivities>
 }
 
-impl Eq for YearlyExpenses {}
+impl Eq for YearlyActivities {}
 
-impl PartialEq for YearlyExpenses {
+impl PartialEq for YearlyActivities {
 	fn eq(&self, other: &Self) -> bool {
 		self.year == other.year
 	}
 }
-impl Ord for YearlyExpenses {
+impl Ord for YearlyActivities {
 	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
 		self.year.cmp(&other.year)
 	}
 }
-impl PartialOrd for YearlyExpenses {
+impl PartialOrd for YearlyActivities {
 	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
 		Some(self.cmp(other))
 	}
 }
 
-impl PartialEq<u32> for YearlyExpenses {
+impl PartialEq<u32> for YearlyActivities {
 	fn eq(&self, y: &u32) -> bool {
 		self.year == *y
 	}
 }
-impl PartialOrd<u32> for YearlyExpenses {
+impl PartialOrd<u32> for YearlyActivities {
 	fn partial_cmp(&self, y: &u32) -> Option<std::cmp::Ordering> {
 		Some(self.year.cmp(y))
 	}
 }
-impl PartialEq<YearlyExpenses> for u32 {
-	fn eq(&self, other: &YearlyExpenses) -> bool {
+impl PartialEq<YearlyActivities> for u32 {
+	fn eq(&self, other: &YearlyActivities) -> bool {
 		*self == other.year
 	}
 }
-impl PartialOrd<YearlyExpenses> for u32 {
-	fn partial_cmp(&self, other: &YearlyExpenses) -> Option<std::cmp::Ordering> {
+impl PartialOrd<YearlyActivities> for u32 {
+	fn partial_cmp(&self, other: &YearlyActivities) -> Option<std::cmp::Ordering> {
 		Some(self.cmp(&other.year))
 	}
 }
 
-impl YearlyExpenses {
-	pub fn new() -> YearlyExpenses {
-		YearlyExpenses {
+impl YearlyActivities {
+	pub fn new() -> YearlyActivities {
+		YearlyActivities {
 			changes: false,
 			year: 0,
 			expenses: Vec::new()
 		}
 	}
-	pub fn new_year(y: &u32, changes: bool) -> YearlyExpenses {
-		YearlyExpenses {
+	pub fn new_year(y: &u32, changes: bool) -> YearlyActivities {
+		YearlyActivities {
 			year: *y,
 			expenses: Vec::new(),
 			changes
 		}
 	}
 
-	pub fn as_ref(&self) -> &YearlyExpenses { self }
-	pub fn as_mut(&mut self) -> &mut YearlyExpenses { self }
+	pub fn as_ref(&self) -> &YearlyActivities { self }
+	pub fn as_mut(&mut self) -> &mut YearlyActivities { self }
 
 	pub fn has_changes(&self) -> bool { self.changes }
 	pub fn set_changes(&mut self, c: bool) {
@@ -117,7 +117,7 @@ impl YearlyExpenses {
 		[get_month]      [as_ref]  [& type]       ;
 		[get_month_mut]  [as_mut]  [&mut type]    ;
 	)]
-	pub fn method(self: reference([Self]), m: &Month) -> Option<reference([MonthlyExpenses])> {
+	pub fn method(self: reference([Self]), m: &Month) -> Option<reference([MonthlyActivities])> {
 		let res = self.expenses.binary_search_by(|e| e.month.cmp(&m));
 		match res {
 			Ok(idx) => Some(self.expenses[idx].convert()),
@@ -125,7 +125,7 @@ impl YearlyExpenses {
 		}
 	}
 
-	pub fn add_month(&mut self, m: &Month) -> &mut MonthlyExpenses {
+	pub fn add_month(&mut self, m: &Month) -> &mut MonthlyActivities {
 		let res = self.expenses.binary_search_by(|e| e.month.cmp(&m));
 		match res {
 			Ok(pos) => {
@@ -135,9 +135,10 @@ impl YearlyExpenses {
 			Err(pos) => {
 				// month does not exist
 				self.expenses.insert(pos, 
-					MonthlyExpenses {
+					MonthlyActivities {
 						month: m.clone(),
-						expenses: Vec::new()
+						expenses: Vec::new(),
+						incomes: Vec::new()
 					}
 				);
 				&mut self.expenses[pos]
