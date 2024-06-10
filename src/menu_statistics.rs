@@ -51,7 +51,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 
 	let mut all_years = ExpenseSummary::new();
 	for year_data in all_data.activities.iter() {
-		println!("Data from year: {}", year_data.year);
+		println!("Data from year: {}", year_data.get_year());
 		println!("====================");
 		println!("");
 
@@ -116,7 +116,7 @@ fn statistics_by_price(all_data: &AllExpenses) {
 
 	let mut all_years = ExpenseSummary::new();
 	for year_data in all_data.activities.iter() {
-		println!("Data from year: {}", year_data.year);
+		println!("Data from year: {}", year_data.get_year());
 		println!("====================");
 		println!("");
 
@@ -149,7 +149,7 @@ fn statistics_by_place(all_data: &AllExpenses) {
 
 	let mut all_years = ExpenseSummary::new();
 	for year_data in all_data.activities.iter() {
-		println!("Data from year: {}", year_data.year);
+		println!("Data from year: {}", year_data.get_year());
 		println!("====================");
 		println!("");
 
@@ -182,7 +182,7 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 
 	let mut all_years = ExpenseSummary::new();
 	for year_data in all_data.activities.iter() {
-		println!("Data from year: {}", year_data.year);
+		println!("Data from year: {}", year_data.get_year());
 		println!("--------------------");
 		println!("");
 

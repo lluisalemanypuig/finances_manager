@@ -39,8 +39,9 @@ use crate::yearly_activities::YearlyActivities;
 
 #[derive(Debug)]
 pub struct AllActivities {
-	pub min_year: u32,
-	pub max_year: u32,
+	m_min_year: u32,
+	m_max_year: u32,
+
 	pub expense_types: ConceptTypes,
 	pub income_types: ConceptTypes,
 	pub activities: Vec<YearlyActivities>
@@ -49,8 +50,8 @@ pub struct AllActivities {
 impl AllActivities {
 	pub fn new() -> AllActivities {
 		AllActivities {
-			min_year: 9999,
-			max_year: 0,
+			m_min_year: 9999,
+			m_max_year: 0,
 			expense_types: ConceptTypes::new(),
 			income_types: ConceptTypes::new(),
 			activities: Vec::new()
@@ -63,11 +64,11 @@ impl AllActivities {
 		[get_year_mut]  [as_mut]  [&mut type]    ;
 	)]
 	pub fn method(self: reference([Self]), y: &u32) -> Option<reference([YearlyActivities])> {
-		if !(self.min_year <= *y && *y <= self.max_year) {
+		if !(self.m_min_year <= *y && *y <= self.m_max_year) {
 			return None;
 		}
 		
-		let res = self.activities.binary_search_by(|e| e.year.cmp(&y));
+		let res = self.activities.binary_search_by(|e| e.get_year().cmp(&y));
 		if let Ok(idx) = res {
 			Some( self.activities[idx].convert() )
 		}
@@ -86,11 +87,11 @@ impl AllActivities {
 	}
 
 	pub fn has_year(&self, y: &u32) -> bool {
-		self.activities.binary_search_by(|e| e.year.cmp(&y)).is_ok()
+		self.activities.binary_search_by(|e| e.get_year().cmp(&y)).is_ok()
 	}
 
 	pub fn add_year(&mut self, y: &u32) -> &mut YearlyActivities {
-		let res = self.activities.binary_search_by(|e| e.year.cmp(&y));
+		let res = self.activities.binary_search_by(|e| e.get_year().cmp(&y));
 		match res {
 			Ok(pos) => {
 				// year already exists
@@ -101,11 +102,11 @@ impl AllActivities {
 				self.activities.insert(pos,
 					YearlyActivities::new_year(y, true)
 				);
-				if self.min_year > *y {
-					self.min_year = *y;
+				if self.m_min_year > *y {
+					self.m_min_year = *y;
 				}
-				if self.max_year < *y {
-					self.max_year = *y;
+				if self.m_max_year < *y {
+					self.m_max_year = *y;
 				}
 				&mut self.activities[pos]
 			}
@@ -113,15 +114,15 @@ impl AllActivities {
 	}
 
 	pub fn push_year(&mut self, y: YearlyActivities) {
-		let res = self.activities.binary_search_by(|e| e.year.cmp(&y.year));
+		let res = self.activities.binary_search_by(|e| e.get_year().cmp(&y.get_year()));
 		match res {
 			Ok(_) => { },
 			Err(pos) => {
-				if self.min_year > y.year {
-					self.min_year = y.year;
+				if self.m_min_year > *y.get_year() {
+					self.m_min_year = *y.get_year();
 				}
-				if self.max_year < y.year {
-					self.max_year = y.year;
+				if self.m_max_year < *y.get_year() {
+					self.m_max_year = *y.get_year();
 				}
 				self.activities.insert(pos, y);
 			}
@@ -129,11 +130,11 @@ impl AllActivities {
 	}
 
 	pub fn merge(&mut self, year_acts: YearlyActivities) {
-		if !self.has_year(&year_acts.year) {
+		if !self.has_year(&year_acts.get_year()) {
 			self.push_year(year_acts);
 		}
 		else {
-			self.get_year_mut(&year_acts.year).unwrap().merge(year_acts);
+			self.get_year_mut(&year_acts.get_year()).unwrap().merge(year_acts);
 		}
 	}
 

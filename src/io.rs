@@ -146,7 +146,7 @@ pub fn read_expense_file(p: &std::path::PathBuf) -> YearlyActivities {
 	
 	if let Some(file_name) = p.file_name() {
 		if let Some(file_str) = file_name.to_str() {
-			yearly_expenses.year = file_str[..4].parse::<u32>().unwrap();
+			yearly_expenses.set_year( file_str[..4].parse::<u32>().unwrap() );
 		}
 	}
 	
@@ -189,7 +189,7 @@ pub fn read_income_file(p: &std::path::PathBuf) -> YearlyActivities {
 	
 	if let Some(file_name) = p.file_name() {
 		if let Some(file_str) = file_name.to_str() {
-			yearly_income.year = file_str[..4].parse::<u32>().unwrap();
+			yearly_income.set_year( file_str[..4].parse::<u32>().unwrap() );
 		}
 	}
 	
@@ -230,41 +230,19 @@ pub fn read_income_file(p: &std::path::PathBuf) -> YearlyActivities {
 pub fn read_all_activities_data(data_dir: &String) -> AllActivities {
 	let mut all_data = AllActivities::new();
 	
-	{
-	let paths = std::fs::read_dir(data_dir.to_owned() + &"expenses").unwrap();
-	for path in paths {
+	let expense_path = std::fs::read_dir(data_dir.to_owned() + &"expenses").unwrap();
+	for path in expense_path {
 		let path = path.unwrap().path();
-		
 		println!("        Reading '{}'...", path.display());
-		
 		let r = read_expense_file(&path);
-		
-		if all_data.min_year > r.year {
-			all_data.min_year = r.year;
-		}
-		if all_data.max_year < r.year {
-			all_data.max_year = r.year;
-		}
 		all_data.merge(r);
 	}
-	}
-	{
-	let paths = std::fs::read_dir(data_dir.to_owned() + &"incomes").unwrap();
-	for path in paths {
+	let income_path = std::fs::read_dir(data_dir.to_owned() + &"incomes").unwrap();
+	for path in income_path {
 		let path = path.unwrap().path();
-		
 		println!("        Reading '{}'...", path.display());
-		
 		let r = read_income_file(&path);
-		
-		if all_data.min_year > r.year {
-			all_data.min_year = r.year;
-		}
-		if all_data.max_year < r.year {
-			all_data.max_year = r.year;
-		}
 		all_data.merge(r);
-	}
 	}
 	all_data.activities.sort();
 	
@@ -303,7 +281,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 		if !ye.has_changes() { continue; }
 		
 		{
-		let expense_filename = data_dir.to_owned() + &format!("expenses/{}.txt", ye.year).to_string();
+		let expense_filename = data_dir.to_owned() + &format!("expenses/{}.txt", ye.get_year()).to_string();
 		println!("Writing into '{expense_filename}'...");
 		let mut expense_file = std::fs::File::create(expense_filename).expect("I wanted to create a file");
 		for me in ye.activities.iter() {
@@ -322,7 +300,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 		}
 
 		{
-		let income_filename = data_dir.to_owned() + &format!("incomes/{}.txt", ye.year).to_string();
+		let income_filename = data_dir.to_owned() + &format!("incomes/{}.txt", ye.get_year()).to_string();
 		println!("Writing into '{income_filename}'...");
 		let mut income_file = std::fs::File::create(income_filename).expect("I wanted to create a file");
 		for me in ye.activities.iter() {

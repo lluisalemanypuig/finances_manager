@@ -60,7 +60,7 @@ fn print_expense_data_month(month_data: &MonthlyActivities)
 fn print_expense_data_year(year_data: &YearlyActivities)
 -> ExpenseSummary
 {
-	println!("Data from year: {}", year_data.year);
+	println!("Data from year: {}", year_data.get_year());
 	println!("--------------------");
 	
 	let mut total_entries = 0;

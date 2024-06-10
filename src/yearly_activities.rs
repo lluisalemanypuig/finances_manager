@@ -37,7 +37,7 @@ use crate::monthly_activities::MonthlyActivities;
 pub struct YearlyActivities {
 	changes: bool,
 
-	pub year: u32,
+	m_year: u32,
 	pub activities: Vec<MonthlyActivities>
 }
 
@@ -45,12 +45,12 @@ impl Eq for YearlyActivities {}
 
 impl PartialEq for YearlyActivities {
 	fn eq(&self, other: &Self) -> bool {
-		self.year == other.year
+		self.m_year == other.m_year
 	}
 }
 impl Ord for YearlyActivities {
 	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-		self.year.cmp(&other.year)
+		self.m_year.cmp(&other.m_year)
 	}
 }
 impl PartialOrd for YearlyActivities {
@@ -61,22 +61,22 @@ impl PartialOrd for YearlyActivities {
 
 impl PartialEq<u32> for YearlyActivities {
 	fn eq(&self, y: &u32) -> bool {
-		self.year == *y
+		self.m_year == *y
 	}
 }
 impl PartialOrd<u32> for YearlyActivities {
 	fn partial_cmp(&self, y: &u32) -> Option<std::cmp::Ordering> {
-		Some(self.year.cmp(y))
+		Some(self.m_year.cmp(y))
 	}
 }
 impl PartialEq<YearlyActivities> for u32 {
 	fn eq(&self, other: &YearlyActivities) -> bool {
-		*self == other.year
+		*self == other.m_year
 	}
 }
 impl PartialOrd<YearlyActivities> for u32 {
 	fn partial_cmp(&self, other: &YearlyActivities) -> Option<std::cmp::Ordering> {
-		Some(self.cmp(&other.year))
+		Some(self.cmp(&other.m_year))
 	}
 }
 
@@ -84,16 +84,21 @@ impl YearlyActivities {
 	pub fn new() -> YearlyActivities {
 		YearlyActivities {
 			changes: false,
-			year: 0,
+			m_year: 0,
 			activities: Vec::new()
 		}
 	}
 	pub fn new_year(y: &u32, changes: bool) -> YearlyActivities {
 		YearlyActivities {
-			year: *y,
+			m_year: *y,
 			activities: Vec::new(),
 			changes
 		}
+	}
+
+	pub fn get_year(&self) -> &u32 { &self.m_year }
+	pub fn set_year(&mut self, y: u32) {
+		self.m_year = y;
 	}
 
 	pub fn as_ref(&self) -> &YearlyActivities { self }
