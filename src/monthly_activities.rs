@@ -43,19 +43,9 @@ pub struct MonthlyActivities {
 	pub incomes: Vec<Income>,
 }
 
-fn add_to_vector<T: Ord>(v: &mut Vec<T>, d: T) {
-	let pos = v.binary_search(&d);
-	match pos {
-		Ok(idx) => {
-			v.insert(idx, d);
-		},
-		Err(idx) => {
-			v.insert(idx, d);
-		}
-	}
-}
-
 impl MonthlyActivities {
+	/* PUBLIC */
+
 	pub fn new() -> MonthlyActivities {
 		MonthlyActivities {
 			month: Month::January,
@@ -68,10 +58,10 @@ impl MonthlyActivities {
 	pub fn as_mut(&mut self) -> &mut MonthlyActivities { self }
 
 	pub fn add_expense(&mut self, exp: Expense) {
-		add_to_vector(&mut self.expenses, exp);
+		Self::add_to_vector(&mut self.expenses, exp);
 	}
 	pub fn add_income(&mut self, inc: Income) {
-		add_to_vector(&mut self.incomes, inc);
+		Self::add_to_vector(&mut self.incomes, inc);
 	}
 
 	#[duplicate::duplicate_item(
@@ -107,12 +97,12 @@ impl MonthlyActivities {
 
 	fn merge_expenses(&mut self, v: Vec<Expense>) {
 		for e in v.into_iter() {
-			add_to_vector(&mut self.expenses, e);
+			Self::add_to_vector(&mut self.expenses, e);
 		}
 	}
 	fn merge_incomes(&mut self, v: Vec<Income>) {
 		for i in v.into_iter() {
-			add_to_vector(&mut self.incomes, i);
+			Self::add_to_vector(&mut self.incomes, i);
 		}
 	}
 
@@ -120,4 +110,19 @@ impl MonthlyActivities {
 		self.merge_expenses(month.expenses);
 		self.merge_incomes(month.incomes);
 	}
+
+	/* PRIVATE */
+
+	fn add_to_vector<T: Ord>(v: &mut Vec<T>, d: T) {
+		let pos = v.binary_search(&d);
+		match pos {
+			Ok(idx) => {
+				v.insert(idx, d);
+			},
+			Err(idx) => {
+				v.insert(idx, d);
+			}
+		}
+	}
+
 }

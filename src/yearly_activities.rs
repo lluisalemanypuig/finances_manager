@@ -141,7 +141,13 @@ impl YearlyActivities {
 	}
 
 	pub fn push_month(&mut self, m: MonthlyActivities) {
-		self.activities.push(m);
+		let res = self.activities.binary_search_by(|e| e.month.cmp(&m.month));
+		match res {
+			Ok(_) => { },
+			Err(pos) => {
+				self.activities.insert(pos, m);
+			}
+		}
 	}
 
 	pub fn merge(&mut self, year_acts: YearlyActivities) {

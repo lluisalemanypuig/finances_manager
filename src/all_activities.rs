@@ -86,11 +86,7 @@ impl AllActivities {
 	}
 
 	pub fn has_year(&self, y: &u32) -> bool {
-		let res = self.activities.binary_search_by(|e| e.year.cmp(&y));
-		match res {
-			Ok(_) => true,
-			Err(_) => false,
-		}
+		self.activities.binary_search_by(|e| e.year.cmp(&y)).is_ok()
 	}
 
 	pub fn add_year(&mut self, y: &u32) -> &mut YearlyActivities {
@@ -117,7 +113,19 @@ impl AllActivities {
 	}
 
 	pub fn push_year(&mut self, y: YearlyActivities) {
-		self.activities.push(y);
+		let res = self.activities.binary_search_by(|e| e.year.cmp(&y.year));
+		match res {
+			Ok(_) => { },
+			Err(pos) => {
+				if self.min_year > y.year {
+					self.min_year = y.year;
+				}
+				if self.max_year < y.year {
+					self.max_year = y.year;
+				}
+				self.activities.insert(pos, y);
+			}
+		}
 	}
 
 	pub fn merge(&mut self, year_acts: YearlyActivities) {

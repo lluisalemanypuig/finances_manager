@@ -245,7 +245,7 @@ pub fn read_all_activities_data(data_dir: &String) -> AllActivities {
 		if all_data.max_year < r.year {
 			all_data.max_year = r.year;
 		}
-		all_data.activities.push(r);
+		all_data.merge(r);
 	}
 	}
 	{
