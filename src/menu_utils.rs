@@ -114,6 +114,18 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	let place_mid_divider: String = std::iter::repeat("·").take(place_width).collect::<String>();
 	let place_header = center_string(&"Place".to_string(), place_width);
 
+	let city_width =
+		std::cmp::max(
+			5,
+			month_data.expenses
+			.iter()
+			.filter(|e: &&expense::Expense| func(e))
+			.fold(0, |max, val| if val.city.len() > max { val.city.len() } else { max })
+		);
+	let city_main_divider = std::iter::repeat("—").take(city_width).collect::<String>();
+	let city_mid_divider: String = std::iter::repeat("·").take(city_width).collect::<String>();
+	let city_header = center_string(&"City".to_string(), city_width);
+
 	let expense_type_main_divider = std::iter::repeat("—").take(EXPENSE_TYPE_WIDTH).collect::<String>();
 	let expense_type_mid_divider: String = std::iter::repeat("·").take(EXPENSE_TYPE_WIDTH).collect::<String>();
 	let expense_type_header = center_string(&"Expense type".to_string(), EXPENSE_TYPE_WIDTH);
@@ -136,6 +148,7 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 		price: pr,
 		expense_type: et,
 		place: pl,
+		city: ci,
 		description: descr
 	})
 	in month_data.expenses.iter().filter(|e| func(e)).enumerate()
@@ -154,29 +167,30 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 
 		let expense_type_text = center_string( et, EXPENSE_TYPE_WIDTH);
 		let place_text = center_string( pl, place_width);
+		let city_text = center_string( ci, city_width);
 		if &previous_date != d {
 
 			if first {
-				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+");
-				println!("    | ID | {date_header} | {price_header} | {expense_type_header} | {place_header} | Description");
-				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+—{city_main_divider}—+");
+				println!("    | ID | {date_header} | {price_header} | {expense_type_header} | {place_header} | {city_header} | Description");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+—{city_main_divider}—+");
 				first = false;
 			}
 			else {
-				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{expense_type_mid_divider}—+—{place_mid_divider}—+");
+				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{expense_type_mid_divider}—+—{place_mid_divider}—+—{city_mid_divider}—+");
 			}
 
 			let date_text = center_string(&d.to_string(), DATE_WIDTH);
-			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {expense_type_text} | {place_text} | {descr}");
+			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {expense_type_text} | {place_text} | {city_text} | {descr}");
 			previous_date = d.clone();
 		}
 		else {
 			let date_text = center_string(&" ".to_string(), DATE_WIDTH);
-			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {expense_type_text} | {place_text} | {descr}");
+			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {expense_type_text} | {place_text} | {city_text} | {descr}");
 		}
 	}
 	if some_data {
-		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+");
+		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+—{city_mid_divider}—+");
 	}
 
 	if some_data {

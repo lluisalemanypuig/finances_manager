@@ -38,6 +38,7 @@ pub struct Expense {
 	pub price: f32,
 	pub expense_type: String,
 	pub place: String,
+	pub city: String,
 	pub description: String
 }
 
@@ -106,8 +107,8 @@ impl std::str::FromStr for Expense {
 	
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		let parts: Vec<String> = split_string_data(s);
-		let [d, pr, et, pl, descr] = parts.as_slice() else {
-			panic!("Can't segment string '{s}' into five parts")
+		let [d, pr, et, pl, ci, descr] = parts.as_slice() else {
+			panic!("Can't segment string '{s}' into six parts")
 		};
 		
 		let date_fromstr = d.parse::<date::Date>().map_err(|_| ParseExpenseError)?;
@@ -118,6 +119,7 @@ impl std::str::FromStr for Expense {
 			price: price_fromstr,
 			expense_type: et.to_string(),
 			place: pl.to_string(),
+			city: ci.to_string(),
 			description: descr.to_string()
 		})
 	}

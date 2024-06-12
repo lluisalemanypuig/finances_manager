@@ -290,11 +290,12 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 				price: pr,
 				expense_type: et,
 				place: pl,
+				city: ci,
 				description: descr
 			}
 			in me.expenses.iter()
 			{
-				writeln!(expense_file, "{d} {pr} \"{et}\" \"{pl}\" \"{descr}\"")?;
+				writeln!(expense_file, "{d} {pr} \"{et}\" \"{pl}\" \"{ci}\" \"{descr}\"")?;
 			}
 		}
 		}

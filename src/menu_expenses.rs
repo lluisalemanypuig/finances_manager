@@ -183,6 +183,9 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 	println!("Place:");
 	let place = io::read_string();
 
+	println!("City:");
+	let city = io::read_string();
+
 	println!("Description:");
 	let description = match io::read_string_or_empty() {
 		Some(str) => str,
@@ -194,6 +197,7 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 		price: price,
 		expense_type: expense_type,
 		place: place,
+		city: city,
 		description: description
 	});
 	year_data.set_changes(true);
@@ -310,6 +314,11 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	println!("Place: {} (leave blank to keep the value)", expense.place);
 	if let Some(place) = io::read_string_or_empty() {
 		expense.place = place;
+	}
+
+	println!("City: {} (leave blank to keep the value)", expense.city);
+	if let Some(city) = io::read_string_or_empty() {
+		expense.city = city;
 	}
 
 	println!("Description: {} (leave blank to keep the value)", expense.description);
