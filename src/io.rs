@@ -1,6 +1,6 @@
 /*********************************************************************
  *
- * Finances Manager -- A command line utility to manage financial domestic
+ * Finances Manager -- A command line utility to manage domestic financial
  * activities.
  *
  * Copyright (C) 2024
