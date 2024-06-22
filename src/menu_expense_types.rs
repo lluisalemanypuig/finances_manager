@@ -39,7 +39,7 @@ type AllExpenses = all_activities::AllActivities;
 
 fn print_expense_types_all(all_data: &AllExpenses) {
 	println!("");
-	for (i, expense_type) in all_data.expense_types.types.iter().enumerate() {
+	for (i, expense_type) in all_data.get_expense_types().get_types().iter().enumerate() {
 		println!("    {i}: {expense_type}");
 	}
 	println!("");
@@ -49,11 +49,11 @@ fn add_expense_type(all_data: &mut AllExpenses) {
 	println!("Enter the new type of expense:");
 	let new_expense = io::read_string();
 
-	if all_data.expense_types.is_type_ok(&new_expense) {
+	if all_data.get_expense_types().is_type_ok(&new_expense) {
 		println!("Expense type '{new_expense}' already exists.")
 	}
 	else {
-		all_data.expense_types.add(new_expense);
+		all_data.get_expense_types_mut().add(new_expense);
 	}
 }
 
@@ -61,16 +61,16 @@ fn rename_expense_type(all_data: &mut AllExpenses) {
 	println!("Enter the type of expense to rename:");
 	let old_expense = io::read_string();
 
-	let idx_old_expense = all_data.expense_types.position_type(&old_expense);
+	let idx_old_expense = all_data.get_expense_types().position_type(&old_expense);
 	
 	if let Some(idx_old) = idx_old_expense {
 		println!("Enter the new type of expense:");
 		let new_expense = io::read_string();
 
-		all_data.expense_types.replace(idx_old, new_expense.clone());
+		all_data.get_expense_types_mut().replace(idx_old, new_expense.clone());
 
 		// replace the old expense type throughout the entire list of expenses
-		for ye in all_data.activities.iter_mut() {
+		for ye in all_data.get_activities_mut().iter_mut() {
 			ye.set_changes(true);
 			for me in ye.get_expenses_mut().get_activities_mut().iter_mut() {
 				for e in me.get_activities_mut().iter_mut().filter(|e| e.expense_type == old_expense) {
@@ -88,8 +88,8 @@ fn remove_expense_type(all_data: &mut AllExpenses) {
 	println!("Enter the type of expense to remove:");
 	let expense_to_remove = io::read_string();
 
-	if let Some(idx) = all_data.expense_types.position_type(&expense_to_remove) {
-		all_data.expense_types.remove(idx);
+	if let Some(idx) = all_data.get_expense_types().position_type(&expense_to_remove) {
+		all_data.get_expense_types_mut().remove(idx);
 	}
 	else {
 		println!("Expense type to remove '{expense_to_remove}' does not exist.");

@@ -45,9 +45,9 @@ pub struct AllActivities {
 	m_min_year: u32,
 	m_max_year: u32,
 
-	pub expense_types: ConceptTypes,
-	pub income_types: ConceptTypes,
-	pub activities: Vec<YearlyActivities>
+	m_expense_types: ConceptTypes,
+	m_income_types: ConceptTypes,
+	m_activities: Vec<YearlyActivities>
 }
 
 impl AllActivities {
@@ -55,10 +55,27 @@ impl AllActivities {
 		AllActivities {
 			m_min_year: 9999,
 			m_max_year: 0,
-			expense_types: ConceptTypes::new(),
-			income_types: ConceptTypes::new(),
-			activities: Vec::new()
+			m_expense_types: ConceptTypes::new(),
+			m_income_types: ConceptTypes::new(),
+			m_activities: Vec::new()
 		}
+	}
+
+	pub fn get_activities(&self) -> &Vec<YearlyActivities> { &self.m_activities }
+	pub fn get_activities_mut(&mut self) -> &mut Vec<YearlyActivities> {
+		self.set_changes_activities(true);
+		&mut self.m_activities
+	}
+
+	pub fn get_expense_types(&self) -> &ConceptTypes { &self.m_expense_types }
+	pub fn get_expense_types_mut(&mut self) -> &mut ConceptTypes {
+		self.m_expense_types.set_changes(true);
+		&mut self.m_expense_types
+	}
+	pub fn get_income_types(&self) -> &ConceptTypes { &self.m_income_types }
+	pub fn get_income_types_mut(&mut self) -> &mut ConceptTypes {
+		self.m_income_types.set_changes(true);
+		&mut self.m_income_types
 	}
 
 	#[duplicate::duplicate_item(
@@ -71,9 +88,9 @@ impl AllActivities {
 			return None;
 		}
 		
-		let res = self.activities.binary_search_by(|e| e.get_year().cmp(&y));
+		let res = self.m_activities.binary_search_by(|e| e.get_year().cmp(&y));
 		if let Ok(idx) = res {
-			Some( self.activities[idx].convert() )
+			Some( self.m_activities[idx].convert() )
 		}
 		else {
 			None
@@ -95,19 +112,19 @@ impl AllActivities {
 	}
 
 	pub fn has_year(&self, y: &u32) -> bool {
-		self.activities.binary_search_by(|e| e.get_year().cmp(&y)).is_ok()
+		self.m_activities.binary_search_by(|e| e.get_year().cmp(&y)).is_ok()
 	}
 
 	pub fn add_year(&mut self, y: u32) -> &mut YearlyActivities {
-		let res = self.activities.binary_search_by(|e| e.get_year().cmp(&y));
+		let res = self.m_activities.binary_search_by(|e| e.get_year().cmp(&y));
 		match res {
 			Ok(pos) => {
 				// year already exists
-				&mut self.activities[pos]
+				&mut self.m_activities[pos]
 			},
 			Err(pos) => {
 				// year does not exist
-				self.activities.insert(pos,
+				self.m_activities.insert(pos,
 					YearlyActivities::new_year(y)
 				);
 				if self.m_min_year > y {
@@ -116,13 +133,13 @@ impl AllActivities {
 				if self.m_max_year < y {
 					self.m_max_year = y;
 				}
-				&mut self.activities[pos]
+				&mut self.m_activities[pos]
 			}
 		}
 	}
 
 	pub fn push_year(&mut self, y: YearlyActivities) {
-		let res = self.activities.binary_search_by(|e| e.get_year().cmp(&y.get_year()));
+		let res = self.m_activities.binary_search_by(|e| e.get_year().cmp(&y.get_year()));
 		match res {
 			Ok(_) => { },
 			Err(pos) => {
@@ -132,7 +149,7 @@ impl AllActivities {
 				if self.m_max_year < *y.get_year() {
 					self.m_max_year = *y.get_year();
 				}
-				self.activities.insert(pos, y);
+				self.m_activities.insert(pos, y);
 			}
 		}
 	}
@@ -146,10 +163,16 @@ impl AllActivities {
 		}
 	}
 
-	pub fn set_changes(&mut self, c: bool) {
-		for ye in self.activities.iter_mut() {
+	pub fn set_changes_activities(&mut self, c: bool) {
+		for ye in self.m_activities.iter_mut() {
 			ye.set_changes(c);
 		}
+	}
+
+	pub fn set_changes(&mut self, c: bool) {
+		self.m_expense_types.set_changes(c);
+		self.m_income_types.set_changes(c);
+		self.set_changes_activities(c);
 	}
 
 }

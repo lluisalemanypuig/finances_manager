@@ -242,8 +242,7 @@ pub fn read_all_activities_data(data_dir: &String) -> AllActivities {
 		let r = read_income_file(&path);
 		all_data.merge(r);
 	}
-	all_data.activities.sort();
-	all_data.set_changes(false);
+	all_data.get_activities_mut().sort();
 	
 	all_data
 }
@@ -265,18 +264,20 @@ fn read_types(data_dir: &String, filename: String) -> Vec<String> {
 	types
 }
 
-pub fn read_expense_types(data_dir: &String) -> Vec<String> {
-	read_types(data_dir, "expense_types.txt".to_string())
+pub fn read_expense_types(data_dir: &String, all_data: &mut AllActivities) {
+	let types = read_types(data_dir, "expense_types.txt".to_string());
+	all_data.get_expense_types_mut().set_types(types);
 }
 
-pub fn read_income_types(data_dir: &String) -> Vec<String> {
-	read_types(data_dir, "income_types.txt".to_string())
+pub fn read_income_types(data_dir: &String, all_data: &mut AllActivities) {
+	let types = read_types(data_dir, "income_types.txt".to_string());
+	all_data.get_income_types_mut().set_types(types);
 }
 
 /* ------------------------------------------------------------------------- */
 
 pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()> {
-	for ye in all_data.activities.iter() {
+	for ye in all_data.get_activities().iter() {
 		
 		if ye.get_expenses().has_changes() {
 			let expense_filename =
@@ -330,19 +331,19 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 			}
 		}
 	}
-	if all_data.expense_types.has_changes() {
+	if all_data.get_expense_types().has_changes() {
 		let filename = data_dir.to_owned() + &"/expense_types.txt".to_string();
 		println!("Writing into '{filename}'...");
 		let mut file = std::fs::File::create(filename).expect("I wanted to create a file");
-		for et in all_data.expense_types.types.iter() {
+		for et in all_data.get_expense_types().get_types().iter() {
 			writeln!(file, "{et}")?;
 		}
 	}
-	if all_data.income_types.has_changes() {
+	if all_data.get_income_types().has_changes() {
 		let filename = data_dir.to_owned() + &"/income_types.txt".to_string();
 		println!("Writing into '{filename}'...");
 		let mut file = std::fs::File::create(filename).expect("I wanted to create a file");
-		for et in all_data.income_types.types.iter() {
+		for et in all_data.get_income_types().get_types().iter() {
 			writeln!(file, "{et}")?;
 		}
 	}

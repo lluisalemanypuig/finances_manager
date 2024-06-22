@@ -54,7 +54,6 @@ mod menu_expenses;
 mod menu_expense_types;
 mod menu_statistics;
 
-type ConceptTypes = concept_types::ConceptTypes;
 type AllExpenses = all_activities::AllActivities;
 
 fn print_main_menu() {
@@ -83,11 +82,7 @@ fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 				io::write_all_data(&data_dir, all_data)
 					.expect("Could not write data");
 				
-				for ye in all_data.activities.iter_mut() {
-					ye.set_changes(false);
-				}
-				all_data.expense_types.set_changes(false);
-				all_data.income_types.set_changes(false);
+				all_data.set_changes(false);
 			},
 			_ => println!("Nothing to do..."),
 		}
@@ -118,20 +113,12 @@ fn main() {
 	println!("    Reading activities data...");
 	let mut all_data = io::read_all_activities_data(&data_dir);
 	
-	for ye in all_data.activities.iter() {
-		if ye.get_expenses().has_changes() {
-			println!("year {} has changes", ye.get_year());
-		}
-	}
-
 	println!("    Reading expense types...");
-	all_data.expense_types = ConceptTypes::new_vec(
-		io::read_expense_types(&data_dir)
-	);
+	io::read_expense_types(&data_dir, &mut all_data);
 	println!("    Reading income types...");
-	all_data.income_types = ConceptTypes::new_vec(
-		io::read_income_types(&data_dir)
-	);
+	io::read_income_types(&data_dir, &mut all_data);
+
+	all_data.set_changes(false);
 
 	println!("");
 	println!("");

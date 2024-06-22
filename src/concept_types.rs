@@ -32,51 +32,52 @@
 
 #[derive(Debug)]
 pub struct ConceptTypes {
-	changes: bool,
+	m_changes: bool,
 
-	pub types: Vec<String>
+	m_types: Vec<String>
 }
 
 impl ConceptTypes {
 	pub fn new() -> ConceptTypes {
 		ConceptTypes {
-			changes: false,
-			types: Vec::new()
-		}
-	}
-	pub fn new_vec(ts: Vec<String>) -> ConceptTypes {
-		ConceptTypes {
-			changes: false,
-			types: ts
+			m_changes: false,
+			m_types: Vec::new()
 		}
 	}
 
-	pub fn has_changes(&self) -> bool { self.changes }
+	pub fn get_types(&self) -> &Vec<String> { &self.m_types }
+
+	pub fn set_types(&mut self, types: Vec<String>) {
+		self.m_types = types;
+		self.m_changes = true;
+	}
+
+	pub fn has_changes(&self) -> bool { self.m_changes }
 	pub fn set_changes(&mut self, c: bool) {
-		self.changes = c;
+		self.m_changes = c;
 	}
 
 	pub fn has_type(&self, expense_type: &String) -> bool {
-		self.types.iter().position(|e| e == expense_type).is_some()
+		self.m_types.iter().position(|e| e == expense_type).is_some()
 	}
 
 	pub fn position_type(&self, expense_type: &String) -> Option<usize> {
-		self.types.iter().position(|e| e == expense_type)
+		self.m_types.iter().position(|e| e == expense_type)
 	}
 
 	pub fn remove(&mut self, idx: usize) {
-		self.types.remove(idx);
-		self.changes = true;
+		self.m_types.remove(idx);
+		self.m_changes = true;
 	}
 
 	pub fn replace(&mut self, idx: usize, new_elem: String) {
-		self.types[idx] = new_elem;
-		self.changes = true;
+		self.m_types[idx] = new_elem;
+		self.m_changes = true;
 	}
 
 	pub fn add(&mut self, new_elem: String) {
-		self.types.push(new_elem);
-		self.changes = true;
+		self.m_types.push(new_elem);
+		self.m_changes = true;
 	}
 
 	pub fn is_type_ok(&self, expense_type: &String) -> bool {

@@ -40,17 +40,17 @@ type AllExpenses = all_activities::AllActivities;
 type ExpenseSummary = expense_summary::ExpenseSummary;
 
 fn statistics_by_expense_type(all_data: &AllExpenses) {
-	let expense_type_opt = menu_utils::read_correct_expense_type(&all_data.expense_types);
+	let expense_type_opt = menu_utils::read_correct_expense_type(&all_data.get_expense_types());
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
 
-	if !all_data.expense_types.is_type_ok(&expense_type) {
+	if !all_data.get_expense_types().is_type_ok(&expense_type) {
 		println!("Non existent expense type '{expense_type}'.");
 		return;
 	}
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.activities.iter() {
+	for year_data in all_data.get_activities().iter() {
 		println!("Data from year: {}", year_data.get_year());
 		println!("====================");
 		println!("");
@@ -86,7 +86,7 @@ fn history_of_expenses<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> s
 
 	let mut summary: std::collections::BTreeMap<String, (u32, f32)> = std::collections::BTreeMap::new();
 
-	for year in all_data.activities.iter() {
+	for year in all_data.get_activities().iter() {
 		for month in year.get_expenses().get_activities().iter() {
 			for exp in month.get_activities().iter().filter(|e| e.expense_type != "Income") {
 
@@ -115,7 +115,7 @@ fn statistics_by_price(all_data: &AllExpenses) {
 	let upper: f32 = io::read_float();
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.activities.iter() {
+	for year_data in all_data.get_activities().iter() {
 		println!("Data from year: {}", year_data.get_year());
 		println!("====================");
 		println!("");
@@ -148,7 +148,7 @@ fn statistics_by_place(all_data: &AllExpenses) {
 	let place: String = io::read_string();
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.activities.iter() {
+	for year_data in all_data.get_activities().iter() {
 		println!("Data from year: {}", year_data.get_year());
 		println!("====================");
 		println!("");
@@ -181,7 +181,7 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 	let substring: String = io::read_string();
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.activities.iter() {
+	for year_data in all_data.get_activities().iter() {
 		println!("Data from year: {}", year_data.get_year());
 		println!("--------------------");
 		println!("");
@@ -218,7 +218,7 @@ fn history_of_places<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> std
 
 	let mut summary: std::collections::BTreeMap<String, (u32, f32)> = std::collections::BTreeMap::new();
 
-	for year in all_data.activities.iter() {
+	for year in all_data.get_activities().iter() {
 		for month in year.get_expenses().get_activities().iter() {
 			for exp in month.get_activities().iter().filter(|e| e.expense_type != "Income") {
 
