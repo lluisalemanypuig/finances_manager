@@ -41,7 +41,7 @@ pub struct Income {
 	pub place: String,
 	pub description: String
 }
- 
+
 impl Eq for Income { }
  
 impl Ord for Income {
