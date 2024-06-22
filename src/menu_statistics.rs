@@ -57,7 +57,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.activities.iter() {
+		for month_data in year_data.get_expenses().get_activities().iter() {
 
 			let current_month = menu_utils::display_and_accounting(
 				month_data,
@@ -87,8 +87,8 @@ fn history_of_expenses<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> s
 	let mut summary: std::collections::BTreeMap<String, (u32, f32)> = std::collections::BTreeMap::new();
 
 	for year in all_data.activities.iter() {
-		for month in year.activities.iter() {
-			for exp in month.expenses.iter().filter(|e| e.expense_type != "Income") {
+		for month in year.get_expenses().get_activities().iter() {
+			for exp in month.get_activities().iter().filter(|e| e.expense_type != "Income") {
 
 				match summary.get_mut(&exp.expense_type) {
 					Some( (num_times, total_value) ) => {
@@ -122,7 +122,7 @@ fn statistics_by_price(all_data: &AllExpenses) {
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.activities.iter() {
+		for month_data in year_data.get_expenses().get_activities().iter() {
 
 			let current_month = menu_utils::display_and_accounting(
 				month_data,
@@ -155,7 +155,7 @@ fn statistics_by_place(all_data: &AllExpenses) {
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.activities.iter() {
+		for month_data in year_data.get_expenses().get_activities().iter() {
 
 			let current_month: expense_summary::ExpenseSummary = menu_utils::display_and_accounting(
 				month_data,
@@ -188,7 +188,7 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.activities.iter() {
+		for month_data in year_data.get_expenses().get_activities().iter() {
 
 			let current_month = menu_utils::display_and_accounting(
 				month_data,
@@ -219,8 +219,8 @@ fn history_of_places<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> std
 	let mut summary: std::collections::BTreeMap<String, (u32, f32)> = std::collections::BTreeMap::new();
 
 	for year in all_data.activities.iter() {
-		for month in year.activities.iter() {
-			for exp in month.expenses.iter().filter(|e| e.expense_type != "Income") {
+		for month in year.get_expenses().get_activities().iter() {
+			for exp in month.get_activities().iter().filter(|e| e.expense_type != "Income") {
 
 				match summary.get_mut(&exp.place) {
 					Some( (num_times, total_value) ) => {

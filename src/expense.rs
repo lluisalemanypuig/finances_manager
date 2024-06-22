@@ -30,6 +30,8 @@
  *
  ********************************************************************/
 
+use crate::traits::AsReferences;
+
 use crate::date;
 
 #[derive(Debug,PartialEq)]
@@ -125,7 +127,7 @@ impl std::str::FromStr for Expense {
 	}
 }
 
-impl Expense {
-	pub fn as_ref(&self) -> &Expense { self }
-	pub fn as_mut(&mut self) -> &mut Expense { self }
+impl AsReferences<Expense> for Expense {
+	fn as_ref(&self) -> &Expense { self }
+	fn as_mut(&mut self) -> &mut Expense { self }
 }

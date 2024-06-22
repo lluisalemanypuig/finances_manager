@@ -72,8 +72,8 @@ fn rename_expense_type(all_data: &mut AllExpenses) {
 		// replace the old expense type throughout the entire list of expenses
 		for ye in all_data.activities.iter_mut() {
 			ye.set_changes(true);
-			for me in ye.activities.iter_mut() {
-				for e in me.expenses.iter_mut().filter(|e| e.expense_type == old_expense) {
+			for me in ye.get_expenses_mut().get_activities_mut().iter_mut() {
+				for e in me.get_activities_mut().iter_mut().filter(|e| e.expense_type == old_expense) {
 					e.expense_type = new_expense.clone();
 				}
 			}

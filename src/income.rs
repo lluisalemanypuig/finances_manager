@@ -30,6 +30,8 @@
  *
  ********************************************************************/
 
+use crate::traits::AsReferences;
+
 use crate::date;
 
 #[derive(Debug,PartialEq)]
@@ -49,7 +51,6 @@ impl Ord for Income {
 		self.day_of_year.cmp(&other.day_of_year)
 	}
 }
- 
 impl PartialOrd for Income {
 	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
 		Some(self.cmp(other))
@@ -124,9 +125,9 @@ impl std::str::FromStr for Income {
 		})
 	}
 }
- 
-impl Income {
-	pub fn as_ref(&self) -> &Income { self }
-	pub fn as_mut(&mut self) -> &mut Income { self }
+
+impl AsReferences<Income> for Income {
+	fn as_ref(&self) -> &Income { self }
+	fn as_mut(&mut self) -> &mut Income { self }
 }
  

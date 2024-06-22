@@ -40,7 +40,7 @@ use crate::expense_summary;
 
 type Expense = expense::Expense;
 type ConecptTypes = concept_types::ConceptTypes;
-type MonthlyActivities = monthly_activities::MonthlyActivities;
+type MonthlyActivities = monthly_activities::MonthlyActivities<Expense>;
 type ExpenseSummary = expense_summary::ExpenseSummary;
 
 pub fn read_option<F: Fn()>(f: F, min_valid: u32, max_valid: u32) -> u32 {
@@ -105,10 +105,10 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	let place_width =
 		std::cmp::max(
 			5,
-			month_data.expenses
-			.iter()
-			.filter(|e: &&expense::Expense| func(e))
-			.fold(0, |max, val| if val.place.len() > max { val.place.len() } else { max })
+			month_data.get_activities()
+				.iter()
+				.filter(|e: &&expense::Expense| func(e))
+				.fold(0, |max, val| if val.place.len() > max { val.place.len() } else { max })
 		);
 	let place_main_divider = std::iter::repeat("—").take(place_width).collect::<String>();
 	let place_mid_divider: String = std::iter::repeat("·").take(place_width).collect::<String>();
@@ -117,10 +117,10 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	let city_width =
 		std::cmp::max(
 			5,
-			month_data.expenses
-			.iter()
-			.filter(|e: &&expense::Expense| func(e))
-			.fold(0, |max, val| if val.city.len() > max { val.city.len() } else { max })
+			month_data.get_activities()
+				.iter()
+				.filter(|e: &&expense::Expense| func(e))
+				.fold(0, |max, val| if val.city.len() > max { val.city.len() } else { max })
 		);
 	let city_main_divider = std::iter::repeat("—").take(city_width).collect::<String>();
 	let city_mid_divider: String = std::iter::repeat("·").take(city_width).collect::<String>();
@@ -151,7 +151,7 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 		city: ci,
 		description: descr
 	})
-	in month_data.expenses.iter().filter(|e| func(e)).enumerate()
+	in month_data.get_activities().iter().filter(|e| func(e)).enumerate()
 	{
 		some_data = true;
 		

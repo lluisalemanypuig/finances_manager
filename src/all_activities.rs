@@ -32,6 +32,9 @@
 
 extern crate duplicate;
 
+use crate::expense::Expense;
+use crate::income::Income;
+
 use crate::date::Month;
 use crate::concept_types::ConceptTypes;
 use crate::monthly_activities::MonthlyActivities;
@@ -77,9 +80,14 @@ impl AllActivities {
 		}
 	}
 
-	pub fn get_month(&self, y: &u32, m: &Month) -> Option<&MonthlyActivities> {
+	#[duplicate::duplicate_item(
+		method               retrieve       result;
+		[get_month_expenses] [get_expenses] [Expense];
+		[get_month_incomes]  [get_incomes]  [Income] ;
+	)]
+	pub fn method(&self, y: &u32, m: &Month) -> Option<&MonthlyActivities<result>> {
 		if let Some(year) = self.get_year(y) {
-			year.get_month(m)
+			year.retrieve().get_month(m)
 		}
 		else {
 			None
@@ -90,7 +98,7 @@ impl AllActivities {
 		self.activities.binary_search_by(|e| e.get_year().cmp(&y)).is_ok()
 	}
 
-	pub fn add_year(&mut self, y: &u32) -> &mut YearlyActivities {
+	pub fn add_year(&mut self, y: u32) -> &mut YearlyActivities {
 		let res = self.activities.binary_search_by(|e| e.get_year().cmp(&y));
 		match res {
 			Ok(pos) => {
@@ -100,13 +108,13 @@ impl AllActivities {
 			Err(pos) => {
 				// year does not exist
 				self.activities.insert(pos,
-					YearlyActivities::new_year(y, true)
+					YearlyActivities::new_year(y)
 				);
-				if self.m_min_year > *y {
-					self.m_min_year = *y;
+				if self.m_min_year > y {
+					self.m_min_year = y;
 				}
-				if self.m_max_year < *y {
-					self.m_max_year = *y;
+				if self.m_max_year < y {
+					self.m_max_year = y;
 				}
 				&mut self.activities[pos]
 			}
@@ -135,6 +143,12 @@ impl AllActivities {
 		}
 		else {
 			self.get_year_mut(&year_acts.get_year()).unwrap().merge(year_acts);
+		}
+	}
+
+	pub fn set_changes(&mut self, c: bool) {
+		for ye in self.activities.iter_mut() {
+			ye.set_changes(c);
 		}
 	}
 

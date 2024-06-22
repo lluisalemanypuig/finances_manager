@@ -45,7 +45,7 @@ use crate::all_activities;
 use crate::expense_summary;
 
 type Expense = expense::Expense;
-type MonthlyActivities = monthly_activities::MonthlyActivities;
+type MonthlyActivities = monthly_activities::MonthlyActivities<Expense>;
 type YearlyActivities = yearly_activities::YearlyActivities;
 type AllExpenses = all_activities::AllActivities;
 
@@ -64,15 +64,15 @@ fn print_expense_data_year(year_data: &YearlyActivities)
 	println!("--------------------");
 	
 	let mut total_entries = 0;
-	for month_data in year_data.activities.iter() {
-		total_entries += month_data.expenses.len();
+	for month_data in year_data.get_expenses().get_activities().iter() {
+		total_entries += month_data.size();
 	}
 	
 	let mut current_year = ExpenseSummary::new();
 
 	println!("    Found {} entries", total_entries);
 	println!("");
-	for month_data in year_data.activities.iter() {
+	for month_data in year_data.get_expenses().get_activities().iter() {
 		let current_month = print_expense_data_month(month_data);
 		current_year.merge(current_month);
 	}
@@ -136,7 +136,7 @@ fn print_expense_data_month_user(all_data: &AllExpenses) {
 	if month_opt.is_none() { return; }
 	let month = month_opt.unwrap();
 	
-	let res = all_data.get_month(&year, &month);
+	let res = all_data.get_month_expenses(&year, &month);
 	if let Some(&ref month_data) = res {
 		print_expense_data_month(&month_data);
 	}
@@ -157,7 +157,7 @@ fn print_expense_data_month_current(all_data: &AllExpenses) {
 	}
 	let month = month_conv.expect("This should have worked!");
 	
-	let res = all_data.get_month(&year, &month);
+	let res = all_data.get_month_expenses(&year, &month);
 	if let Some(&ref month_data) = res {
 		print_expense_data_month(&month_data);
 	}
@@ -174,8 +174,8 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
 
-	let year_data = all_data.add_year(&year);
-	let month_data = year_data.add_month(&month);
+	let year_data = all_data.add_year(year);
+	let month_data = year_data.get_expenses_mut().add(&month);
 
 	println!("Price:");
 	let price: f32 = io::read_float();
@@ -192,7 +192,7 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 		None => "".to_string()
 	};
 
-	month_data.add_expense(Expense {
+	month_data.push(Expense {
 		day_of_year : date::Date { year, month, day},
 		price: price,
 		expense_type: expense_type,
@@ -200,7 +200,6 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 		city: city,
 		description: description
 	});
-	year_data.set_changes(true);
 }
 
 fn add_new_expense(all_data: &mut AllExpenses) {
@@ -234,7 +233,7 @@ fn add_new_expense_today(all_data: &mut AllExpenses) {
 	add_new_expense_with_date(all_data, year, month, day);
 }
 
-fn add_new_expense_to_year_month(all_data: &mut AllExpenses) {
+fn add_new_expenses_to_year_month(all_data: &mut AllExpenses) {
 	println!("Year:");
 	let year: u32 = io::read_int();
 
@@ -243,13 +242,11 @@ fn add_new_expense_to_year_month(all_data: &mut AllExpenses) {
 	if month_opt.is_none() { return; }
 	let month = month_opt.unwrap();
 
-	let mut changes: bool = false;
 	loop {
 		println!("Day:");
 		match io::read_int_or_empty::<u8>() {
 			Some(day) => {
 				add_new_expense_with_date(all_data, year, month.clone(), day);
-				changes = true;
 				println!("");
 			},
 			None => {
@@ -257,8 +254,6 @@ fn add_new_expense_to_year_month(all_data: &mut AllExpenses) {
 			}
 		}
 	}
-
-	all_data.get_year_mut(&year).unwrap().set_changes(changes);
 }
 
 fn edit_expense(all_data: &mut AllExpenses) {
@@ -274,14 +269,14 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	if month_opt.is_none() { return; }
 	let month = month_opt.unwrap();
 
-	if !all_data.get_year(&year).unwrap().has_month(&month) {
+	if !all_data.get_year(&year).unwrap().get_expenses().has_month(&month) {
 		println!("Month '{month}' does not exist");
 		return;
 	}
 
 	{
 	let year_data = all_data.get_year(&year).unwrap();
-	let month_data = year_data.get_month(&month).unwrap();
+	let month_data = year_data.get_expenses().get_month(&month).unwrap();
 	menu_utils::display_and_accounting(month_data, |_| true);
 	}
 
@@ -292,15 +287,15 @@ fn edit_expense(all_data: &mut AllExpenses) {
 
 	let expense_type_opt: Option<String>;
 	{
-		let month_data = all_data.get_month(&year, &month).expect("Expected month data");
-		let expense = month_data.get_expense(id_expense);
+		let month_data = all_data.get_month_expenses(&year, &month).expect("Expected month data");
+		let expense = month_data.get(id_expense);
 		println!("Expense Type: {} (leave blank to keep the value)", expense.expense_type);
 		expense_type_opt = menu_utils::read_correct_expense_type(&all_data.expense_types)
 	}
 	
-	let year_data = all_data.add_year(&year);
-	let month_data = year_data.add_month(&month);
-	let expense = month_data.get_expense_mut(id_expense);
+	let year_data = all_data.add_year(year);
+	let month_data = year_data.get_expenses_mut().add(&month);
+	let expense = month_data.get_mut(id_expense);
 	
 	if expense_type_opt.is_some() {
 		expense.expense_type = expense_type_opt.unwrap();
@@ -342,17 +337,17 @@ fn remove_expense(all_data: &mut AllExpenses) {
 	if month_opt.is_none() { return; }
 	let month = month_opt.unwrap();
 
-	if !all_data.get_year(&year).unwrap().has_month(&month) {
+	if !all_data.get_year(&year).unwrap().get_expenses().has_month(&month) {
 		println!("Month '{month}' does not exist");
 		return;
 	}
 
 	println!("Id of expense to be deleted.");
 	if let Some(id_expense) = io::read_int_or_empty::<usize>() {
-		let year_data = all_data.add_year(&year);
-		let month_data = year_data.add_month(&month);
+		let year_data = all_data.add_year(year);
+		let month_data = year_data.get_expenses_mut().add(&month);
 
-		month_data.remove_expense(id_expense);
+		month_data.remove(id_expense);
 		year_data.set_changes(true);
 	}
 }
@@ -389,7 +384,7 @@ pub fn menu(all_data: &mut AllExpenses) {
 			5 => print_expense_data_month_current(&all_data),
 			6 => add_new_expense(all_data),
 			7 => add_new_expense_today(all_data),
-			8 => add_new_expense_to_year_month(all_data),
+			8 => add_new_expenses_to_year_month(all_data),
 			9 => edit_expense(all_data),
 			10 => remove_expense(all_data),
 			_ => println!("Nothing to do..."),

@@ -30,15 +30,17 @@
  *
  ********************************************************************/
 
-use crate::date::Month;
-use crate::monthly_activities::MonthlyActivities;
+use crate::monthly_activities::MonthlyActivitiesCollection;
+
+use crate::expense::Expense;
+use crate::income::Income;
 
 #[derive(Debug)]
 pub struct YearlyActivities {
-	changes: bool,
-
 	m_year: u32,
-	pub activities: Vec<MonthlyActivities>
+
+	m_expenses: MonthlyActivitiesCollection<Expense>,
+	m_incomes: MonthlyActivitiesCollection<Income>,
 }
 
 impl Eq for YearlyActivities {}
@@ -83,16 +85,30 @@ impl PartialOrd<YearlyActivities> for u32 {
 impl YearlyActivities {
 	pub fn new() -> YearlyActivities {
 		YearlyActivities {
-			changes: false,
 			m_year: 0,
-			activities: Vec::new()
+			m_expenses: MonthlyActivitiesCollection::new(),
+			m_incomes: MonthlyActivitiesCollection::new(),
 		}
 	}
-	pub fn new_year(y: &u32, changes: bool) -> YearlyActivities {
+	pub fn new_year(y: u32) -> YearlyActivities {
 		YearlyActivities {
-			m_year: *y,
-			activities: Vec::new(),
-			changes
+			m_year: y,
+			m_expenses: MonthlyActivitiesCollection::new_changes(true),
+			m_incomes: MonthlyActivitiesCollection::new_changes(true),
+		}
+	}
+	pub fn new_changes(c: bool) -> YearlyActivities {
+		YearlyActivities {
+			m_year: 0,
+			m_expenses: MonthlyActivitiesCollection::new_changes(c),
+			m_incomes: MonthlyActivitiesCollection::new_changes(c),
+		}
+	}
+	pub fn new_year_changes(y: u32, c: bool) -> YearlyActivities {
+		YearlyActivities {
+			m_year: y,
+			m_expenses: MonthlyActivitiesCollection::new_changes(c),
+			m_incomes: MonthlyActivitiesCollection::new_changes(c),
 		}
 	}
 
@@ -102,68 +118,31 @@ impl YearlyActivities {
 	}
 
 	pub fn as_ref(&self) -> &YearlyActivities { self }
-	pub fn as_mut(&mut self) -> &mut YearlyActivities { self }
-
-	pub fn has_changes(&self) -> bool { self.changes }
-	pub fn set_changes(&mut self, c: bool) {
-		self.changes = c;
-	}
-
-	pub fn has_month(&self, m: &Month) -> bool {
-		let res = self.activities.binary_search_by(|e| e.month.cmp(&m));
-		match res {
-			Ok(_) => true,
-			Err(_) => false
-		}
-	}
-
-	#[duplicate::duplicate_item(
-		method           convert   reference(type);
-		[get_month]      [as_ref]  [& type]       ;
-		[get_month_mut]  [as_mut]  [&mut type]    ;
-	)]
-	pub fn method(self: reference([Self]), m: &Month) -> Option<reference([MonthlyActivities])> {
-		let res = self.activities.binary_search_by(|e| e.month.cmp(&m));
-		match res {
-			Ok(idx) => Some(self.activities[idx].convert()),
-			Err(_) => None
-		}
-	}
-
-	pub fn add_month(&mut self, m: &Month) -> &mut MonthlyActivities {
-		let res = self.activities.binary_search_by(|e| e.month.cmp(&m));
-		match res {
-			Ok(pos) => {
-				// month already exists
-				&mut self.activities[pos]
-			},
-			Err(pos) => {
-				// month does not exist
-				self.activities.insert(pos, MonthlyActivities::new());
-				&mut self.activities[pos]
-			}
-		}
-	}
-
-	pub fn push_month(&mut self, m: MonthlyActivities) {
-		let res = self.activities.binary_search_by(|e| e.month.cmp(&m.month));
-		match res {
-			Ok(_) => { },
-			Err(pos) => {
-				self.activities.insert(pos, m);
-			}
-		}
+	pub fn as_mut(&mut self) -> &mut YearlyActivities {
+		self.set_changes(true);
+		self
 	}
 
 	pub fn merge(&mut self, year_acts: YearlyActivities) {
-		for month in year_acts.activities.into_iter() {
-			if !self.has_month(&month.month) {
-				self.push_month(month);
-			}
-			else {
-				self.get_month_mut(&month.month).unwrap().merge(month);
-			}
-		}
+		self.m_expenses.merge(year_acts.m_expenses);
+		self.m_incomes.merge(year_acts.m_incomes);
+		self.set_changes(true);
 	}
 
+	pub fn get_expenses(&self) -> &MonthlyActivitiesCollection<Expense> { &self.m_expenses }
+	pub fn get_expenses_mut(&mut self) -> &mut MonthlyActivitiesCollection<Expense> {
+		self.m_expenses.set_changes(true);
+		&mut self.m_expenses
+	}
+
+	pub fn get_incomes(&self) -> &MonthlyActivitiesCollection<Income> { &self.m_incomes }
+	pub fn get_incomes_mut(&mut self) -> &mut MonthlyActivitiesCollection<Income> {
+		self.m_incomes.set_changes(true);
+		&mut self.m_incomes
+	}
+
+	pub fn set_changes(&mut self, c: bool) {
+		self.m_expenses.set_changes(c);
+		self.m_incomes.set_changes(c);
+	}
 }

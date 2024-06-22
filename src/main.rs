@@ -35,6 +35,8 @@ extern crate serde_json;
 
 use std::io::Read;
 
+mod traits;
+
 mod date;
 mod io;
 
@@ -78,11 +80,14 @@ fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 			2 => menu_expense_types::menu(all_data),
 			3 => menu_statistics::menu(all_data),
 			4 => {
-				io::write_all_data(&data_dir, all_data).expect("Could not write data");
+				io::write_all_data(&data_dir, all_data)
+					.expect("Could not write data");
+				
 				for ye in all_data.activities.iter_mut() {
 					ye.set_changes(false);
 				}
 				all_data.expense_types.set_changes(false);
+				all_data.income_types.set_changes(false);
 			},
 			_ => println!("Nothing to do..."),
 		}
@@ -113,6 +118,12 @@ fn main() {
 	println!("    Reading activities data...");
 	let mut all_data = io::read_all_activities_data(&data_dir);
 	
+	for ye in all_data.activities.iter() {
+		if ye.get_expenses().has_changes() {
+			println!("year {} has changes", ye.get_year());
+		}
+	}
+
 	println!("    Reading expense types...");
 	all_data.expense_types = ConceptTypes::new_vec(
 		io::read_expense_types(&data_dir)
