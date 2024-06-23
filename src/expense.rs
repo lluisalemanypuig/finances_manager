@@ -38,7 +38,7 @@ use crate::date;
 pub struct Expense {
 	pub day_of_year: date::Date,
 	pub price: f32,
-	pub expense_type: String,
+	pub concept: String,
 	pub place: String,
 	pub city: String,
 	pub description: String
@@ -119,7 +119,7 @@ impl std::str::FromStr for Expense {
 		Ok(Expense {
 			day_of_year: date_fromstr,
 			price: price_fromstr,
-			expense_type: et.to_string(),
+			concept: et.to_string(),
 			place: pl.to_string(),
 			city: ci.to_string(),
 			description: descr.to_string()

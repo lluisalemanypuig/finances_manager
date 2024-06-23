@@ -67,13 +67,13 @@ impl AllActivities {
 		&mut self.m_activities
 	}
 
-	pub fn get_expense_types(&self) -> &ConceptTypes { &self.m_expense_types }
-	pub fn get_expense_types_mut(&mut self) -> &mut ConceptTypes {
+	pub fn get_expense_concept_types(&self) -> &ConceptTypes { &self.m_expense_types }
+	pub fn get_expense_concept_types_mut(&mut self) -> &mut ConceptTypes {
 		self.m_expense_types.set_changes(true);
 		&mut self.m_expense_types
 	}
-	pub fn get_income_types(&self) -> &ConceptTypes { &self.m_income_types }
-	pub fn get_income_types_mut(&mut self) -> &mut ConceptTypes {
+	pub fn get_income_concept_types(&self) -> &ConceptTypes { &self.m_income_types }
+	pub fn get_income_concept_types_mut(&mut self) -> &mut ConceptTypes {
 		self.m_income_types.set_changes(true);
 		&mut self.m_income_types
 	}

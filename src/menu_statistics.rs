@@ -40,11 +40,11 @@ type AllExpenses = all_activities::AllActivities;
 type ExpenseSummary = expense_summary::ExpenseSummary;
 
 fn statistics_by_expense_type(all_data: &AllExpenses) {
-	let expense_type_opt = menu_utils::read_correct_expense_type(&all_data.get_expense_types());
+	let expense_type_opt = menu_utils::read_correct_expense_type(&all_data.get_expense_concept_types());
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
 
-	if !all_data.get_expense_types().is_type_ok(&expense_type) {
+	if !all_data.get_expense_concept_types().is_type_ok(&expense_type) {
 		println!("Non existent expense type '{expense_type}'.");
 		return;
 	}
@@ -61,7 +61,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 
 			let current_month = menu_utils::display_and_accounting(
 				month_data,
-				|e| e.expense_type == expense_type
+				|e| e.concept == expense_type
 			);
 			current_year.merge(current_month);
 		}
@@ -88,15 +88,15 @@ fn history_of_expenses<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> s
 
 	for year in all_data.get_activities().iter() {
 		for month in year.get_expenses().get_activities().iter() {
-			for exp in month.get_activities().iter().filter(|e| e.expense_type != "Income") {
+			for exp in month.get_activities().iter().filter(|e| e.concept != "Income") {
 
-				match summary.get_mut(&exp.expense_type) {
+				match summary.get_mut(&exp.concept) {
 					Some( (num_times, total_value) ) => {
 						*num_times += 1;
 						*total_value += exp.price;
 					},
 					None => {
-						summary.insert( exp.expense_type.clone(), (1, exp.price) );
+						summary.insert( exp.concept.clone(), (1, exp.price) );
 					}
 				}
 
@@ -220,7 +220,7 @@ fn history_of_places<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> std
 
 	for year in all_data.get_activities().iter() {
 		for month in year.get_expenses().get_activities().iter() {
-			for exp in month.get_activities().iter().filter(|e| e.expense_type != "Income") {
+			for exp in month.get_activities().iter().filter(|e| e.concept != "Income") {
 
 				match summary.get_mut(&exp.place) {
 					Some( (num_times, total_value) ) => {

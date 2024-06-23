@@ -51,7 +51,7 @@ mod expense_summary;
 
 mod menu_utils;
 mod menu_expenses;
-mod menu_expense_types;
+mod menu_concept_types;
 mod menu_statistics;
 
 type AllExpenses = all_activities::AllActivities;
@@ -60,9 +60,11 @@ fn print_main_menu() {
 	println!("What menu do you want to access?");
 	println!("");
 	println!("    1. Expenses menu");
-	println!("    2. Expenses types menu");
-	println!("    3. Statistics menu");
-	println!("    4. Save all data");
+	println!("    2. Expense concept types menu");
+	println!("    3. Incomes menu");
+	println!("    4. Income concept types menu");
+	println!("    5. Statistics menu");
+	println!("    6. Save all data");
 	println!("    0. Leave");
 }
 
@@ -76,9 +78,11 @@ fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 
 		match option {
 			1 => menu_expenses::menu(all_data),
-			2 => menu_expense_types::menu(all_data),
-			3 => menu_statistics::menu(all_data),
-			4 => {
+			2 => menu_concept_types::menu_expense_concept_types(all_data),
+			3 => menu_expenses::menu(all_data),
+			4 => menu_concept_types::menu_income_concept_types(all_data),
+			5 => menu_statistics::menu(all_data),
+			6 => {
 				io::write_all_data(&data_dir, all_data)
 					.expect("Could not write data");
 				

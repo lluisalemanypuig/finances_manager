@@ -169,7 +169,7 @@ fn print_expense_data_month_current(all_data: &AllExpenses) {
 fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date::Month, day: u8) {
 	let expense_type_opt = || -> Option<String> {
 		println!("Expense Type:");
-		menu_utils::read_correct_expense_type(&all_data.get_expense_types())
+		menu_utils::read_correct_expense_type(&all_data.get_expense_concept_types())
 	}();
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
@@ -195,7 +195,7 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 	month_data.push(Expense {
 		day_of_year : date::Date { year, month, day},
 		price: price,
-		expense_type: expense_type,
+		concept: expense_type,
 		place: place,
 		city: city,
 		description: description
@@ -289,8 +289,8 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	{
 		let month_data = all_data.get_month_expenses(&year, &month).expect("Expected month data");
 		let expense = month_data.get(id_expense);
-		println!("Expense Type: {} (leave blank to keep the value)", expense.expense_type);
-		expense_type_opt = menu_utils::read_correct_expense_type(&all_data.get_expense_types())
+		println!("Expense Type: {} (leave blank to keep the value)", expense.concept);
+		expense_type_opt = menu_utils::read_correct_expense_type(&all_data.get_expense_concept_types())
 	}
 	
 	let year_data = all_data.add_year(year);
@@ -298,7 +298,7 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	let expense = month_data.get_mut(id_expense);
 	
 	if expense_type_opt.is_some() {
-		expense.expense_type = expense_type_opt.unwrap();
+		expense.concept = expense_type_opt.unwrap();
 	}
 
 	println!("Price: {} (leave blank to keep the value)", expense.price);

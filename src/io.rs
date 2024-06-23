@@ -266,12 +266,12 @@ fn read_types(data_dir: &String, filename: String) -> Vec<String> {
 
 pub fn read_expense_types(data_dir: &String, all_data: &mut AllActivities) {
 	let types = read_types(data_dir, "expense_types.txt".to_string());
-	all_data.get_expense_types_mut().set_types(types);
+	all_data.get_expense_concept_types_mut().set_types(types);
 }
 
 pub fn read_income_types(data_dir: &String, all_data: &mut AllActivities) {
 	let types = read_types(data_dir, "income_types.txt".to_string());
-	all_data.get_income_types_mut().set_types(types);
+	all_data.get_income_concept_types_mut().set_types(types);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -293,7 +293,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 				for Expense {
 					day_of_year: d,
 					price: pr,
-					expense_type: et,
+					concept: et,
 					place: pl,
 					city: ci,
 					description: descr
@@ -331,19 +331,19 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 			}
 		}
 	}
-	if all_data.get_expense_types().has_changes() {
-		let filename = data_dir.to_owned() + &"/expense_types.txt".to_string();
+	if all_data.get_expense_concept_types().has_changes() {
+		let filename = data_dir.to_owned() + &"expense_types.txt".to_string();
 		println!("Writing into '{filename}'...");
 		let mut file = std::fs::File::create(filename).expect("I wanted to create a file");
-		for et in all_data.get_expense_types().get_types().iter() {
+		for et in all_data.get_expense_concept_types().get_types().iter() {
 			writeln!(file, "{et}")?;
 		}
 	}
-	if all_data.get_income_types().has_changes() {
-		let filename = data_dir.to_owned() + &"/income_types.txt".to_string();
+	if all_data.get_income_concept_types().has_changes() {
+		let filename = data_dir.to_owned() + &"income_types.txt".to_string();
 		println!("Writing into '{filename}'...");
 		let mut file = std::fs::File::create(filename).expect("I wanted to create a file");
-		for et in all_data.get_income_types().get_types().iter() {
+		for et in all_data.get_income_concept_types().get_types().iter() {
 			writeln!(file, "{et}")?;
 		}
 	}

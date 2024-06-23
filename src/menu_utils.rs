@@ -146,7 +146,7 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	for (i, Expense {
 		day_of_year: d,
 		price: pr,
-		expense_type: et,
+		concept: et,
 		place: pl,
 		city: ci,
 		description: descr
