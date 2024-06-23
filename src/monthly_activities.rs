@@ -42,7 +42,10 @@ pub struct MonthlyActivities<T> {
 	m_activities: Vec<T>
 }
 
-impl<T: AsReferences<T> + Ord> MonthlyActivities<T> {
+impl<T> MonthlyActivities<T>
+where
+	T: AsReferences<T> + Ord
+{
 	/* PUBLIC */
 
 	pub fn new() -> Self {
@@ -151,6 +154,7 @@ where
 	pub fn set_changes(&mut self, c: bool) {
 		self.m_changes = c;
 	}
+	fn nothing(&self, _: bool) { }
 	
 	pub fn has_month(&self, m: &Month) -> bool {
 		let res = self.m_activities.binary_search_by(
@@ -163,21 +167,25 @@ where
 	}
 
 	#[duplicate::duplicate_item(
-		method           convert   reference(type);
-		[get_month]      [as_ref]  [& type]       ;
-		[get_month_mut]  [as_mut]  [&mut type]    ;
+		method           convert   update         reference(type);
+		[get_month]      [as_ref]  [nothing]      [& type]       ;
+		[get_month_mut]  [as_mut]  [set_changes]  [&mut type]    ;
 	)]
 	pub fn method(self: reference([Self]), m: &Month) -> Option<reference([MonthlyActivities<T>])> {
 		let res = self.m_activities.binary_search_by(
 			|e| e.get_month().cmp(&m)
 		);
 		match res {
-			Ok(idx) => Some(self.m_activities[idx].convert()),
+			Ok(idx) => {
+				self.update(true);
+				Some(self.m_activities[idx].convert())
+			},
 			Err(_) => None
 		}
 	}
 
 	pub fn add(&mut self, m: &Month) -> &mut MonthlyActivities<T> {
+		self.set_changes(true);
 		let res = self.m_activities.binary_search_by(
 			|e| e.get_month().cmp(&m)
 		);
@@ -195,6 +203,7 @@ where
 	}
 
 	pub fn push(&mut self, m: MonthlyActivities<T>) {
+		self.set_changes(true);
 		let res = self.m_activities.binary_search_by(
 				|e| e.get_month().cmp(&m.get_month())
 		);
@@ -208,6 +217,7 @@ where
 	}
 
 	pub fn merge(&mut self, acts: MonthlyActivitiesCollection<T>) {
+		self.set_changes(true);
 		for month in acts.m_activities.into_iter() {
 			if !self.has_month(month.get_month()) {
 				self.push(month);

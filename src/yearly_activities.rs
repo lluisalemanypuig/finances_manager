@@ -80,19 +80,13 @@ impl YearlyActivities {
 	}
 
 	pub fn get_expenses(&self) -> &MonthlyActivitiesCollection<Expense> { &self.m_expenses }
-	pub fn get_expenses_mut(&mut self) -> &mut MonthlyActivitiesCollection<Expense> {
-		self.m_expenses.set_changes(true);
-		&mut self.m_expenses
-	}
+	pub fn get_expenses_mut(&mut self) -> &mut MonthlyActivitiesCollection<Expense> { &mut self.m_expenses }
 
 	pub fn iter_incomes(&self) -> std::slice::Iter<'_, MonthlyActivities<Income>> { self.m_incomes.iter() }
 	pub fn iter_mut_incomes(&mut self) -> std::slice::IterMut<'_, MonthlyActivities<Income>> { self.m_incomes.iter_mut() }
 
 	pub fn get_incomes(&self) -> &MonthlyActivitiesCollection<Income> { &self.m_incomes }
-	pub fn get_incomes_mut(&mut self) -> &mut MonthlyActivitiesCollection<Income> {
-		self.m_incomes.set_changes(true);
-		&mut self.m_incomes
-	}
+	pub fn get_incomes_mut(&mut self) -> &mut MonthlyActivitiesCollection<Income> { &mut self.m_incomes }
 
 	pub fn get_year(&self) -> &u32 { &self.m_year }
 	pub fn set_year(&mut self, y: u32) {
@@ -108,7 +102,6 @@ impl YearlyActivities {
 	pub fn merge(&mut self, year_acts: YearlyActivities) {
 		self.m_expenses.merge(year_acts.m_expenses);
 		self.m_incomes.merge(year_acts.m_incomes);
-		self.set_changes(true);
 	}
 
 	pub fn set_changes(&mut self, c: bool) {
