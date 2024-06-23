@@ -515,7 +515,12 @@ fn method(all_data: &mut AllActivities) {
 	}
 }
 
-fn print_expenses_menu() {
+#[duplicate::duplicate_item(
+	method                thing;
+	[print_menu_expenses] ["expense"];
+	[print_menu_income]   ["income"];
+)]
+fn method() {
 	println!("Query and edit the expenses:");
 	println!("");
 	println!("     1. Show all current data");
@@ -523,16 +528,16 @@ fn print_expenses_menu() {
 	println!("     3.     Show data of the current year");
 	println!("     4. Show data of a month");
 	println!("     5.     Show data of the current month");
-	println!("     6. Add another expense");
-	println!("     7.     Add another expense today");
-	println!("     8.     Add expenses to a year and month");
-	println!("     9. Edit an expense");
-	println!("    10. Remove an expense");
+	println!("     6. Add another {}", thing);
+	println!("     7.     Add another {} today", thing);
+	println!("     8.     Add {}s to a year and month", thing);
+	println!("     9. Edit an {}", thing);
+	println!("    10. Remove an {}", thing);
 	println!("     0. Leave");
 }
 
 pub fn menu_expenses(all_data: &mut AllActivities) {
-	let print_function = print_expenses_menu;
+	let print_function = print_menu_expenses;
 	let min_option = 0;
 	let max_option = 10;
 	
@@ -558,7 +563,7 @@ pub fn menu_expenses(all_data: &mut AllActivities) {
 }
 
 pub fn menu_incomes(all_data: &mut AllActivities) {
-	let print_function = print_expenses_menu;
+	let print_function = print_menu_income;
 	let min_option = 0;
 	let max_option = 10;
 	
