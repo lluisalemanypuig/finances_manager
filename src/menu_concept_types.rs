@@ -51,12 +51,12 @@ fn method(all_data: &AllExpenses) {
 }
 
 #[duplicate::duplicate_item(
-	method                     get                         get_mut;
-	[add_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut];
-	[add_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut];
+	thing         method                     get                         get_mut;
+	["expense"]  [add_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut];
+	["income"]   [add_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut];
 )]
 fn method(all_data: &mut AllExpenses) {
-	println!("Enter the new type:");
+	println!("Enter the new {} type:", thing);
 	let new_type = io::read_string();
 
 	if all_data.get().is_type_ok(&new_type) {
@@ -68,18 +68,18 @@ fn method(all_data: &mut AllExpenses) {
 }
 
 #[duplicate::duplicate_item(
-	method                        get                         get_mut                         iter_mut_act;
-	[rename_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut] [iter_mut_expenses];
-	[rename_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut]  [iter_mut_incomes];
+	thing         method                        get                         get_mut                         iter_mut_act;
+	["expense"]  [rename_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut] [iter_mut_expenses];
+	["income"]   [rename_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut]  [iter_mut_incomes];
 )]
 fn method(all_data: &mut AllExpenses) {
-	println!("Enter the type to rename:");
+	println!("Enter the {} type to rename:", thing);
 	let old_type = io::read_string();
 
 	let idx_old_type = all_data.get().position_type(&old_type);
 	
 	if let Some(idx_old) = idx_old_type {
-		println!("Enter the new type:");
+		println!("Enter the new {} type:", thing);
 		let new_type = io::read_string();
 
 		all_data.get_mut().replace(idx_old, new_type.clone());
@@ -100,12 +100,12 @@ fn method(all_data: &mut AllExpenses) {
 }
 
 #[duplicate::duplicate_item(
-	method                        get                         get_mut;
-	[remove_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut];
-	[remove_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut];
+	thing        method                        get                         get_mut;
+	["expense"]  [remove_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut];
+	["income"]   [remove_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut];
 )]
 fn method(all_data: &mut AllExpenses) {
-	println!("Enter the type to remove:");
+	println!("Enter the {} type to remove:", thing);
 	let type_to_remove = io::read_string();
 
 	if let Some(idx) = all_data.get().position_type(&type_to_remove) {
@@ -116,28 +116,28 @@ fn method(all_data: &mut AllExpenses) {
 	}
 }
 
-fn print_expense_concept_types_menu() {
+#[duplicate::duplicate_item(
+	thing        method;
+	["expense"]  [print_expense_concept_types_menu];
+	["income"]   [print_income_concept_types_menu];
+)]
+fn method() {
 	println!("Query and edit the expense concept types:");
 	println!("");
-	println!("    1. Show all expense concept types");
-	println!("    2. Add a new expense concept type");
-	println!("    3. Rename a specific expense concept type");
-	println!("    4. Remove an expense concept type");
+	println!("    1. Show all {} concept types", thing);
+	println!("    2. Add a new {} concept type", thing);
+	println!("    3. Rename a specific {} concept type", thing);
+	println!("    4. Remove an {} concept type", thing);
 	println!("    0. Leave");
 }
 
-fn print_income_concept_types_menu() {
-	println!("Query and edit the income concept types:");
-	println!("");
-	println!("    1. Show all income concept types");
-	println!("    2. Add a new income concept type");
-	println!("    3. Rename a specific income concept type");
-	println!("    4. Remove an income concept type");
-	println!("    0. Leave");
-}
-
-pub fn menu_expense_concept_types(all_data: &mut AllExpenses) {
-	let print_function = print_expense_concept_types_menu;
+#[duplicate::duplicate_item(
+	menu                          print_menu                          print_all_types                    add_type                    rename_type                    remove_type;
+	[menu_expense_concept_types]  [print_expense_concept_types_menu]  [print_expense_concept_types_all]  [add_expense_concept_type]  [rename_expense_concept_type]  [remove_expense_concept_type];
+	[menu_income_concept_types]   [print_income_concept_types_menu]   [print_income_concept_types_all]   [add_income_concept_type]   [rename_income_concept_type]   [remove_income_concept_type];
+)]
+pub fn menu(all_data: &mut AllExpenses) {
+	let print_function = print_menu;
 	let min_option = 0;
 	let max_option = 4;
 	
@@ -145,37 +145,13 @@ pub fn menu_expense_concept_types(all_data: &mut AllExpenses) {
 	while option != 0 {
 		
 		match option {
-			1 => print_expense_concept_types_all(&all_data),
-			2 => add_expense_concept_type(all_data),
-			3 => rename_expense_concept_type(all_data),
-			4 => remove_expense_concept_type(all_data),
+			1 => print_all_types(&all_data),
+			2 => add_type(all_data),
+			3 => rename_type(all_data),
+			4 => remove_type(all_data),
 			_ => println!("Nothing to do..."),
 		}
 		
 		option = menu_utils::read_option(print_function, min_option, max_option);
 	}
-	
-	println!("Goodbye!");
-}
-
-pub fn menu_income_concept_types(all_data: &mut AllExpenses) {
-	let print_function = print_income_concept_types_menu;
-	let min_option = 0;
-	let max_option = 4;
-	
-	let mut option = menu_utils::read_option(print_function, min_option, max_option);
-	while option != 0 {
-		
-		match option {
-			1 => print_income_concept_types_all(&all_data),
-			2 => add_income_concept_type(all_data),
-			3 => rename_income_concept_type(all_data),
-			4 => remove_income_concept_type(all_data),
-			_ => println!("Nothing to do..."),
-		}
-		
-		option = menu_utils::read_option(print_function, min_option, max_option);
-	}
-	
-	println!("Goodbye!");
 }

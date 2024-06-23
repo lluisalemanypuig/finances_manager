@@ -85,7 +85,7 @@ impl AllActivities {
 		&mut self.m_expense_types
 	}
 
-	pub fn iter_income_concept_types(&self) -> std::slice::Iter<'_, String> { self.m_expense_types.iter() }
+	pub fn iter_income_concept_types(&self) -> std::slice::Iter<'_, String> { self.m_income_types.iter() }
 	pub fn iter_mut_income_concept_types(&mut self) -> std::slice::IterMut<'_, String> {
 		self.m_income_types.set_changes(true);
 		self.m_income_types.iter_mut()
