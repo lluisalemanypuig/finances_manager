@@ -48,8 +48,6 @@ impl ConceptTypes {
 	pub fn iter(&self) -> std::slice::Iter<'_, String> { self.m_types.iter() }
 	pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, String> { self.m_types.iter_mut() }
 
-	pub fn get_types(&self) -> &Vec<String> { &self.m_types }
-
 	pub fn set_types(&mut self, types: Vec<String>) {
 		self.m_types = types;
 		self.m_changes = true;
