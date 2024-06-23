@@ -137,12 +137,15 @@ where
 
 	pub fn iter(&self) -> std::slice::Iter<'_, MonthlyActivities<T>> { self.m_activities.iter() }
 	pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, MonthlyActivities<T>> {
-		self.m_changes = true;
+		self.set_changes(true);
 		self.m_activities.iter_mut()
 	}
 
 	pub fn get_activities(&self) -> &Vec<MonthlyActivities<T>> { &self.m_activities }
-	pub fn get_activities_mut(&mut self) -> &mut Vec<MonthlyActivities<T>> { &mut self.m_activities }
+	pub fn get_activities_mut(&mut self) -> &mut Vec<MonthlyActivities<T>> {
+		self.set_changes(true);
+		&mut self.m_activities
+	}
 
 	pub fn has_changes(&self) -> bool { self.m_changes }
 	pub fn set_changes(&mut self, c: bool) {
