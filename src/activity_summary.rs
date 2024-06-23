@@ -43,6 +43,10 @@ impl ActivitySummary {
 		}
 	}
 
+	pub fn get_width_concept(&self) -> usize {
+		self.m_activity_to_money.iter().map(|(s, _)| -> usize { s.len() }).max().unwrap_or(0)
+	}
+
 	pub fn iter_summary(&self) -> std::collections::btree_map::Iter<'_, String, f32> { self.m_activity_to_money.iter() }
 	pub fn iter_mut_summary(&mut self) -> std::collections::btree_map::IterMut<'_, String, f32> { self.m_activity_to_money.iter_mut() }
 

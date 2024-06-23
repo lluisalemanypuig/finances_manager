@@ -50,7 +50,7 @@ mod concept_types;
 mod activity_summary;
 
 mod menu_utils;
-mod menu_expenses;
+mod menu_activities;
 mod menu_concept_types;
 mod menu_statistics;
 
@@ -77,9 +77,9 @@ fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 	while option != 0 {
 
 		match option {
-			1 => menu_expenses::menu(all_data),
+			1 => menu_activities::menu_expenses(all_data),
 			2 => menu_concept_types::menu_expense_concept_types(all_data),
-			3 => menu_expenses::menu(all_data),
+			3 => menu_activities::menu_incomes(all_data),
 			4 => menu_concept_types::menu_income_concept_types(all_data),
 			5 => menu_statistics::menu(all_data),
 			6 => {

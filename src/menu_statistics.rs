@@ -40,7 +40,7 @@ type AllExpenses = all_activities::AllActivities;
 type ExpenseSummary = activity_summary::ActivitySummary;
 
 fn statistics_by_expense_type(all_data: &AllExpenses) {
-	let expense_type_opt = menu_utils::read_correct_expense_type(&all_data.get_expense_concept_types());
+	let expense_type_opt = menu_utils::read_correct_concept_type(&all_data.get_expense_concept_types());
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
 
@@ -59,7 +59,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 
 		for month_data in year_data.iter_expenses() {
 
-			let current_month = menu_utils::display_and_accounting(
+			let current_month = menu_utils::display_and_accounting_expenses(
 				month_data,
 				|e| e.concept == expense_type
 			);
@@ -68,7 +68,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 
 		if current_year.has_data() {
 			println!("This year's summary:");
-			menu_utils::display_expense_summary(&current_year, &"");
+			menu_utils::display_summary_activity(&current_year, &"");
 
 			all_years.merge(current_year);
 		}
@@ -76,7 +76,7 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 
 	if all_years.has_data() {
 		println!("Total history:");
-		menu_utils::display_expense_summary(&all_years, &"");
+		menu_utils::display_summary_activity(&all_years, &"");
 	}
 }
 
@@ -124,7 +124,7 @@ fn statistics_by_price(all_data: &AllExpenses) {
 
 		for month_data in year_data.iter_expenses() {
 
-			let current_month = menu_utils::display_and_accounting(
+			let current_month = menu_utils::display_and_accounting_expenses(
 				month_data,
 				|e| lower <= e.price && e.price <= upper
 			);
@@ -133,14 +133,14 @@ fn statistics_by_price(all_data: &AllExpenses) {
 
 		if current_year.has_data() {
 			println!("This year's summary:");
-			menu_utils::display_expense_summary(&current_year, &"");
+			menu_utils::display_summary_activity(&current_year, &"");
 			all_years.merge(current_year);
 		}
 	}
 
 	if all_years.has_data() {
 		println!("Total history:");
-		menu_utils::display_expense_summary(&all_years, &"");
+		menu_utils::display_summary_activity(&all_years, &"");
 	}
 }
 
@@ -157,7 +157,7 @@ fn statistics_by_place(all_data: &AllExpenses) {
 
 		for month_data in year_data.iter_expenses() {
 
-			let current_month: activity_summary::ActivitySummary = menu_utils::display_and_accounting(
+			let current_month: activity_summary::ActivitySummary = menu_utils::display_and_accounting_expenses(
 				month_data,
 				|e| e.place == place
 			);
@@ -166,14 +166,14 @@ fn statistics_by_place(all_data: &AllExpenses) {
 
 		if current_year.has_data() {
 			println!("This year's summary:");
-			menu_utils::display_expense_summary(&current_year, &"");
+			menu_utils::display_summary_activity(&current_year, &"");
 			all_years.merge(current_year);
 		}
 	}
 
 	if all_years.has_data() {
 		println!("Total history:");
-		menu_utils::display_expense_summary(&all_years, &"");
+		menu_utils::display_summary_activity(&all_years, &"");
 	}
 }
 
@@ -190,7 +190,7 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 
 		for month_data in year_data.iter_expenses() {
 
-			let current_month = menu_utils::display_and_accounting(
+			let current_month = menu_utils::display_and_accounting_expenses(
 				month_data,
 				|e| e.place.contains(&substring)
 			);
@@ -199,7 +199,7 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 
 		if current_year.has_data() {
 			println!("This year's summary:");
-			menu_utils::display_expense_summary(&current_year, &"");
+			menu_utils::display_summary_activity(&current_year, &"");
 
 			all_years.merge(current_year);
 		}
@@ -208,7 +208,7 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 	if all_years.has_data() {
 		println!("Total history:");
 		println!("==============");
-		menu_utils::display_expense_summary(&all_years, &"");
+		menu_utils::display_summary_activity(&all_years, &"");
 	}
 }
 

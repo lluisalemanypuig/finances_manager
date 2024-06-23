@@ -39,77 +39,106 @@ use crate::io::read_float_or_empty;
 use crate::menu_utils;
 
 use crate::expense;
+use crate::income;
 use crate::monthly_activities;
 use crate::yearly_activities;
 use crate::all_activities;
 use crate::activity_summary;
 
 type Expense = expense::Expense;
-type MonthlyActivities = monthly_activities::MonthlyActivities<Expense>;
+type Income = income::Income;
+type MonthlyActivities<T> = monthly_activities::MonthlyActivities<T>;
 type YearlyActivities = yearly_activities::YearlyActivities;
-type AllExpenses = all_activities::AllActivities;
+type AllActivities = all_activities::AllActivities;
 
-type ExpenseSummary = activity_summary::ActivitySummary;
+type ActivitySummary = activity_summary::ActivitySummary;
 
-fn print_expense_data_month(month_data: &MonthlyActivities)
--> ExpenseSummary
+#[duplicate::duplicate_item(
+	method                      func                              activity;
+	[print_data_month_expenses] [display_and_accounting_expenses] [Expense];
+	[print_data_month_incomes]  [display_and_accounting_incomes]  [Income];
+)]
+fn method(month_data: &MonthlyActivities<activity>)
+-> ActivitySummary
 {
-	menu_utils::display_and_accounting(month_data, |_| true)
+	menu_utils::func(month_data, |_| true)
 }
 
-fn print_expense_data_year(year_data: &YearlyActivities)
--> ExpenseSummary
+#[duplicate::duplicate_item(
+	method                     iterate         print;
+	[print_data_year_expenses] [iter_expenses] [print_data_month_expenses];
+	[print_data_year_incomes]  [iter_incomes]  [print_data_month_incomes];
+)]
+fn method(year_data: &YearlyActivities)
+-> ActivitySummary
 {
 	println!("Data from year: {}", year_data.get_year());
 	println!("--------------------");
 	
 	let mut total_entries = 0;
-	for month_data in year_data.iter_expenses() {
+	for month_data in year_data.iterate() {
 		total_entries += month_data.size();
 	}
 	
-	let mut current_year = ExpenseSummary::new();
+	let mut current_year = ActivitySummary::new();
 
 	println!("    Found {} entries", total_entries);
 	println!("");
-	for month_data in year_data.iter_expenses() {
-		let current_month = print_expense_data_month(month_data);
+	for month_data in year_data.iterate() {
+		let current_month = print(month_data);
 		current_year.merge(current_month);
 	}
 
-	println!("This year's summary:");
-	menu_utils::display_expense_summary(&current_year, &"");
+	if current_year.has_data() {
+		println!("This year's summary:");
+		menu_utils::display_summary_activity(&current_year, &"");
+	}
 
 	current_year
 }
 
-fn print_expense_data_all(all_data: &AllExpenses) {
-	let mut all_years = ExpenseSummary::new();
+#[duplicate::duplicate_item(
+	method                    print;
+	[print_data_all_expenses] [print_data_year_expenses];
+	[print_data_all_incomes]  [print_data_year_incomes];
+)]
+fn method(all_data: &AllActivities) {
+	let mut all_years = ActivitySummary::new();
 
 	for year_expense in all_data.iter_activities() {
-		let current_year = print_expense_data_year(&year_expense);
+		let current_year = print(&year_expense);
 		all_years.merge(current_year);
 	}
 
 	println!("Total history:");
 	println!("==============");
-	menu_utils::display_expense_summary(&all_years, &"");
+	menu_utils::display_summary_activity(&all_years, &"");
 }
 
-fn print_expense_data_year_user(all_data: &AllExpenses) {
+#[duplicate::duplicate_item(
+	method                          print;
+	[print_data_year_user_expenses] [print_data_year_expenses];
+	[print_data_year_user_incomes]  [print_data_year_incomes];
+)]
+fn method(all_data: &AllActivities) {
 	println!("What year do you want to see?");
 	let year: u32 = io::read_int();
 	
 	let res = all_data.get_year(&year);
 	if let Some(year) = res {
-		print_expense_data_year(year);
+		print(year);
 	}
 	else {
 		println!("Year '{year}' does not exist!");
 	};
 }
 
-fn print_expense_data_year_current(all_data: &AllExpenses) {
+#[duplicate::duplicate_item(
+	method                             print;
+	[print_data_year_current_expenses] [print_data_year_expenses];
+	[print_data_year_current_incomes]  [print_data_year_incomes];
+)]
+fn method(all_data: &AllActivities) {
 	let now = chrono::prelude::Utc::now();
 	let local_date = now.with_timezone(&chrono::prelude::Local);
 
@@ -117,14 +146,19 @@ fn print_expense_data_year_current(all_data: &AllExpenses) {
 
 	let res = all_data.get_year(&year);
 	if let Some(year) = res {
-		print_expense_data_year(year);
+		print(year);
 	}
 	else {
 		println!("Year '{year}' does not exist!");
 	};
 }
 
-fn print_expense_data_month_user(all_data: &AllExpenses) {
+#[duplicate::duplicate_item(
+	method                           get                  print;
+	[print_data_month_user_expenses] [get_month_expenses] [print_data_month_expenses];
+	[print_data_month_user_incomes]  [get_month_incomes]  [print_data_month_incomes];
+)]
+fn method(all_data: &AllActivities) {
 	println!("What year and month do you want to see? Year -> Month");
 	let year: u32 = io::read_int();
 	if !all_data.has_year(&year) {
@@ -136,16 +170,21 @@ fn print_expense_data_month_user(all_data: &AllExpenses) {
 	if month_opt.is_none() { return; }
 	let month = month_opt.unwrap();
 	
-	let res = all_data.get_month_expenses(&year, &month);
+	let res = all_data.get(&year, &month);
 	if let Some(&ref month_data) = res {
-		print_expense_data_month(&month_data);
+		print(&month_data);
 	}
 	else {
 		println!("Month '{month}' does not exist in year '{year}'.");
 	}
 }
 
-fn print_expense_data_month_current(all_data: &AllExpenses) {
+#[duplicate::duplicate_item(
+	method                              get                  print;
+	[print_data_month_current_expenses] [get_month_expenses] [print_data_month_expenses];
+	[print_data_month_current_incomes]  [get_month_incomes]  [print_data_month_incomes];
+)]
+fn method(all_data: &AllActivities) {
 	let now = chrono::prelude::Utc::now();
 	let local_date = now.with_timezone(&chrono::prelude::Local);
 
@@ -157,19 +196,19 @@ fn print_expense_data_month_current(all_data: &AllExpenses) {
 	}
 	let month = month_conv.expect("This should have worked!");
 	
-	let res = all_data.get_month_expenses(&year, &month);
+	let res = all_data.get(&year, &month);
 	if let Some(&ref month_data) = res {
-		print_expense_data_month(&month_data);
+		print(&month_data);
 	}
 	else {
 		println!("Month '{month}' does not exist in year '{year}'.");
 	}
 }
 
-fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date::Month, day: u8) {
+fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: date::Month, day: u8) {
 	let expense_type_opt = || -> Option<String> {
 		println!("Expense Type:");
-		menu_utils::read_correct_expense_type(&all_data.get_expense_concept_types())
+		menu_utils::read_correct_concept_type(&all_data.get_expense_concept_types())
 	}();
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
@@ -202,7 +241,48 @@ fn add_new_expense_with_date(all_data: &mut AllExpenses, year: u32, month: date:
 	});
 }
 
-fn add_new_expense(all_data: &mut AllExpenses) {
+fn add_new_with_date_income(all_data: &mut AllActivities, year: u32, month: date::Month, day: u8) {
+	let expense_type_opt = || -> Option<String> {
+		println!("Income Type:");
+		menu_utils::read_correct_concept_type(&all_data.get_income_concept_types())
+	}();
+	if expense_type_opt.is_none() { return; }
+	let expense_type = expense_type_opt.unwrap();
+
+	let year_data = all_data.add_year(year);
+	let month_data = year_data.get_incomes_mut().add(&month);
+
+	println!("Price:");
+	let price: f32 = io::read_float();
+	
+	println!("From:");
+	let from = io::read_string();
+
+	println!("Place:");
+	let place = io::read_string();
+
+	println!("Description:");
+	let description = match io::read_string_or_empty() {
+		Some(str) => str,
+		None => "".to_string()
+	};
+
+	month_data.push(Income {
+		day_of_year : date::Date { year, month, day},
+		price: price,
+		concept: expense_type,
+		from: from,
+		place: place,
+		description: description
+	});
+}
+
+#[duplicate::duplicate_item(
+	method            add;
+	[add_new_expense] [add_new_with_date_expense];
+	[add_new_income]  [add_new_with_date_income];
+)]
+fn method(all_data: &mut AllActivities) {
 	println!("Year:");
 	let year: u32 = io::read_int();
 
@@ -214,10 +294,15 @@ fn add_new_expense(all_data: &mut AllExpenses) {
 	println!("Day:");
 	let day: u8 = io::read_int();
 
-	add_new_expense_with_date(all_data, year, month, day);
+	add(all_data, year, month, day);
 }
 
-fn add_new_expense_today(all_data: &mut AllExpenses) {
+#[duplicate::duplicate_item(
+	method                  add;
+	[add_new_today_expense] [add_new_with_date_expense];
+	[add_new_today_income]  [add_new_with_date_income];
+)]
+fn method(all_data: &mut AllActivities) {
 	let now = chrono::prelude::Utc::now();
 	let local_date = now.with_timezone(&chrono::prelude::Local);
 
@@ -230,10 +315,15 @@ fn add_new_expense_today(all_data: &mut AllExpenses) {
 	let month = month_conv.expect("This should have worked!");
 	let day = local_date.day() as u8;
 
-	add_new_expense_with_date(all_data, year, month, day);
+	add(all_data, year, month, day);
 }
 
-fn add_new_expenses_to_year_month(all_data: &mut AllExpenses) {
+#[duplicate::duplicate_item(
+	method                       add;
+	[add_new_year_month_expense] [add_new_with_date_expense];
+	[add_new_year_month_income]  [add_new_with_date_income];
+)]
+fn method(all_data: &mut AllActivities) {
 	println!("Year:");
 	let year: u32 = io::read_int();
 
@@ -246,7 +336,7 @@ fn add_new_expenses_to_year_month(all_data: &mut AllExpenses) {
 		println!("Day:");
 		match io::read_int_or_empty::<u8>() {
 			Some(day) => {
-				add_new_expense_with_date(all_data, year, month.clone(), day);
+				add(all_data, year, month.clone(), day);
 				println!("");
 			},
 			None => {
@@ -256,7 +346,7 @@ fn add_new_expenses_to_year_month(all_data: &mut AllExpenses) {
 	}
 }
 
-fn edit_expense(all_data: &mut AllExpenses) {
+fn edit_expense(all_data: &mut AllActivities) {
 	println!("Select year:");
 	let year: u32 = io::read_int();
 	if !all_data.has_year(&year) {
@@ -277,7 +367,7 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	{
 	let year_data = all_data.get_year(&year).unwrap();
 	let month_data = year_data.get_expenses().get_month(&month).unwrap();
-	menu_utils::display_and_accounting(month_data, |_| true);
+	menu_utils::display_and_accounting_expenses(month_data, |_| true);
 	}
 
 	println!("Id of expense to be edited.");
@@ -290,7 +380,7 @@ fn edit_expense(all_data: &mut AllExpenses) {
 		let month_data = all_data.get_month_expenses(&year, &month).expect("Expected month data");
 		let expense = month_data.get(id_expense);
 		println!("Expense Type: {} (leave blank to keep the value)", expense.concept);
-		expense_type_opt = menu_utils::read_correct_expense_type(&all_data.get_expense_concept_types())
+		expense_type_opt = menu_utils::read_correct_concept_type(&all_data.get_expense_concept_types())
 	}
 	
 	let year_data = all_data.add_year(year);
@@ -324,7 +414,7 @@ fn edit_expense(all_data: &mut AllExpenses) {
 	year_data.set_changes(true);
 }
 
-fn remove_expense(all_data: &mut AllExpenses) {
+fn edit_income(all_data: &mut AllActivities) {
 	println!("Select year:");
 	let year: u32 = io::read_int();
 	if !all_data.has_year(&year) {
@@ -337,7 +427,80 @@ fn remove_expense(all_data: &mut AllExpenses) {
 	if month_opt.is_none() { return; }
 	let month = month_opt.unwrap();
 
-	if !all_data.get_year(&year).unwrap().get_expenses().has_month(&month) {
+	if !all_data.get_year(&year).unwrap().get_incomes().has_month(&month) {
+		println!("Month '{month}' does not exist");
+		return;
+	}
+
+	{
+	let year_data = all_data.get_year(&year).unwrap();
+	let month_data = year_data.get_incomes().get_month(&month).unwrap();
+	menu_utils::display_and_accounting_incomes(month_data, |_| true);
+	}
+
+	println!("Id of expense to be edited.");
+	let id_expense_opt = io::read_int_or_empty::<usize>();
+	if id_expense_opt.is_none() { return; }
+	let id_expense = id_expense_opt.unwrap();
+
+	let expense_type_opt: Option<String>;
+	{
+		let month_data = all_data.get_month_incomes(&year, &month).expect("Expected month data");
+		let expense = month_data.get(id_expense);
+		println!("Expense Type: {} (leave blank to keep the value)", expense.concept);
+		expense_type_opt = menu_utils::read_correct_concept_type(&all_data.get_income_concept_types())
+	}
+	
+	let year_data = all_data.add_year(year);
+	let month_data = year_data.get_incomes_mut().add(&month);
+	let income = month_data.get_mut(id_expense);
+	
+	if expense_type_opt.is_some() {
+		income.concept = expense_type_opt.unwrap();
+	}
+
+	println!("Price: {} (leave blank to keep the value)", income.price);
+	if let Some(price) = read_float_or_empty::<f32>() {
+		income.price = price;
+	}
+
+	println!("From: {} (leave blank to keep the value)", income.from);
+	if let Some(from) = io::read_string_or_empty() {
+		income.from = from;
+	}
+
+	println!("Place: {} (leave blank to keep the value)", income.place);
+	if let Some(place) = io::read_string_or_empty() {
+		income.place = place;
+	}
+
+	println!("Description: {} (leave blank to keep the value)", income.description);
+	if let Some(value) = io::read_string_or_empty() {
+		income.description = value;
+	}
+	
+	year_data.set_changes(true);
+}
+
+#[duplicate::duplicate_item(
+	method           get            get_mut;
+	[remove_expense] [get_expenses] [get_expenses_mut];
+	[remove_income]  [get_incomes]  [get_incomes_mut];
+)]
+fn method(all_data: &mut AllActivities) {
+	println!("Select year:");
+	let year: u32 = io::read_int();
+	if !all_data.has_year(&year) {
+		println!("Year '{year}' does not exist.");
+		return;
+	}
+	
+	println!("Select month:");
+	let month_opt = io::read_correct_month();
+	if month_opt.is_none() { return; }
+	let month = month_opt.unwrap();
+
+	if !all_data.get_year(&year).unwrap().get().has_month(&month) {
 		println!("Month '{month}' does not exist");
 		return;
 	}
@@ -345,7 +508,7 @@ fn remove_expense(all_data: &mut AllExpenses) {
 	println!("Id of expense to be deleted.");
 	if let Some(id_expense) = io::read_int_or_empty::<usize>() {
 		let year_data = all_data.add_year(year);
-		let month_data = year_data.get_expenses_mut().add(&month);
+		let month_data = year_data.get_mut().add(&month);
 
 		month_data.remove(id_expense);
 		year_data.set_changes(true);
@@ -368,7 +531,7 @@ fn print_expenses_menu() {
 	println!("     0. Leave");
 }
 
-pub fn menu(all_data: &mut AllExpenses) {
+pub fn menu_expenses(all_data: &mut AllActivities) {
 	let print_function = print_expenses_menu;
 	let min_option = 0;
 	let max_option = 10;
@@ -377,16 +540,42 @@ pub fn menu(all_data: &mut AllExpenses) {
 	while option != 0 {
 		
 		match option {
-			1 => print_expense_data_all(&all_data),
-			2 => print_expense_data_year_user(&all_data),
-			3 => print_expense_data_year_current(&all_data),
-			4 => print_expense_data_month_user(&all_data),
-			5 => print_expense_data_month_current(&all_data),
+			1 => print_data_all_expenses(&all_data),
+			2 => print_data_year_user_expenses(&all_data),
+			3 => print_data_year_current_expenses(&all_data),
+			4 => print_data_month_user_expenses(&all_data),
+			5 => print_data_month_current_expenses(&all_data),
 			6 => add_new_expense(all_data),
-			7 => add_new_expense_today(all_data),
-			8 => add_new_expenses_to_year_month(all_data),
+			7 => add_new_today_expense(all_data),
+			8 => add_new_year_month_expense(all_data),
 			9 => edit_expense(all_data),
 			10 => remove_expense(all_data),
+			_ => println!("Nothing to do..."),
+		}
+		
+		option = menu_utils::read_option(print_function, min_option, max_option);
+	}
+}
+
+pub fn menu_incomes(all_data: &mut AllActivities) {
+	let print_function = print_expenses_menu;
+	let min_option = 0;
+	let max_option = 10;
+	
+	let mut option = menu_utils::read_option(print_function, min_option, max_option);
+	while option != 0 {
+		
+		match option {
+			1 => print_data_all_incomes(&all_data),
+			2 => print_data_year_user_incomes(&all_data),
+			3 => print_data_year_current_incomes(&all_data),
+			4 => print_data_month_user_incomes(&all_data),
+			5 => print_data_month_current_incomes(&all_data),
+			6 => add_new_income(all_data),
+			7 => add_new_today_income(all_data),
+			8 => add_new_year_month_income(all_data),
+			9 => edit_income(all_data),
+			10 => remove_income(all_data),
 			_ => println!("Nothing to do..."),
 		}
 		
