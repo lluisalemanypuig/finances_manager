@@ -30,38 +30,54 @@
  *
  ********************************************************************/
 
-pub struct ExpenseSummary {
-	pub expense_to_price: std::collections::BTreeMap<String, f32>,
-	pub total_spent: f32,
-	pub total_income: f32
+pub struct ActivitySummary {
+	m_activity_to_money: std::collections::BTreeMap<String, f32>,
+	m_total_money: f32
 }
 
-impl ExpenseSummary {
-	pub fn new() -> ExpenseSummary {
-		ExpenseSummary {
-			expense_to_price: std::collections::BTreeMap::new(),
-			total_spent: 0.0,
-			total_income: 0.0
+impl ActivitySummary {
+	pub fn new() -> ActivitySummary {
+		ActivitySummary {
+			m_activity_to_money: std::collections::BTreeMap::new(),
+			m_total_money: 0.0
 		}
 	}
 
-	pub fn merge(&mut self, other: ExpenseSummary) {
-		for (exp, val) in other.expense_to_price.iter() {
-			match self.expense_to_price.get_mut(exp) {
+	pub fn iter_summary(&self) -> std::collections::btree_map::Iter<'_, String, f32> { self.m_activity_to_money.iter() }
+	pub fn iter_mut_summary(&mut self) -> std::collections::btree_map::IterMut<'_, String, f32> { self.m_activity_to_money.iter_mut() }
+
+	pub fn merge(&mut self, other: ActivitySummary) {
+		for (exp, val) in other.m_activity_to_money.iter() {
+			match self.m_activity_to_money.get_mut(exp) {
 				Some(value) => {
 					*value += *val;
 				},
 				None => {
-					self.expense_to_price.insert(exp.clone(), *val);
+					self.m_activity_to_money.insert(exp.clone(), *val);
 				}
 			}
 		}
 
-		self.total_spent += other.total_spent;
-		self.total_income += other.total_income;
+		self.m_total_money += other.m_total_money;
 	}
 
+	pub fn add(&mut self, name: String, price: f32) {
+		self.m_total_money += price;
+		match self.m_activity_to_money.get_mut(&name) {
+			Some(value) => {
+				*value += price;
+			},
+			None => {
+				self.m_activity_to_money.insert(name.clone(), price);
+
+				
+			}
+		}
+	}
+
+	pub fn get_total(&self) -> f32 { self.m_total_money }
+
 	pub fn has_data(&self) -> bool {
-		self.expense_to_price.len() > 0 || self.total_income != 0.0
+		self.m_activity_to_money.len() > 0
 	}
 }

@@ -36,12 +36,12 @@ use crate::date;
 use crate::expense;
 use crate::concept_types;
 use crate::monthly_activities;
-use crate::expense_summary;
+use crate::activity_summary;
 
 type Expense = expense::Expense;
 type ConecptTypes = concept_types::ConceptTypes;
 type MonthlyActivities = monthly_activities::MonthlyActivities<Expense>;
-type ExpenseSummary = expense_summary::ExpenseSummary;
+type ActivitySummary = activity_summary::ActivitySummary;
 
 pub fn read_option<F: Fn()>(f: F, min_valid: u32, max_valid: u32) -> u32 {
 	loop {
@@ -64,13 +64,13 @@ fn center_string(s: &String, width: usize) -> String {
 	format!("{left_pad}{s}{right_pad}")
 }
 
-static EXPENSE_TYPE_WIDTH: usize = 15;
+static CONCEPT_TYPE_WIDTH: usize = 15;
 static PRICE_WIDTH: usize = 8;
 static DATE_WIDTH: usize = 17;
 
-pub fn display_expense_summary(summary: &ExpenseSummary, pre_tab: &str) {
-	let expense_type_main_divider = std::iter::repeat("—").take(EXPENSE_TYPE_WIDTH).collect::<String>();
-	let expense_type_header = center_string(&"Expense type".to_string(), EXPENSE_TYPE_WIDTH);
+pub fn display_expense_summary(summary: &ActivitySummary, pre_tab: &str) {
+	let concept_type_main_divider = std::iter::repeat("—").take(CONCEPT_TYPE_WIDTH).collect::<String>();
+	let concept_type_header = center_string(&"Expense type".to_string(), CONCEPT_TYPE_WIDTH);
 
 	let price_main_divider = std::iter::repeat("—").take(PRICE_WIDTH).collect::<String>();
 	let price_header = center_string(&"Price".to_string(), PRICE_WIDTH);
@@ -81,17 +81,17 @@ pub fn display_expense_summary(summary: &ExpenseSummary, pre_tab: &str) {
 
 	println!("");
 	let tab = pre_tab.to_owned() + "    ";
-	println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
-	println!("{tab}| {expense_type_header} | {price_header} | {percentage_header} |");
-	println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
-	for (expense_type, value) in summary.expense_to_price.iter() {
-		println!("{tab}| {:<EXPENSE_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} | {:>9.2}% |", expense_type, value, (value/summary.total_spent)*100.0);
+	println!("{tab}+—{concept_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	println!("{tab}| {concept_type_header} | {price_header} | {percentage_header} |");
+	println!("{tab}+—{concept_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	for (expense_type, value) in summary.iter_summary() {
+		println!("{tab}| {:<CONCEPT_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} | {:>9.2}% |", expense_type, value, (value/summary.get_total())*100.0);
 	}
 	
-	println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	println!("{tab}+—{concept_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
 	let total_spent_msg: String = "Total spent".to_string();
-	println!("{tab}| {:<EXPENSE_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} |            |", total_spent_msg, summary.total_spent);
-	println!("{tab}+—{expense_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	println!("{tab}| {:<CONCEPT_TYPE_WIDTH$} | {:>PRICE_WIDTH$.2} |            |", total_spent_msg, summary.get_total());
+	println!("{tab}+—{concept_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
 	println!("");
 	println!("");
 }
@@ -100,12 +100,12 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	month_data: &MonthlyActivities,
 	func: F
 )
--> ExpenseSummary
+-> ActivitySummary
 {
 	let place_width =
 		std::cmp::max(
 			5,
-			month_data.get_activities()
+			month_data
 				.iter()
 				.filter(|e: &&expense::Expense| func(e))
 				.fold(0, |max, val| if val.place.len() > max { val.place.len() } else { max })
@@ -117,7 +117,7 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	let city_width =
 		std::cmp::max(
 			5,
-			month_data.get_activities()
+			month_data
 				.iter()
 				.filter(|e: &&expense::Expense| func(e))
 				.fold(0, |max, val| if val.city.len() > max { val.city.len() } else { max })
@@ -126,9 +126,9 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	let city_mid_divider: String = std::iter::repeat("·").take(city_width).collect::<String>();
 	let city_header = center_string(&"City".to_string(), city_width);
 
-	let expense_type_main_divider = std::iter::repeat("—").take(EXPENSE_TYPE_WIDTH).collect::<String>();
-	let expense_type_mid_divider: String = std::iter::repeat("·").take(EXPENSE_TYPE_WIDTH).collect::<String>();
-	let expense_type_header = center_string(&"Expense type".to_string(), EXPENSE_TYPE_WIDTH);
+	let concept_type_main_divider = std::iter::repeat("—").take(CONCEPT_TYPE_WIDTH).collect::<String>();
+	let concept_type_mid_divider: String = std::iter::repeat("·").take(CONCEPT_TYPE_WIDTH).collect::<String>();
+	let concept_type_header = center_string(&"Expense type".to_string(), CONCEPT_TYPE_WIDTH);
 
 	let price_main_divider = std::iter::repeat("—").take(PRICE_WIDTH).collect::<String>();
 	let price_mid_divider: String = std::iter::repeat("·").take(PRICE_WIDTH).collect::<String>();
@@ -138,7 +138,7 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 	let date_mid_divider: String = std::iter::repeat("·").take(DATE_WIDTH).collect::<String>();
 	let date_header = center_string(&"Date".to_string(), DATE_WIDTH);
 
-	let mut summary: ExpenseSummary = ExpenseSummary::new();
+	let mut summary = ActivitySummary::new();
 	
 	let mut first: bool = true;
 	let mut some_data: bool = false;
@@ -151,33 +151,24 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 		city: ci,
 		description: descr
 	})
-	in month_data.get_activities().iter().filter(|e| func(e)).enumerate()
+	in month_data.iter().filter(|e| func(e)).enumerate()
 	{
 		some_data = true;
-		
-		summary.total_spent += pr;
-		match summary.expense_to_price.get_mut(et) {
-			Some(value) => {
-				*value += *pr;
-			},
-			None => {
-				summary.expense_to_price.insert(et.clone(), *pr);
-			}
-		}
+		summary.add(et.clone(), *pr);
 
-		let expense_type_text = center_string( et, EXPENSE_TYPE_WIDTH);
+		let expense_type_text = center_string( et, CONCEPT_TYPE_WIDTH);
 		let place_text = center_string( pl, place_width);
 		let city_text = center_string( ci, city_width);
 		if &previous_date != d {
 
 			if first {
-				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+—{city_main_divider}—+");
-				println!("    | ID | {date_header} | {price_header} | {expense_type_header} | {place_header} | {city_header} | Description");
-				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+—{city_main_divider}—+");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{city_main_divider}—+");
+				println!("    | ID | {date_header} | {price_header} | {concept_type_header} | {place_header} | {city_header} | Description");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{city_main_divider}—+");
 				first = false;
 			}
 			else {
-				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{expense_type_mid_divider}—+—{place_mid_divider}—+—{city_mid_divider}—+");
+				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{concept_type_mid_divider}—+—{place_mid_divider}—+—{city_mid_divider}—+");
 			}
 
 			let date_text = center_string(&d.to_string(), DATE_WIDTH);
@@ -190,7 +181,7 @@ pub fn display_and_accounting<F: Fn(&Expense) -> bool>(
 		}
 	}
 	if some_data {
-		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{expense_type_main_divider}—+—{place_main_divider}—+—{city_mid_divider}—+");
+		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{city_mid_divider}—+");
 	}
 
 	if some_data {

@@ -58,6 +58,9 @@ impl<T: AsReferences<T> + Ord> MonthlyActivities<T> {
 		}
 	}
 
+	pub fn iter(&self) -> std::slice::Iter<'_, T> { self.m_activities.iter() }
+	pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, T> { self.m_activities.iter_mut() }
+
 	pub fn as_ref(&self) -> &Self { self }
 	pub fn as_mut(&mut self) -> &mut Self { self }
 
@@ -115,7 +118,10 @@ pub struct MonthlyActivitiesCollection<T> {
 	m_activities: Vec<MonthlyActivities<T>>,
 }
 
-impl<T: AsReferences<T> + Ord> MonthlyActivitiesCollection<T> {
+impl<T> MonthlyActivitiesCollection<T>
+where
+	T: AsReferences<T> + Ord
+{
 	pub fn new() -> Self {
 		MonthlyActivitiesCollection {
 			m_changes: false,
@@ -127,6 +133,12 @@ impl<T: AsReferences<T> + Ord> MonthlyActivitiesCollection<T> {
 			m_changes: changes,
 			m_activities: Vec::new()
 		}
+	}
+
+	pub fn iter(&self) -> std::slice::Iter<'_, MonthlyActivities<T>> { self.m_activities.iter() }
+	pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, MonthlyActivities<T>> {
+		self.m_changes = true;
+		self.m_activities.iter_mut()
 	}
 
 	pub fn get_activities(&self) -> &Vec<MonthlyActivities<T>> { &self.m_activities }

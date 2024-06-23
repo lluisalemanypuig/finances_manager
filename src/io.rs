@@ -277,7 +277,7 @@ pub fn read_income_types(data_dir: &String, all_data: &mut AllActivities) {
 /* ------------------------------------------------------------------------- */
 
 pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()> {
-	for ye in all_data.get_activities().iter() {
+	for ye in all_data.iter_activities() {
 		
 		if ye.get_expenses().has_changes() {
 			let expense_filename =
@@ -289,7 +289,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 				std::fs::File::create(expense_filename)
 					.expect("I wanted to create a file");
 			
-			for me in ye.get_expenses().get_activities().iter() {
+			for me in ye.iter_expenses() {
 				for Expense {
 					day_of_year: d,
 					price: pr,
@@ -315,7 +315,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 				std::fs::File::create(income_filename)
 				.expect("I wanted to create a file");
 
-			for me in ye.get_incomes().get_activities().iter() {
+			for me in ye.iter_incomes() {
 				for Income {
 					day_of_year: d,
 					price: pr,
@@ -335,7 +335,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 		let filename = data_dir.to_owned() + &"expense_types.txt".to_string();
 		println!("Writing into '{filename}'...");
 		let mut file = std::fs::File::create(filename).expect("I wanted to create a file");
-		for et in all_data.get_expense_concept_types().get_types().iter() {
+		for et in all_data.iter_expense_concept_types() {
 			writeln!(file, "{et}")?;
 		}
 	}
@@ -343,7 +343,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 		let filename = data_dir.to_owned() + &"income_types.txt".to_string();
 		println!("Writing into '{filename}'...");
 		let mut file = std::fs::File::create(filename).expect("I wanted to create a file");
-		for et in all_data.get_income_concept_types().get_types().iter() {
+		for et in all_data.iter_income_concept_types() {
 			writeln!(file, "{et}")?;
 		}
 	}

@@ -42,14 +42,14 @@ use crate::expense;
 use crate::monthly_activities;
 use crate::yearly_activities;
 use crate::all_activities;
-use crate::expense_summary;
+use crate::activity_summary;
 
 type Expense = expense::Expense;
 type MonthlyActivities = monthly_activities::MonthlyActivities<Expense>;
 type YearlyActivities = yearly_activities::YearlyActivities;
 type AllExpenses = all_activities::AllActivities;
 
-type ExpenseSummary = expense_summary::ExpenseSummary;
+type ExpenseSummary = activity_summary::ActivitySummary;
 
 fn print_expense_data_month(month_data: &MonthlyActivities)
 -> ExpenseSummary
@@ -64,7 +64,7 @@ fn print_expense_data_year(year_data: &YearlyActivities)
 	println!("--------------------");
 	
 	let mut total_entries = 0;
-	for month_data in year_data.get_expenses().get_activities().iter() {
+	for month_data in year_data.iter_expenses() {
 		total_entries += month_data.size();
 	}
 	
@@ -72,7 +72,7 @@ fn print_expense_data_year(year_data: &YearlyActivities)
 
 	println!("    Found {} entries", total_entries);
 	println!("");
-	for month_data in year_data.get_expenses().get_activities().iter() {
+	for month_data in year_data.iter_expenses() {
 		let current_month = print_expense_data_month(month_data);
 		current_year.merge(current_month);
 	}
@@ -86,7 +86,7 @@ fn print_expense_data_year(year_data: &YearlyActivities)
 fn print_expense_data_all(all_data: &AllExpenses) {
 	let mut all_years = ExpenseSummary::new();
 
-	for year_expense in all_data.get_activities().iter() {
+	for year_expense in all_data.iter_activities() {
 		let current_year = print_expense_data_year(&year_expense);
 		all_years.merge(current_year);
 	}

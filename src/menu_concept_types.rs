@@ -38,20 +38,20 @@ use crate::all_activities;
 type AllExpenses = all_activities::AllActivities;
 
 #[duplicate::duplicate_item(
-	method                            get;
-	[print_expense_concept_types_all] [get_expense_concept_types];
-	[print_income_concept_types_all]  [get_income_concept_types];
+	method                            iterate;
+	[print_expense_concept_types_all] [iter_expense_concept_types];
+	[print_income_concept_types_all]  [iter_income_concept_types];
 )]
 fn method(all_data: &AllExpenses) {
 	println!("");
-	for (i, thing_type) in all_data.get().get_types().iter().enumerate() {
+	for (i, thing_type) in all_data.iterate().enumerate() {
 		println!("    {i}: {thing_type}");
 	}
 	println!("");
 }
 
 #[duplicate::duplicate_item(
-	method             get                 get_mut;
+	method                     get                         get_mut;
 	[add_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut];
 	[add_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut];
 )]
@@ -68,9 +68,9 @@ fn method(all_data: &mut AllExpenses) {
 }
 
 #[duplicate::duplicate_item(
-	method                        get                 get_mut                 get_act_mut;
-	[rename_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut] [get_expenses_mut];
-	[rename_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut]  [get_incomes_mut];
+	method                        get                         get_mut                         iter_mut_act;
+	[rename_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut] [iter_mut_expenses];
+	[rename_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut]  [iter_mut_incomes];
 )]
 fn method(all_data: &mut AllExpenses) {
 	println!("Enter the type to rename:");
@@ -85,9 +85,9 @@ fn method(all_data: &mut AllExpenses) {
 		all_data.get_mut().replace(idx_old, new_type.clone());
 
 		// replace the old type throughout the entire list of activities
-		for ye in all_data.get_activities_mut().iter_mut() {
+		for ye in all_data.iter_mut_activities() {
 			ye.set_changes(true);
-			for me in ye.get_act_mut().get_activities_mut().iter_mut() {
+			for me in ye.iter_mut_act() {
 				for e in me.get_activities_mut().iter_mut().filter(|e| e.concept == old_type) {
 					e.concept = new_type.clone();
 				}

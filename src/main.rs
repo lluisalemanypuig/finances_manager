@@ -47,7 +47,7 @@ mod monthly_activities;
 mod yearly_activities;
 mod all_activities;
 mod concept_types;
-mod expense_summary;
+mod activity_summary;
 
 mod menu_utils;
 mod menu_expenses;

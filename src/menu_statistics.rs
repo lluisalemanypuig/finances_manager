@@ -34,10 +34,10 @@ use crate::io;
 use crate::menu_utils;
 
 use crate::all_activities;
-use crate::expense_summary;
+use crate::activity_summary;
 
 type AllExpenses = all_activities::AllActivities;
-type ExpenseSummary = expense_summary::ExpenseSummary;
+type ExpenseSummary = activity_summary::ActivitySummary;
 
 fn statistics_by_expense_type(all_data: &AllExpenses) {
 	let expense_type_opt = menu_utils::read_correct_expense_type(&all_data.get_expense_concept_types());
@@ -50,14 +50,14 @@ fn statistics_by_expense_type(all_data: &AllExpenses) {
 	}
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.get_activities().iter() {
+	for year_data in all_data.iter_activities() {
 		println!("Data from year: {}", year_data.get_year());
 		println!("====================");
 		println!("");
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.get_expenses().get_activities().iter() {
+		for month_data in year_data.iter_expenses() {
 
 			let current_month = menu_utils::display_and_accounting(
 				month_data,
@@ -86,9 +86,9 @@ fn history_of_expenses<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> s
 
 	let mut summary: std::collections::BTreeMap<String, (u32, f32)> = std::collections::BTreeMap::new();
 
-	for year in all_data.get_activities().iter() {
-		for month in year.get_expenses().get_activities().iter() {
-			for exp in month.get_activities().iter().filter(|e| e.concept != "Income") {
+	for year in all_data.iter_activities() {
+		for month in year.iter_expenses() {
+			for exp in month.iter().filter(|e| e.concept != "Income") {
 
 				match summary.get_mut(&exp.concept) {
 					Some( (num_times, total_value) ) => {
@@ -115,14 +115,14 @@ fn statistics_by_price(all_data: &AllExpenses) {
 	let upper: f32 = io::read_float();
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.get_activities().iter() {
+	for year_data in all_data.iter_activities() {
 		println!("Data from year: {}", year_data.get_year());
 		println!("====================");
 		println!("");
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.get_expenses().get_activities().iter() {
+		for month_data in year_data.iter_expenses() {
 
 			let current_month = menu_utils::display_and_accounting(
 				month_data,
@@ -148,16 +148,16 @@ fn statistics_by_place(all_data: &AllExpenses) {
 	let place: String = io::read_string();
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.get_activities().iter() {
+	for year_data in all_data.iter_activities() {
 		println!("Data from year: {}", year_data.get_year());
 		println!("====================");
 		println!("");
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.get_expenses().get_activities().iter() {
+		for month_data in year_data.iter_expenses() {
 
-			let current_month: expense_summary::ExpenseSummary = menu_utils::display_and_accounting(
+			let current_month: activity_summary::ActivitySummary = menu_utils::display_and_accounting(
 				month_data,
 				|e| e.place == place
 			);
@@ -181,14 +181,14 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 	let substring: String = io::read_string();
 
 	let mut all_years = ExpenseSummary::new();
-	for year_data in all_data.get_activities().iter() {
+	for year_data in all_data.iter_activities() {
 		println!("Data from year: {}", year_data.get_year());
 		println!("--------------------");
 		println!("");
 
 		let mut current_year = ExpenseSummary::new();
 
-		for month_data in year_data.get_expenses().get_activities().iter() {
+		for month_data in year_data.iter_expenses() {
 
 			let current_month = menu_utils::display_and_accounting(
 				month_data,
@@ -218,9 +218,9 @@ fn history_of_places<F: FnMut( &(String,(u32,f32)), &(String,(u32,f32)) ) -> std
 
 	let mut summary: std::collections::BTreeMap<String, (u32, f32)> = std::collections::BTreeMap::new();
 
-	for year in all_data.get_activities().iter() {
-		for month in year.get_expenses().get_activities().iter() {
-			for exp in month.get_activities().iter().filter(|e| e.concept != "Income") {
+	for year in all_data.iter_activities() {
+		for month in year.iter_expenses() {
+			for exp in month.iter().filter(|e| e.concept != "Income") {
 
 				match summary.get_mut(&exp.place) {
 					Some( (num_times, total_value) ) => {
