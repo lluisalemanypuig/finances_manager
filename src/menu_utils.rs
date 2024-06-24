@@ -106,7 +106,7 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 )
 -> ActivitySummary
 {
-	let place_width =
+	let place_column_width =
 		std::cmp::max(
 			5,
 			month_data
@@ -116,11 +116,11 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 				.max()
 				.unwrap_or(0)
 		);
-	let place_main_divider = std::iter::repeat("—").take(place_width).collect::<String>();
-	let place_mid_divider: String = std::iter::repeat("·").take(place_width).collect::<String>();
-	let place_header = center_string(&"Place".to_string(), place_width);
+	let place_main_divider = std::iter::repeat("—").take(place_column_width).collect::<String>();
+	let place_mid_divider: String = std::iter::repeat("·").take(place_column_width).collect::<String>();
+	let place_header = center_string(&"Place".to_string(), place_column_width);
 
-	let city_width =
+	let city_column_width =
 		std::cmp::max(
 			5,
 			month_data
@@ -130,11 +130,11 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 				.max()
 				.unwrap_or(0)
 		);
-	let city_main_divider = std::iter::repeat("—").take(city_width).collect::<String>();
-	let city_mid_divider: String = std::iter::repeat("·").take(city_width).collect::<String>();
-	let city_header = center_string(&"City".to_string(), city_width);
+	let city_main_divider = std::iter::repeat("—").take(city_column_width).collect::<String>();
+	let city_mid_divider: String = std::iter::repeat("·").take(city_column_width).collect::<String>();
+	let city_header = center_string(&"City".to_string(), city_column_width);
 
-	let concept_type_width =
+	let concept_type_column_width =
 		std::cmp::max(
 			CONCEPT_TYPE_WIDTH,
 			month_data
@@ -144,9 +144,9 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 				.max()
 				.unwrap_or(0)
 		);
-	let concept_type_main_divider = std::iter::repeat("—").take(concept_type_width).collect::<String>();
-	let concept_type_mid_divider: String = std::iter::repeat("·").take(concept_type_width).collect::<String>();
-	let concept_type_header = center_string(&"Expense type".to_string(), concept_type_width);
+	let concept_type_main_divider = std::iter::repeat("—").take(concept_type_column_width).collect::<String>();
+	let concept_type_mid_divider: String = std::iter::repeat("·").take(concept_type_column_width).collect::<String>();
+	let concept_type_header = center_string(&"Expense type".to_string(), concept_type_column_width);
 
 	let price_main_divider = std::iter::repeat("—").take(PRICE_WIDTH).collect::<String>();
 	let price_mid_divider: String = std::iter::repeat("·").take(PRICE_WIDTH).collect::<String>();
@@ -174,9 +174,9 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 		some_data = true;
 		summary.add(et.clone(), *pr);
 
-		let expense_type_text = center_string( et, concept_type_width);
-		let place_text = center_string( pl, place_width);
-		let city_text = center_string( ci, city_width);
+		let expense_type_text = center_string( et, concept_type_column_width);
+		let place_text = center_string( pl, place_column_width);
+		let city_text = center_string( ci, city_column_width);
 		if &previous_date != d {
 
 			if first {
@@ -199,7 +199,7 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 		}
 	}
 	if some_data {
-		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{city_mid_divider}—+");
+		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{city_main_divider}—+");
 	}
 
 	if some_data {
@@ -215,7 +215,7 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 )
 -> ActivitySummary
 {
-	let place_width =
+	let place_column_width =
 		std::cmp::max(
 			5,
 			month_data
@@ -225,11 +225,11 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 				.max()
 				.unwrap_or(0)
 		);
-	let place_main_divider = std::iter::repeat("—").take(place_width).collect::<String>();
-	let place_mid_divider: String = std::iter::repeat("·").take(place_width).collect::<String>();
-	let place_header = center_string(&"Place".to_string(), place_width);
+	let place_main_divider = std::iter::repeat("—").take(place_column_width).collect::<String>();
+	let place_mid_divider: String = std::iter::repeat("·").take(place_column_width).collect::<String>();
+	let place_header = center_string(&"Place".to_string(), place_column_width);
 
-	let from_width =
+	let from_column_width =
 		std::cmp::max(
 			5,
 			month_data
@@ -239,11 +239,11 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 				.max()
 				.unwrap_or(0)
 		);
-	let from_main_divider = std::iter::repeat("—").take(from_width).collect::<String>();
-	let from_mid_divider: String = std::iter::repeat("·").take(from_width).collect::<String>();
-	let from_header = center_string(&"City".to_string(), from_width);
+	let from_main_divider = std::iter::repeat("—").take(from_column_width).collect::<String>();
+	let from_mid_divider: String = std::iter::repeat("·").take(from_column_width).collect::<String>();
+	let from_header = center_string(&"City".to_string(), from_column_width);
 
-	let concept_type_width =
+	let concept_type_column_width =
 		std::cmp::max(
 			CONCEPT_TYPE_WIDTH,
 			month_data
@@ -253,9 +253,9 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 				.max()
 				.unwrap_or(0)
 		);
-	let concept_type_main_divider = std::iter::repeat("—").take(concept_type_width).collect::<String>();
-	let concept_type_mid_divider: String = std::iter::repeat("·").take(concept_type_width).collect::<String>();
-	let concept_type_header = center_string(&"Incomes type".to_string(), concept_type_width);
+	let concept_type_main_divider = std::iter::repeat("—").take(concept_type_column_width).collect::<String>();
+	let concept_type_mid_divider: String = std::iter::repeat("·").take(concept_type_column_width).collect::<String>();
+	let concept_type_header = center_string(&"Incomes type".to_string(), concept_type_column_width);
 
 	let price_main_divider = std::iter::repeat("—").take(PRICE_WIDTH).collect::<String>();
 	let price_mid_divider: String = std::iter::repeat("·").take(PRICE_WIDTH).collect::<String>();
@@ -283,9 +283,9 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 		some_data = true;
 		summary.add(et.clone(), *pr);
 
-		let income_type_text = center_string( et, concept_type_width);
-		let place_text = center_string( pl, place_width);
-		let from_text = center_string( fr, from_width);
+		let income_type_text = center_string( et, concept_type_column_width);
+		let place_text = center_string( pl, place_column_width);
+		let from_text = center_string( fr, from_column_width);
 		if &previous_date != d {
 
 			if first {
@@ -308,7 +308,7 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 		}
 	}
 	if some_data {
-		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{from_mid_divider}—+");
+		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{from_main_divider}—+");
 	}
 
 	if some_data {
@@ -318,30 +318,46 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 	summary
 }
 
-pub fn display_full_summary(
-	vec_summary: &Vec<(String, (u32,f32))>,
-	title: String
+pub fn display_history_summary(
+	vec_summary: &Vec<(String, (String,u32,f32))>,
+	first_title: String,
+	second_title: String
 )
 {
-	let title_width =
+	let first_column_width =
 	std::cmp::max(
-		title.len(),
+		first_title.len(),
 		vec_summary
 		.iter()
-		.fold(0, |max, val| if val.0.len() > max { val.0.len() } else { max })
+		.map(|v| -> usize { v.0.len() })
+		.max()
+		.unwrap_or(0)
 	);
-	let title_main_divider = std::iter::repeat("—").take(title_width).collect::<String>();
-	let title_header = center_string(&title, title_width);
+	let first_main_divider = std::iter::repeat("—").take(first_column_width).collect::<String>();
+	let first_header = center_string(&first_title, first_column_width);
+
+	let second_column_width =
+	std::cmp::max(
+		second_title.len(),
+		vec_summary
+		.iter()
+		.map(|v| -> usize { v.1.0.len() })
+		.max()
+		.unwrap_or(0)
+	);
+	let second_main_divider = std::iter::repeat("—").take(second_column_width).collect::<String>();
+	let second_header = center_string(&second_title, second_column_width);
 
 	let tab = "    ";
-	println!("{tab}+—{title_main_divider}—+—————————————+———————————————————+");
-	println!("{tab}| {title_header} | Times found | Total money spent |");
-	println!("{tab}+—{title_main_divider}—+—————————————+———————————————————+");
-	for (thing, (num_times, total_value)) in vec_summary.iter() {
-		let thing_text = center_string( thing, title_width);
-		println!("{tab}| {thing_text} | {num_times:>11} | {total_value:>17.2} |");
+	println!("{tab}+—{first_main_divider}—+—{second_main_divider}—+—————————————+———————————————————+");
+	println!("{tab}| {first_header} | {second_header} | Times found | Total money spent |");
+	println!("{tab}+—{first_main_divider}—+—{second_main_divider}—+—————————————+———————————————————+");
+	for (thing, (a, num_times, total_value)) in vec_summary.iter() {
+		let thing_text = center_string( thing, first_column_width);
+		let a_text = center_string( a, second_column_width);
+		println!("{tab}| {thing_text} | {a_text} | {num_times:>11} | {total_value:>17.2} |");
 	}
-	println!("{tab}+—{title_main_divider}—+—————————————+———————————————————+");
+	println!("{tab}+—{first_main_divider}—+—{second_main_divider}—+—————————————+———————————————————+");
 }
 
 pub fn read_correct_concept_type(concept_types: &ConceptTypes) -> Option<String> {

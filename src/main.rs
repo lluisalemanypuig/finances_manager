@@ -63,8 +63,9 @@ fn print_main_menu() {
 	println!("    2. Expense concept types menu");
 	println!("    3. Incomes menu");
 	println!("    4. Income concept types menu");
-	println!("    5. Statistics menu");
-	println!("    6. Save all data");
+	println!("    5. Expense statistics menu");
+	println!("    6. Income statistics menu");
+	println!("    7. Save all data");
 	println!("    0. Leave");
 }
 
@@ -81,8 +82,8 @@ fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 			2 => menu_concept_types::menu_expense_concept_types(all_data),
 			3 => menu_activities::menu_incomes(all_data),
 			4 => menu_concept_types::menu_income_concept_types(all_data),
-			5 => menu_statistics::menu(all_data),
-			6 => {
+			5 => menu_statistics::menu_expenses(all_data),
+			7 => {
 				io::write_all_data(&data_dir, all_data)
 					.expect("Could not write data");
 				
