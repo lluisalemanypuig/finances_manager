@@ -75,9 +75,7 @@ impl YearlyActivities {
 	}
 
 	pub fn iter_expenses(&self) -> std::slice::Iter<'_, MonthlyActivities<Expense>> { self.m_expenses.iter() }
-	pub fn iter_mut_expenses(&mut self) -> std::slice::IterMut<'_, MonthlyActivities<Expense>> {
-		self.m_expenses.iter_mut()
-	}
+	pub fn iter_mut_expenses(&mut self) -> std::slice::IterMut<'_, MonthlyActivities<Expense>> { self.m_expenses.iter_mut() }
 
 	pub fn get_expenses(&self) -> &MonthlyActivitiesCollection<Expense> { &self.m_expenses }
 	pub fn get_expenses_mut(&mut self) -> &mut MonthlyActivitiesCollection<Expense> { &mut self.m_expenses }
