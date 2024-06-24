@@ -318,8 +318,9 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 	summary
 }
 
+pub type Cell = (String, u32, f32);
 pub fn display_history_summary(
-	vec_summary: &Vec<(String, (String,u32,f32))>,
+	vec_summary: &Vec<(String, Cell)>,
 	first_title: String,
 	second_title: String
 )
