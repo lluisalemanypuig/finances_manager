@@ -39,7 +39,7 @@ pub struct Expense {
 	pub day_of_year: date::Date,
 	pub price: f32,
 	pub concept: String,
-	pub place: String,
+	pub shop: String,
 	pub city: String,
 	pub description: String
 }
@@ -120,7 +120,7 @@ impl std::str::FromStr for Expense {
 			day_of_year: date_fromstr,
 			price: price_fromstr,
 			concept: et.to_string(),
-			place: pl.to_string(),
+			shop: pl.to_string(),
 			city: ci.to_string(),
 			description: descr.to_string()
 		})

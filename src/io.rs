@@ -294,7 +294,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 					day_of_year: d,
 					price: pr,
 					concept: et,
-					place: pl,
+					shop: pl,
 					city: ci,
 					description: descr
 				}

@@ -106,19 +106,19 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 )
 -> ActivitySummary
 {
-	let place_column_width =
+	let shop_column_width =
 		std::cmp::max(
-			5,
+			4,
 			month_data
 				.iter()
 				.filter(|e: &&Expense| func(e))
-				.map(|i: &Expense| -> usize { i.place.len() })
+				.map(|i: &Expense| -> usize { i.shop.len() })
 				.max()
 				.unwrap_or(0)
 		);
-	let place_main_divider = std::iter::repeat("—").take(place_column_width).collect::<String>();
-	let place_mid_divider: String = std::iter::repeat("·").take(place_column_width).collect::<String>();
-	let place_header = center_string(&"Place".to_string(), place_column_width);
+	let shop_main_divider = std::iter::repeat("—").take(shop_column_width).collect::<String>();
+	let shop_mid_divider: String = std::iter::repeat("·").take(shop_column_width).collect::<String>();
+	let shop_header = center_string(&"Shop".to_string(), shop_column_width);
 
 	let city_column_width =
 		std::cmp::max(
@@ -165,7 +165,7 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 		day_of_year: d,
 		price: pr,
 		concept: et,
-		place: pl,
+		shop: pl,
 		city: ci,
 		description: descr
 	})
@@ -175,18 +175,18 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 		summary.add(et.clone(), *pr);
 
 		let expense_type_text = center_string( et, concept_type_column_width);
-		let place_text = center_string( pl, place_column_width);
+		let place_text = center_string( pl, shop_column_width);
 		let city_text = center_string( ci, city_column_width);
 		if &previous_date != d {
 
 			if first {
-				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{city_main_divider}—+");
-				println!("    | ID | {date_header} | {price_header} | {concept_type_header} | {place_header} | {city_header} | Description");
-				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{city_main_divider}—+");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{shop_main_divider}—+—{city_main_divider}—+");
+				println!("    | ID | {date_header} | {price_header} | {concept_type_header} | {shop_header} | {city_header} | Description");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{shop_main_divider}—+—{city_main_divider}—+");
 				first = false;
 			}
 			else {
-				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{concept_type_mid_divider}—+—{place_mid_divider}—+—{city_mid_divider}—+");
+				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{concept_type_mid_divider}—+—{shop_mid_divider}—+—{city_mid_divider}—+");
 			}
 
 			let date_text = center_string(&d.to_string(), DATE_WIDTH);
@@ -199,7 +199,7 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 		}
 	}
 	if some_data {
-		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{city_main_divider}—+");
+		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{shop_main_divider}—+—{city_main_divider}—+");
 	}
 
 	if some_data {

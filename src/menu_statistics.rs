@@ -129,7 +129,7 @@ fn statistics_by_place(all_data: &AllExpenses) {
 
 			let current_month: activity_summary::ActivitySummary = menu_utils::display_and_accounting_expenses(
 				month_data,
-				|e| e.place == place
+				|e| e.shop == place
 			);
 			current_year.merge(current_month);
 		}
@@ -162,7 +162,7 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 
 			let current_month = menu_utils::display_and_accounting_expenses(
 				month_data,
-				|e| e.place.contains(&substring)
+				|e| e.shop.contains(&substring)
 			);
 			current_year.merge(current_month);
 		}
@@ -224,14 +224,14 @@ fn history_of_expense_places<F: FnMut( &(String,(String,u32,f32)), &(String,(Str
 		for month in year.iter_expenses() {
 			for exp in month.iter().filter(|e| e.concept != "Income") {
 
-				match summary.get_mut(&exp.place) {
+				match summary.get_mut(&exp.shop) {
 					Some( (_, num_times, total_value) ) => {
 						*num_times += 1;
 						*total_value += exp.price;
 					},
 					None => {
 						summary.insert(
-							exp.place.clone(),
+							exp.shop.clone(),
 							(exp.city.clone(), 1, exp.price)
 						);
 					}

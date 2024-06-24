@@ -235,7 +235,7 @@ fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: dat
 		day_of_year : date::Date { year, month, day},
 		price: price,
 		concept: expense_type,
-		place: place,
+		shop: place,
 		city: city,
 		description: description
 	});
@@ -396,9 +396,9 @@ fn edit_expense(all_data: &mut AllActivities) {
 		expense.price = price;
 	}
 
-	println!("Place: {} (leave blank to keep the value)", expense.place);
+	println!("Place: {} (leave blank to keep the value)", expense.shop);
 	if let Some(place) = io::read_string_or_empty() {
-		expense.place = place;
+		expense.shop = place;
 	}
 
 	println!("City: {} (leave blank to keep the value)", expense.city);
