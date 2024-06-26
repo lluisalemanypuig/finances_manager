@@ -208,10 +208,17 @@ fn method(all_data: &AllActivities) {
 fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: date::Month, day: u8) {
 	let expense_type_opt = || -> Option<String> {
 		println!("Expense Type:");
-		menu_utils::read_correct_concept_type(&all_data.get_expense_concept_types())
+		menu_utils::read_from_options(all_data.get_expense_concept_types().get_types())
 	}();
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
+
+	let expense_subtype_opt = || -> Option<String> {
+		println!("Expense Subtype:");
+		menu_utils::read_from_options(all_data.get_expense_concept_types().get_subtypes(&expense_type))
+	}();
+	if expense_subtype_opt.is_none() { return; }
+	let expense_subtype = expense_subtype_opt.unwrap();
 
 	let year_data = all_data.add_year(year);
 	let month_data = year_data.get_expenses_mut().add(&month);
@@ -235,6 +242,7 @@ fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: dat
 		day_of_year : date::Date { year, month, day},
 		price: price,
 		concept: expense_type,
+		sub_concept: expense_subtype,
 		shop,
 		city,
 		description: description
@@ -242,12 +250,19 @@ fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: dat
 }
 
 fn add_new_with_date_income(all_data: &mut AllActivities, year: u32, month: date::Month, day: u8) {
-	let expense_type_opt = || -> Option<String> {
+	let income_type_opt = || -> Option<String> {
 		println!("Income Type:");
-		menu_utils::read_correct_concept_type(&all_data.get_income_concept_types())
+		menu_utils::read_from_options(all_data.get_income_concept_types().get_types())
 	}();
-	if expense_type_opt.is_none() { return; }
-	let expense_type = expense_type_opt.unwrap();
+	if income_type_opt.is_none() { return; }
+	let income_type = income_type_opt.unwrap();
+
+	let income_subtype_opt = || -> Option<String> {
+		println!("Income Subyype:");
+		menu_utils::read_from_options(all_data.get_income_concept_types().get_subtypes(&income_type))
+	}();
+	if income_subtype_opt.is_none() { return; }
+	let income_subtype = income_subtype_opt.unwrap();
 
 	let year_data = all_data.add_year(year);
 	let month_data = year_data.get_incomes_mut().add(&month);
@@ -270,7 +285,8 @@ fn add_new_with_date_income(all_data: &mut AllActivities, year: u32, month: date
 	month_data.push(Income {
 		day_of_year : date::Date { year, month, day},
 		price: price,
-		concept: expense_type,
+		concept: income_type,
+		sub_concept: income_subtype,
 		from: from,
 		place: place,
 		description: description
@@ -377,10 +393,31 @@ fn edit_expense(all_data: &mut AllActivities) {
 
 	let expense_type_opt: Option<String>;
 	{
-		let month_data = all_data.get_month_expenses(&year, &month).expect("Expected month data");
+		let month_data =
+			all_data
+			.get_month_expenses(&year, &month)
+			.expect("Expected month data");
+
 		let expense = month_data.get(id_expense);
 		println!("Expense Type: {} (leave blank to keep the value)", expense.concept);
-		expense_type_opt = menu_utils::read_correct_concept_type(&all_data.get_expense_concept_types())
+		expense_type_opt = menu_utils::read_from_options(&all_data.get_expense_concept_types().get_types())
+	}
+	let expense_subtype_opt: Option<String>;
+	{
+		let month_data = all_data.get_month_expenses(&year, &month).expect("Expected month data");
+		let expense = month_data.get(id_expense);
+		println!("Expense Subtype: {} (leave blank to keep the value)", expense.sub_concept);
+
+		let et;
+		if expense_type_opt.is_some() {
+			et = expense_type_opt.clone().unwrap();
+		}
+		else {
+			et = expense.concept.clone();
+		}
+
+		expense_subtype_opt = menu_utils::read_from_options
+			(&all_data.get_expense_concept_types().get_subtypes(&et))
 	}
 	
 	let year_data = all_data.add_year(year);
@@ -389,6 +426,9 @@ fn edit_expense(all_data: &mut AllActivities) {
 	
 	if expense_type_opt.is_some() {
 		expense.concept = expense_type_opt.unwrap();
+	}
+	if expense_subtype_opt.is_some() {
+		expense.sub_concept = expense_subtype_opt.unwrap();
 	}
 
 	println!("Price: {} (leave blank to keep the value)", expense.price);
@@ -439,24 +479,44 @@ fn edit_income(all_data: &mut AllActivities) {
 	}
 
 	println!("Id of expense to be edited.");
-	let id_expense_opt = io::read_int_or_empty::<usize>();
-	if id_expense_opt.is_none() { return; }
-	let id_expense = id_expense_opt.unwrap();
+	let id_income_opt = io::read_int_or_empty::<usize>();
+	if id_income_opt.is_none() { return; }
+	let id_income = id_income_opt.unwrap();
 
-	let expense_type_opt: Option<String>;
+	let income_type_opt: Option<String>;
 	{
 		let month_data = all_data.get_month_incomes(&year, &month).expect("Expected month data");
-		let expense = month_data.get(id_expense);
+		let expense = month_data.get(id_income);
 		println!("Expense Type: {} (leave blank to keep the value)", expense.concept);
-		expense_type_opt = menu_utils::read_correct_concept_type(&all_data.get_income_concept_types())
+		income_type_opt = menu_utils::read_from_options(&all_data.get_income_concept_types().get_types())
+	}
+	let income_subtype_opt: Option<String>;
+	{
+		let month_data = all_data.get_month_expenses(&year, &month).expect("Expected month data");
+		let expense = month_data.get(id_income);
+		println!("Expense Subtype: {} (leave blank to keep the value)", expense.sub_concept);
+
+		let et;
+		if income_type_opt.is_some() {
+			et = income_type_opt.clone().unwrap();
+		}
+		else {
+			et = expense.concept.clone();
+		}
+
+		income_subtype_opt = menu_utils::read_from_options
+			(&all_data.get_expense_concept_types().get_subtypes(&et))
 	}
 	
 	let year_data = all_data.add_year(year);
 	let month_data = year_data.get_incomes_mut().add(&month);
-	let income = month_data.get_mut(id_expense);
+	let income = month_data.get_mut(id_income);
 	
-	if expense_type_opt.is_some() {
-		income.concept = expense_type_opt.unwrap();
+	if income_type_opt.is_some() {
+		income.concept = income_type_opt.unwrap();
+	}
+	if income_subtype_opt.is_some() {
+		income.sub_concept = income_subtype_opt.unwrap();
 	}
 
 	println!("Price: {} (leave blank to keep the value)", income.price);

@@ -36,7 +36,10 @@ use crate::expense::Expense;
 use crate::income::Income;
 
 use crate::date::Month;
+
+use crate::concept_types;
 use crate::concept_types::ConceptTypes;
+
 use crate::monthly_activities::MonthlyActivities;
 use crate::yearly_activities::YearlyActivities;
 
@@ -67,17 +70,28 @@ impl AllActivities {
 		self.m_activities.iter_mut()
 	}
 
-	pub fn get_activities(&self) -> &Vec<YearlyActivities> { &self.m_activities }
+	//pub fn get_activities(&self) -> &Vec<YearlyActivities> { &self.m_activities }
 	pub fn get_activities_mut(&mut self) -> &mut Vec<YearlyActivities> {
 		self.set_changes_activities(true);
 		&mut self.m_activities
 	}
 
-	pub fn iter_expense_concept_types(&self) -> std::slice::Iter<'_, String> { self.m_expense_types.iter() }
+	// Expenses
+
+	pub fn iter_expense_concept_types(&self) -> std::slice::Iter<'_, String> { self.m_expense_types.iter_types() }
+	/*
 	pub fn iter_mut_expense_concept_types(&mut self) -> std::slice::IterMut<'_, String> {
 		self.m_expense_types.set_changes(true);
-		self.m_expense_types.iter_mut()
+		self.m_expense_types.iter_mut_types()
 	}
+	*/
+	pub fn iter_expense_concept_subtypes(&self) -> concept_types::Iter { self.m_expense_types.iter_subtypes() }
+	/*
+	pub fn iter_mut_expense_concept_subtypes(&mut self) -> concept_types::IterMut {
+		self.m_expense_types.set_changes(true);
+		self.m_expense_types.iter_mut_subtypes()
+	}
+	*/
 
 	pub fn get_expense_concept_types(&self) -> &ConceptTypes { &self.m_expense_types }
 	pub fn get_expense_concept_types_mut(&mut self) -> &mut ConceptTypes {
@@ -85,17 +99,31 @@ impl AllActivities {
 		&mut self.m_expense_types
 	}
 
-	pub fn iter_income_concept_types(&self) -> std::slice::Iter<'_, String> { self.m_income_types.iter() }
+	// Incomes
+
+	pub fn iter_income_concept_types(&self) -> std::slice::Iter<'_, String> { self.m_income_types.iter_types() }
+	/*
 	pub fn iter_mut_income_concept_types(&mut self) -> std::slice::IterMut<'_, String> {
 		self.m_income_types.set_changes(true);
-		self.m_income_types.iter_mut()
+		self.m_income_types.iter_mut_types()
 	}
+	*/
 
 	pub fn get_income_concept_types(&self) -> &ConceptTypes { &self.m_income_types }
 	pub fn get_income_concept_types_mut(&mut self) -> &mut ConceptTypes {
 		self.m_income_types.set_changes(true);
 		&mut self.m_income_types
 	}
+
+	pub fn iter_income_concept_subtypes(&self) -> concept_types::Iter { self.m_income_types.iter_subtypes() }
+	/*
+	pub fn iter_mut_income_concept_subtypes(&mut self) -> concept_types::IterMut {
+		self.m_income_types.set_changes(true);
+		self.m_income_types.iter_mut_subtypes()
+	}
+	*/
+
+	// -----
 
 	#[duplicate::duplicate_item(
 		method          convert   reference(type);

@@ -59,7 +59,7 @@ fn method(all_data: &mut AllExpenses) {
 	println!("Enter the new {} type:", thing);
 	let new_type = io::read_string();
 
-	if all_data.get().is_type_ok(&new_type) {
+	if all_data.get().has_type(&new_type) {
 		println!("Type '{new_type}' already exists.")
 	}
 	else {

@@ -31,7 +31,7 @@
  ********************************************************************/
 
 pub struct ActivitySummary {
-	m_activity_to_money: std::collections::BTreeMap<String, f32>,
+	m_activity_to_money: std::collections::BTreeMap<(String,String), f32>,
 	m_total_money: f32
 }
 
@@ -43,12 +43,28 @@ impl ActivitySummary {
 		}
 	}
 
-	pub fn get_width_concept(&self) -> usize {
-		self.m_activity_to_money.iter().map(|(s, _)| -> usize { s.len() }).max().unwrap_or(0)
+	pub fn get_width_concept_type(&self) -> usize {
+		self.m_activity_to_money
+			.iter()
+			.map(|(s, _)| -> usize { s.0.len() })
+			.max()
+			.unwrap_or(0)
+	}
+	pub fn get_width_concept_subtype(&self) -> usize {
+		self.m_activity_to_money
+			.iter()
+			.map(|(s, _)| -> usize { s.1.len() })
+			.max()
+			.unwrap_or(0)
 	}
 
-	pub fn iter_summary(&self) -> std::collections::btree_map::Iter<'_, String, f32> { self.m_activity_to_money.iter() }
-	pub fn iter_mut_summary(&mut self) -> std::collections::btree_map::IterMut<'_, String, f32> { self.m_activity_to_money.iter_mut() }
+	pub fn iter_summary(&self) -> std::collections::btree_map::Iter<'_, (String,String), f32>
+	{ self.m_activity_to_money.iter() }
+
+	/*
+	pub fn iter_mut_summary(&mut self) -> std::collections::btree_map::IterMut<'_, (String,String), f32>
+	{ self.m_activity_to_money.iter_mut() }
+	*/
 
 	pub fn merge(&mut self, other: ActivitySummary) {
 		for (exp, val) in other.m_activity_to_money.iter() {
@@ -65,16 +81,17 @@ impl ActivitySummary {
 		self.m_total_money += other.m_total_money;
 	}
 
-	pub fn add(&mut self, name: String, price: f32) {
+	pub fn add(&mut self, name: String, subname: String, price: f32) {
 		self.m_total_money += price;
-		match self.m_activity_to_money.get_mut(&name) {
+		let pair = (name, subname);
+
+		match self.m_activity_to_money.get_mut(&pair) {
 			Some(value) => {
 				*value += price;
 			},
 			None => {
-				self.m_activity_to_money.insert(name.clone(), price);
-
-				
+				self.m_activity_to_money
+					.insert(pair, price);
 			}
 		}
 	}

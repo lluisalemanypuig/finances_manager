@@ -30,26 +30,42 @@
  *
  ********************************************************************/
 
+ pub type Key = String;
+ pub type Value = Vec<String>;
+ pub type Container = std::collections::BTreeMap<String, Vec<String>>;
+ pub type Iter<'a> = std::collections::btree_map::Iter<'a,Key,Value>;
+ //pub type IterMut<'a> = std::collections::btree_map::IterMut<'a,Key,Value>;
+
 #[derive(Debug)]
 pub struct ConceptTypes {
 	m_changes: bool,
 
-	m_types: Vec<String>
+	m_types: Vec<String>,
+
+	m_sub_types: Container
 }
 
 impl ConceptTypes {
 	pub fn new() -> ConceptTypes {
 		ConceptTypes {
 			m_changes: false,
-			m_types: Vec::new()
+			m_types: Vec::new(),
+			m_sub_types: Container::new()
 		}
 	}
 
-	pub fn iter(&self) -> std::slice::Iter<'_, String> { self.m_types.iter() }
-	pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, String> { self.m_types.iter_mut() }
+	pub fn iter_types(&self) -> std::slice::Iter<'_, String> { self.m_types.iter() }
+	//pub fn iter_mut_types(&mut self) -> std::slice::IterMut<'_, String> { self.m_types.iter_mut() }
+	
+	pub fn iter_subtypes(&self) -> Iter { self.m_sub_types.iter() }
+	//pub fn iter_mut_subtypes(&mut self) -> IterMut { self.m_sub_types.iter_mut() }
 
-	pub fn set_types(&mut self, types: Vec<String>) {
-		self.m_types = types;
+	pub fn add_type(&mut self, concept: String) {
+		self.m_types.push(concept);
+		self.m_changes = true;
+	}
+	pub fn set_subtypes(&mut self, concept: String, subtypes: Vec<String>) {
+		self.m_sub_types.insert(concept, subtypes);
 		self.m_changes = true;
 	}
 
@@ -58,8 +74,21 @@ impl ConceptTypes {
 		self.m_changes = c;
 	}
 
-	pub fn has_type(&self, expense_type: &String) -> bool {
-		self.m_types.iter().position(|e| e == expense_type).is_some()
+	pub fn has_type(&self, concept_type: &String) -> bool {
+		self.m_types.contains(concept_type)
+	}
+	/*
+	pub fn has_subtype(&self, concept_type: &String, concept_subtype: &String) -> bool {
+		if !self.has_type(concept_type) { return false; }
+		self.m_sub_types.get(concept_type).unwrap().contains(concept_subtype)
+	}
+	*/
+
+	pub fn get_types(&self) -> &Vec<String> {
+		&self.m_types
+	}
+	pub fn get_subtypes(&self, concept_type: &String) -> &Vec<String> {
+		&self.m_sub_types.get(concept_type).unwrap()
 	}
 
 	pub fn position_type(&self, expense_type: &String) -> Option<usize> {
@@ -80,9 +109,5 @@ impl ConceptTypes {
 		self.m_types.push(new_elem);
 		self.m_changes = true;
 	}
-
-	pub fn is_type_ok(&self, expense_type: &String) -> bool {
-		self.has_type(expense_type)
-	}
-
+	
 }

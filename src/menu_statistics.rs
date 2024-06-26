@@ -41,11 +41,11 @@ type ActivitySummary = activity_summary::ActivitySummary;
 type Cell = menu_utils::Cell;
 
 fn statistics_by_expense_type(all_data: &AllExpenses) {
-	let expense_type_opt = menu_utils::read_correct_concept_type(&all_data.get_expense_concept_types());
+	let expense_type_opt = menu_utils::read_from_options(&all_data.get_expense_concept_types().get_types());
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
 
-	if !all_data.get_expense_concept_types().is_type_ok(&expense_type) {
+	if !all_data.get_expense_concept_types().has_type(&expense_type) {
 		println!("Non existent expense type '{expense_type}'.");
 		return;
 	}

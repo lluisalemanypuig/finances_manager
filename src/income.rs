@@ -39,6 +39,7 @@ pub struct Income {
 	pub day_of_year: date::Date,
 	pub price: f32,
 	pub concept: String,
+	pub sub_concept: String,
 	pub from: String,
 	pub place: String,
 	pub description: String
@@ -108,8 +109,8 @@ impl std::str::FromStr for Income {
 	
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		let parts: Vec<String> = split_string_data(s);
-		let [d, pr, co, fr, pl, descr] = parts.as_slice() else {
-			panic!("Can't segment string '{s}' into six parts")
+		let [d, pr, c, st, fr, pl, descr] = parts.as_slice() else {
+			panic!("Can't segment string '{s}' into 7 parts")
 		};
 		
 		let date_fromstr = d.parse::<date::Date>().map_err(|_| ParseIncomeError)?;
@@ -118,7 +119,8 @@ impl std::str::FromStr for Income {
 		Ok(Income {
 			day_of_year: date_fromstr,
 			price: price_fromstr,
-			concept: co.to_string(),
+			concept: c.to_string(),
+			sub_concept: st.to_string(),
 			from: fr.to_string(),
 			place: pl.to_string(),
 			description: descr.to_string()

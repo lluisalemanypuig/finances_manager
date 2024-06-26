@@ -35,13 +35,11 @@ use crate::io;
 use crate::date;
 use crate::expense;
 use crate::income;
-use crate::concept_types;
 use crate::monthly_activities;
 use crate::activity_summary;
 
 type Expense = expense::Expense;
 type Income = income::Income;
-type ConceptTypes = concept_types::ConceptTypes;
 type MonthlyActivities<T> = monthly_activities::MonthlyActivities<T>;
 type ActivitySummary = activity_summary::ActivitySummary;
 
@@ -66,15 +64,19 @@ fn center_string(s: &String, width: usize) -> String {
 	format!("{left_pad}{s}{right_pad}")
 }
 
-static CONCEPT_TYPE_WIDTH: usize = 15;
+static CONCEPT_TYPE_WIDTH: usize = 4;
+static CONCEPT_SUBTYPE_WIDTH: usize = 7;
 static PRICE_WIDTH: usize = 8;
 static DATE_WIDTH: usize = 17;
 
 pub fn display_summary_activity(summary: &ActivitySummary, pre_tab: &str) {
-	let concept_width = std::cmp::max(CONCEPT_TYPE_WIDTH, summary.get_width_concept());
+	let concept_type_width = std::cmp::max(CONCEPT_TYPE_WIDTH, summary.get_width_concept_type());
+	let concept_type_main_divider = std::iter::repeat("—").take(concept_type_width).collect::<String>();
+	let concept_type_header = center_string(&"Type".to_string(), concept_type_width);
 
-	let concept_type_main_divider = std::iter::repeat("—").take(concept_width).collect::<String>();
-	let concept_type_header = center_string(&"Concept type".to_string(), concept_width);
+	let concept_subtype_width = std::cmp::max(CONCEPT_SUBTYPE_WIDTH, summary.get_width_concept_subtype());
+	let concept_subtype_main_divider = std::iter::repeat("—").take(concept_subtype_width).collect::<String>();
+	let concept_subtype_header = center_string(&"Subtype".to_string(), concept_subtype_width);
 
 	let price_main_divider = std::iter::repeat("—").take(PRICE_WIDTH).collect::<String>();
 	let price_header = center_string(&"Price".to_string(), PRICE_WIDTH);
@@ -85,17 +87,28 @@ pub fn display_summary_activity(summary: &ActivitySummary, pre_tab: &str) {
 
 	println!("");
 	let tab = pre_tab.to_owned() + "    ";
-	println!("{tab}+—{concept_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
-	println!("{tab}| {concept_type_header} | {price_header} | {percentage_header} |");
-	println!("{tab}+—{concept_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
-	for (expense_type, value) in summary.iter_summary() {
-		println!("{tab}| {:<concept_width$} | {:>PRICE_WIDTH$.2} | {:>9.2}% |", expense_type, value, (value/summary.get_total())*100.0);
+	println!("{tab}+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	println!("{tab}| {concept_type_header} | {concept_subtype_header} | {price_header} | {percentage_header} |");
+	println!("{tab}+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	for ((activity_type, activity_subtype), value) in summary.iter_summary() {
+		println!(
+			"{tab}| {:<concept_type_width$} | {:<concept_subtype_width$} | {:>PRICE_WIDTH$.2} | {:>9.2}% |",
+			activity_type,
+			activity_subtype,
+			value,
+			(value/summary.get_total())*100.0
+		);
 	}
 	
-	println!("{tab}+—{concept_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
-	let total_spent_msg: String = "Total money".to_string();
-	println!("{tab}| {:<concept_width$} | {:>PRICE_WIDTH$.2} |            |", total_spent_msg, summary.get_total());
-	println!("{tab}+—{concept_type_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	println!("{tab}+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
+	let total_spent_msg: String = "Total".to_string();
+	println!(
+		"{tab}| {:<concept_type_width$} | {:<concept_subtype_width$} | {:>PRICE_WIDTH$.2} |            |",
+		total_spent_msg,
+		"".to_string(),
+		summary.get_total()
+	);
+	println!("{tab}+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
 	println!("");
 	println!("");
 }
@@ -146,7 +159,21 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 		);
 	let concept_type_main_divider = std::iter::repeat("—").take(concept_type_column_width).collect::<String>();
 	let concept_type_mid_divider: String = std::iter::repeat("·").take(concept_type_column_width).collect::<String>();
-	let concept_type_header = center_string(&"Expense type".to_string(), concept_type_column_width);
+	let concept_type_header = center_string(&"Type".to_string(), concept_type_column_width);
+
+	let concept_subtype_column_width =
+		std::cmp::max(
+			CONCEPT_SUBTYPE_WIDTH,
+			month_data
+				.iter()
+				.filter(|i: &&Expense| func(i))
+				.map(|i: &Expense| -> usize { i.sub_concept.len() })
+				.max()
+				.unwrap_or(0)
+		);
+	let concept_subtype_main_divider = std::iter::repeat("—").take(concept_subtype_column_width).collect::<String>();
+	let concept_subtype_mid_divider: String = std::iter::repeat("·").take(concept_subtype_column_width).collect::<String>();
+	let concept_subtype_header = center_string(&"Subtype".to_string(), concept_subtype_column_width);
 
 	let price_main_divider = std::iter::repeat("—").take(PRICE_WIDTH).collect::<String>();
 	let price_mid_divider: String = std::iter::repeat("·").take(PRICE_WIDTH).collect::<String>();
@@ -165,6 +192,7 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 		day_of_year: d,
 		price: pr,
 		concept: et,
+		sub_concept: sc,
 		shop: pl,
 		city: ci,
 		description: descr
@@ -172,34 +200,35 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 	in month_data.iter().filter(|e| func(e)).enumerate()
 	{
 		some_data = true;
-		summary.add(et.clone(), *pr);
+		summary.add(et.clone(), sc.clone(), *pr);
 
 		let expense_type_text = center_string( et, concept_type_column_width);
+		let expense_subtype_text = center_string( sc, concept_subtype_column_width);
 		let place_text = center_string( pl, shop_column_width);
 		let city_text = center_string( ci, city_column_width);
 		if &previous_date != d {
 
 			if first {
-				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{shop_main_divider}—+—{city_main_divider}—+");
-				println!("    | ID | {date_header} | {price_header} | {concept_type_header} | {shop_header} | {city_header} | Description");
-				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{shop_main_divider}—+—{city_main_divider}—+");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{shop_main_divider}—+—{city_main_divider}—+");
+				println!("    | ID | {date_header} | {price_header} | {concept_type_header} | {concept_subtype_header} | {shop_header} | {city_header} | Description");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{shop_main_divider}—+—{city_main_divider}—+");
 				first = false;
 			}
 			else {
-				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{concept_type_mid_divider}—+—{shop_mid_divider}—+—{city_mid_divider}—+");
+				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{concept_type_mid_divider}—+—{concept_subtype_mid_divider}—+—{shop_mid_divider}—+—{city_mid_divider}—+");
 			}
 
 			let date_text = center_string(&d.to_string(), DATE_WIDTH);
-			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {expense_type_text} | {place_text} | {city_text} | {descr}");
+			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {expense_type_text} | {expense_subtype_text} | {place_text} | {city_text} | {descr}");
 			previous_date = d.clone();
 		}
 		else {
 			let date_text = center_string(&" ".to_string(), DATE_WIDTH);
-			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {expense_type_text} | {place_text} | {city_text} | {descr}");
+			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {expense_type_text} | {expense_subtype_text} | {place_text} | {city_text} | {descr}");
 		}
 	}
 	if some_data {
-		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{shop_main_divider}—+—{city_main_divider}—+");
+		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{shop_main_divider}—+—{city_main_divider}—+");
 	}
 
 	if some_data {
@@ -255,7 +284,21 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 		);
 	let concept_type_main_divider = std::iter::repeat("—").take(concept_type_column_width).collect::<String>();
 	let concept_type_mid_divider: String = std::iter::repeat("·").take(concept_type_column_width).collect::<String>();
-	let concept_type_header = center_string(&"Incomes type".to_string(), concept_type_column_width);
+	let concept_type_header = center_string(&"Type".to_string(), concept_type_column_width);
+
+	let concept_subtype_column_width =
+		std::cmp::max(
+			CONCEPT_SUBTYPE_WIDTH,
+			month_data
+				.iter()
+				.filter(|i: &&Income| func(i))
+				.map(|i: &Income| -> usize { i.sub_concept.len() })
+				.max()
+				.unwrap_or(0)
+		);
+	let concept_subtype_main_divider = std::iter::repeat("—").take(concept_subtype_column_width).collect::<String>();
+	let concept_subtype_mid_divider: String = std::iter::repeat("·").take(concept_subtype_column_width).collect::<String>();
+	let concept_subtype_header = center_string(&"Subtype".to_string(), concept_subtype_column_width);
 
 	let price_main_divider = std::iter::repeat("—").take(PRICE_WIDTH).collect::<String>();
 	let price_mid_divider: String = std::iter::repeat("·").take(PRICE_WIDTH).collect::<String>();
@@ -274,6 +317,7 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 		day_of_year: d,
 		price: pr,
 		concept: et,
+		sub_concept: sc,
 		from: fr,
 		place: pl,
 		description: descr
@@ -281,34 +325,35 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 	in month_data.iter().filter(|e| func(e)).enumerate()
 	{
 		some_data = true;
-		summary.add(et.clone(), *pr);
+		summary.add(et.clone(), sc.clone(), *pr);
 
 		let income_type_text = center_string( et, concept_type_column_width);
+		let income_subtype_text = center_string( sc, concept_subtype_column_width);
 		let place_text = center_string( pl, place_column_width);
 		let from_text = center_string( fr, from_column_width);
 		if &previous_date != d {
 
 			if first {
-				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{from_main_divider}—+");
-				println!("    | ID | {date_header} | {price_header} | {concept_type_header} | {place_header} | {from_header} | Description");
-				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{from_main_divider}—+");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{place_main_divider}—+—{from_main_divider}—+");
+				println!("    | ID | {date_header} | {price_header} | {concept_type_header} | {concept_subtype_header} | {place_header} | {from_header} | Description");
+				println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{place_main_divider}—+—{from_main_divider}—+");
 				first = false;
 			}
 			else {
-				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{concept_type_mid_divider}—+—{place_mid_divider}—+—{from_mid_divider}—+");
+				println!("    +————+—{date_mid_divider}—+—{price_mid_divider}—+—{concept_type_mid_divider}—+—{concept_subtype_mid_divider}—+—{place_mid_divider}—+—{from_mid_divider}—+");
 			}
 
 			let date_text = center_string(&d.to_string(), DATE_WIDTH);
-			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {income_type_text} | {place_text} | {from_text} | {descr}");
+			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {income_type_text} | {income_subtype_text} | {place_text} | {from_text} | {descr}");
 			previous_date = d.clone();
 		}
 		else {
 			let date_text = center_string(&" ".to_string(), DATE_WIDTH);
-			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {income_type_text} | {place_text} | {from_text} | {descr}");
+			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {income_type_text} | {income_subtype_text} | {place_text} | {from_text} | {descr}");
 		}
 	}
 	if some_data {
-		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{place_main_divider}—+—{from_main_divider}—+");
+		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{place_main_divider}—+—{from_main_divider}—+");
 	}
 
 	if some_data {
@@ -361,10 +406,16 @@ pub fn display_history_summary(
 	println!("{tab}+—{first_main_divider}—+—{second_main_divider}—+—————————————+———————————————————+");
 }
 
-pub fn read_correct_concept_type(concept_types: &ConceptTypes) -> Option<String> {
+pub fn read_from_options(options: &Vec<String>) -> Option<String> {
 	loop {
 		if let Some(str) = io::read_string_or_empty() {
-			if concept_types.is_type_ok(&str) {
+			if str == "?".to_string() {
+				for opt in options.iter() {
+					println!("    {opt}");
+				}
+				println!("");
+			}
+			else if options.contains(&str) {
 				return Some(str);
 			}
 		}
