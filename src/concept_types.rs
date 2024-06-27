@@ -30,11 +30,11 @@
  *
  ********************************************************************/
 
- pub type Key = String;
- pub type Value = Vec<String>;
- pub type Container = std::collections::BTreeMap<String, Vec<String>>;
- pub type Iter<'a> = std::collections::btree_map::Iter<'a,Key,Value>;
- //pub type IterMut<'a> = std::collections::btree_map::IterMut<'a,Key,Value>;
+pub type Key = String;
+pub type Value = Vec<String>;
+pub type Container = std::collections::BTreeMap<String, Vec<String>>;
+pub type Iter<'a> = std::collections::btree_map::Iter<'a,Key,Value>;
+//pub type IterMut<'a> = std::collections::btree_map::IterMut<'a,Key,Value>;
 
 #[derive(Debug)]
 pub struct ConceptTypes {
