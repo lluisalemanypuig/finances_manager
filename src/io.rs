@@ -146,6 +146,14 @@ pub fn read_from_options_or_empty(options: &Vec<String>) -> Option<String> {
 	}
 }
 
+pub fn read_from_options(options: &Vec<String>) -> String {
+	loop {
+		if let Some(s) = read_from_options_or_empty(options) {
+			return s;
+		}
+	}
+}
+
 /* ------------------------------------------------------------------------- */
 
 pub fn read_correct_month() -> Option<date::Month> {
@@ -297,7 +305,7 @@ pub fn read_expense_types(data_dir: &String, all_data: &mut AllActivities) {
 	read_types(
 		data_dir, 
 		"expense_types.txt".to_string(),
-		all_data.get_expense_concept_types_mut()
+		all_data.get_expense_concepts_mut()
 	);
 }
 
@@ -305,7 +313,7 @@ pub fn read_income_types(data_dir: &String, all_data: &mut AllActivities) {
 	read_types(
 		data_dir, 
 		"income_types.txt".to_string(),
-		all_data.get_income_concept_types_mut()
+		all_data.get_income_concepts_mut()
 	);
 }
 
@@ -384,15 +392,15 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 			}
 		}
 	}
-	if all_data.get_expense_concept_types().has_changes() {
+	if all_data.get_expense_concepts().has_changes() {
 		let filename = "expense_types.txt".to_string();
 		println!("Writing into '{filename}'...");
-		write_concept_types(data_dir, filename, all_data.iter_expense_concept_subtypes())?;
+		write_concept_types(data_dir, filename, all_data.iter_expense_subconcepts())?;
 	}
-	if all_data.get_income_concept_types().has_changes() {
+	if all_data.get_income_concepts().has_changes() {
 		let filename = "income_types.txt".to_string();
 		println!("Writing into '{filename}'...");
-		write_concept_types(data_dir, filename, all_data.iter_income_concept_subtypes())?;
+		write_concept_types(data_dir, filename, all_data.iter_income_subconcepts())?;
 	}
 
 	Ok(())

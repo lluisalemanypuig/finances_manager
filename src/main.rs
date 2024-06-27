@@ -60,9 +60,9 @@ fn print_main_menu() {
 	println!("What menu do you want to access?");
 	println!("");
 	println!("    1. Expenses menu");
-	println!("    2. Expense concept types menu");
+	println!("    2. Expense concepts menu");
 	println!("    3. Incomes menu");
-	println!("    4. Income concept types menu");
+	println!("    4. Income concepts menu");
 	println!("    5. Expense statistics menu");
 	println!("    6. Income statistics menu");
 	println!("    7. Save all data");
@@ -79,9 +79,9 @@ fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 
 		match option {
 			1 => menu_activities::menu_expenses(all_data),
-			2 => menu_concept_types::menu_expense_concept_types(all_data),
+			2 => menu_concept_types::menu_expense_concepts(all_data),
 			3 => menu_activities::menu_incomes(all_data),
-			4 => menu_concept_types::menu_income_concept_types(all_data),
+			4 => menu_concept_types::menu_income_concepts(all_data),
 			5 => menu_statistics::menu_expenses(all_data),
 			7 => {
 				io::write_all_data(&data_dir, all_data)

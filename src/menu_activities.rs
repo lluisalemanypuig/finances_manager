@@ -208,14 +208,14 @@ fn method(all_data: &AllActivities) {
 fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: date::Month, day: u8) {
 	let expense_type_opt = || -> Option<String> {
 		println!("Expense Type:");
-		io::read_from_options_or_empty(all_data.get_expense_concept_types().get_concepts())
+		io::read_from_options_or_empty(all_data.get_expense_concepts().get_concepts())
 	}();
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
 
 	let expense_subtype_opt = || -> Option<String> {
 		println!("Expense Subtype:");
-		io::read_from_options_or_empty(all_data.get_expense_concept_types().get_subconcept(&expense_type))
+		io::read_from_options_or_empty(all_data.get_expense_concepts().get_subconcepts(&expense_type))
 	}();
 	if expense_subtype_opt.is_none() { return; }
 	let expense_subtype = expense_subtype_opt.unwrap();
@@ -252,14 +252,14 @@ fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: dat
 fn add_new_with_date_income(all_data: &mut AllActivities, year: u32, month: date::Month, day: u8) {
 	let income_type_opt = || -> Option<String> {
 		println!("Income Type:");
-		io::read_from_options_or_empty(all_data.get_income_concept_types().get_concepts())
+		io::read_from_options_or_empty(all_data.get_income_concepts().get_concepts())
 	}();
 	if income_type_opt.is_none() { return; }
 	let income_type = income_type_opt.unwrap();
 
 	let income_subtype_opt = || -> Option<String> {
 		println!("Income Subyype:");
-		io::read_from_options_or_empty(all_data.get_income_concept_types().get_subconcept(&income_type))
+		io::read_from_options_or_empty(all_data.get_income_concepts().get_subconcepts(&income_type))
 	}();
 	if income_subtype_opt.is_none() { return; }
 	let income_subtype = income_subtype_opt.unwrap();
@@ -400,7 +400,7 @@ fn edit_expense(all_data: &mut AllActivities) {
 
 		let expense = month_data.get(id_expense);
 		println!("Expense Type: {} (leave blank to keep the value)", expense.concept);
-		expense_type_opt = io::read_from_options_or_empty(&all_data.get_expense_concept_types().get_concepts())
+		expense_type_opt = io::read_from_options_or_empty(&all_data.get_expense_concepts().get_concepts())
 	}
 	let expense_subtype_opt: Option<String>;
 	{
@@ -417,7 +417,7 @@ fn edit_expense(all_data: &mut AllActivities) {
 		}
 
 		expense_subtype_opt = io::read_from_options_or_empty
-			(&all_data.get_expense_concept_types().get_subconcept(&et))
+			(&all_data.get_expense_concepts().get_subconcepts(&et))
 	}
 	
 	let year_data = all_data.add_year(year);
@@ -488,7 +488,7 @@ fn edit_income(all_data: &mut AllActivities) {
 		let month_data = all_data.get_month_incomes(&year, &month).expect("Expected month data");
 		let expense = month_data.get(id_income);
 		println!("Expense Type: {} (leave blank to keep the value)", expense.concept);
-		income_type_opt = io::read_from_options_or_empty(&all_data.get_income_concept_types().get_concepts())
+		income_type_opt = io::read_from_options_or_empty(&all_data.get_income_concepts().get_concepts())
 	}
 	let income_subtype_opt: Option<String>;
 	{
@@ -505,7 +505,7 @@ fn edit_income(all_data: &mut AllActivities) {
 		}
 
 		income_subtype_opt = io::read_from_options_or_empty
-			(&all_data.get_expense_concept_types().get_subconcept(&et))
+			(&all_data.get_expense_concepts().get_subconcepts(&et))
 	}
 	
 	let year_data = all_data.add_year(year);
