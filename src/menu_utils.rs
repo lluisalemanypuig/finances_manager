@@ -405,22 +405,3 @@ pub fn display_history_summary(
 	}
 	println!("{tab}+—{first_main_divider}—+—{second_main_divider}—+—————————————+———————————————————+");
 }
-
-pub fn read_from_options(options: &Vec<String>) -> Option<String> {
-	loop {
-		if let Some(str) = io::read_string_or_empty() {
-			if str == "?".to_string() {
-				for opt in options.iter() {
-					println!("    {opt}");
-				}
-				println!("");
-			}
-			else if options.contains(&str) {
-				return Some(str);
-			}
-		}
-		else {
-			return None;
-		}
-	}
-}

@@ -78,14 +78,14 @@ impl AllActivities {
 
 	// Expenses
 
-	pub fn iter_expense_concept_types(&self) -> std::slice::Iter<'_, String> { self.m_expense_types.iter_types() }
+	pub fn iter_expense_concept_types(&self) -> std::slice::Iter<'_, String> { self.m_expense_types.iter_concepts() }
 	/*
 	pub fn iter_mut_expense_concept_types(&mut self) -> std::slice::IterMut<'_, String> {
 		self.m_expense_types.set_changes(true);
 		self.m_expense_types.iter_mut_types()
 	}
 	*/
-	pub fn iter_expense_concept_subtypes(&self) -> concept_types::Iter { self.m_expense_types.iter_subtypes() }
+	pub fn iter_expense_concept_subtypes(&self) -> concept_types::Iter { self.m_expense_types.iter_subconcepts() }
 	/*
 	pub fn iter_mut_expense_concept_subtypes(&mut self) -> concept_types::IterMut {
 		self.m_expense_types.set_changes(true);
@@ -101,7 +101,7 @@ impl AllActivities {
 
 	// Incomes
 
-	pub fn iter_income_concept_types(&self) -> std::slice::Iter<'_, String> { self.m_income_types.iter_types() }
+	pub fn iter_income_concept_types(&self) -> std::slice::Iter<'_, String> { self.m_income_types.iter_concepts() }
 	/*
 	pub fn iter_mut_income_concept_types(&mut self) -> std::slice::IterMut<'_, String> {
 		self.m_income_types.set_changes(true);
@@ -115,7 +115,7 @@ impl AllActivities {
 		&mut self.m_income_types
 	}
 
-	pub fn iter_income_concept_subtypes(&self) -> concept_types::Iter { self.m_income_types.iter_subtypes() }
+	pub fn iter_income_concept_subtypes(&self) -> concept_types::Iter { self.m_income_types.iter_subconcepts() }
 	/*
 	pub fn iter_mut_income_concept_subtypes(&mut self) -> concept_types::IterMut {
 		self.m_income_types.set_changes(true);

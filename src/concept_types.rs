@@ -40,33 +40,37 @@
 pub struct ConceptTypes {
 	m_changes: bool,
 
-	m_types: Vec<String>,
+	m_concepts: Vec<String>,
 
-	m_sub_types: Container
+	m_subconcepts: Container
 }
 
 impl ConceptTypes {
 	pub fn new() -> ConceptTypes {
 		ConceptTypes {
 			m_changes: false,
-			m_types: Vec::new(),
-			m_sub_types: Container::new()
+			m_concepts: Vec::new(),
+			m_subconcepts: Container::new()
 		}
 	}
 
-	pub fn iter_types(&self) -> std::slice::Iter<'_, String> { self.m_types.iter() }
+	pub fn iter_concepts(&self) -> std::slice::Iter<'_, String> { self.m_concepts.iter() }
 	//pub fn iter_mut_types(&mut self) -> std::slice::IterMut<'_, String> { self.m_types.iter_mut() }
 	
-	pub fn iter_subtypes(&self) -> Iter { self.m_sub_types.iter() }
+	pub fn iter_subconcepts(&self) -> Iter { self.m_subconcepts.iter() }
 	//pub fn iter_mut_subtypes(&mut self) -> IterMut { self.m_sub_types.iter_mut() }
 
-	pub fn add_type(&mut self, concept: String) {
-		self.m_types.push(concept);
-		self.m_changes = true;
+	pub fn add_concept(&mut self, concept: String) {
+		self.m_concepts.push(concept.clone());
+
+		self.m_subconcepts.insert(concept, Vec::new());
+
+		self.set_changes(true);
 	}
-	pub fn set_subtypes(&mut self, concept: String, subtypes: Vec<String>) {
-		self.m_sub_types.insert(concept, subtypes);
-		self.m_changes = true;
+	pub fn set_subconcept(&mut self, concept: String, subconcept: Vec<String>) {
+		self.m_subconcepts.insert(concept, subconcept);
+		
+		self.set_changes(true);
 	}
 
 	pub fn has_changes(&self) -> bool { self.m_changes }
@@ -74,8 +78,8 @@ impl ConceptTypes {
 		self.m_changes = c;
 	}
 
-	pub fn has_type(&self, concept_type: &String) -> bool {
-		self.m_types.contains(concept_type)
+	pub fn has_concept(&self, concept: &String) -> bool {
+		self.m_concepts.contains(concept)
 	}
 	/*
 	pub fn has_subtype(&self, concept_type: &String, concept_subtype: &String) -> bool {
@@ -84,30 +88,48 @@ impl ConceptTypes {
 	}
 	*/
 
-	pub fn get_types(&self) -> &Vec<String> {
-		&self.m_types
+	pub fn get_concepts(&self) -> &Vec<String> {
+		&self.m_concepts
 	}
-	pub fn get_subtypes(&self, concept_type: &String) -> &Vec<String> {
-		&self.m_sub_types.get(concept_type).unwrap()
-	}
-
-	pub fn position_type(&self, expense_type: &String) -> Option<usize> {
-		self.m_types.iter().position(|e| e == expense_type)
+	pub fn get_subconcept(&self, concept: &String) -> &Vec<String> {
+		&self.m_subconcepts.get(concept).unwrap()
 	}
 
-	pub fn remove(&mut self, idx: usize) {
-		self.m_types.remove(idx);
-		self.m_changes = true;
+
+	fn position_in_vector(v: &Vec<String>, elem: &String) -> Option<usize> {
+		v.iter().position(|e| e == elem)
 	}
 
-	pub fn replace(&mut self, idx: usize, new_elem: String) {
-		self.m_types[idx] = new_elem;
-		self.m_changes = true;
+	pub fn remove_concept(&mut self, concept: String) {
+		if let Some(idx) = Self::position_in_vector(&self.m_concepts, &concept) {
+			self.m_subconcepts.remove(&concept);
+	
+			self.m_concepts.remove(idx);
+	
+			self.set_changes(true);
+		}
+	}
+	pub fn remove_subconcept(&mut self, concept: String, subconcept: String) {
+		if self.has_concept(&concept) {
+
+			let subconcepts = self.m_subconcepts.get_mut(&concept).unwrap();
+			if let Some(idx) = Self::position_in_vector(&subconcepts, &subconcept) {
+				subconcepts.remove(idx);
+
+				self.set_changes(true);
+			}
+		}
 	}
 
-	pub fn add(&mut self, new_elem: String) {
-		self.m_types.push(new_elem);
-		self.m_changes = true;
+	pub fn rename_concept(&mut self, old_concept: &String, new_concept: String) {
+		if let Some(idx) = Self::position_in_vector(&self.m_concepts, old_concept) {
+			self.m_concepts[idx] = new_concept.clone();
+
+			let res = self.m_subconcepts.remove(old_concept).unwrap();
+			self.m_subconcepts.insert( new_concept, res );
+
+			self.set_changes(true);
+		}
 	}
 	
 }

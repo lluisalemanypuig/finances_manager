@@ -51,51 +51,49 @@ fn method(all_data: &AllExpenses) {
 }
 
 #[duplicate::duplicate_item(
-	thing         method                     get                         get_mut;
-	["expense"]  [add_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut];
-	["income"]   [add_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut];
+	thing       method                     get                         get_mut;
+	["expense"] [add_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut];
+	["income"]  [add_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut];
 )]
 fn method(all_data: &mut AllExpenses) {
 	println!("Enter the new {} type:", thing);
 	let new_type = io::read_string();
 
-	if all_data.get().has_type(&new_type) {
+	if all_data.get().has_concept(&new_type) {
 		println!("Type '{new_type}' already exists.")
 	}
 	else {
-		all_data.get_mut().add(new_type);
+		all_data.get_mut().add_concept(new_type);
 	}
 }
 
 #[duplicate::duplicate_item(
-	thing         method                        get                         get_mut                         iter_mut_act;
+	thing        method                        get                         get_mut                         iter_mut_act;
 	["expense"]  [rename_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut] [iter_mut_expenses];
 	["income"]   [rename_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut]  [iter_mut_incomes];
 )]
 fn method(all_data: &mut AllExpenses) {
 	println!("Enter the {} type to rename:", thing);
-	let old_type = io::read_string();
+	let old_concept = io::read_string();
 
-	let idx_old_type = all_data.get().position_type(&old_type);
-	
-	if let Some(idx_old) = idx_old_type {
+	if all_data.get().has_concept(&old_concept) {
 		println!("Enter the new {} type:", thing);
 		let new_type = io::read_string();
 
-		all_data.get_mut().replace(idx_old, new_type.clone());
+		all_data.get_mut().rename_concept(&old_concept, new_type.clone());
 
 		// replace the old type throughout the entire list of activities
 		for ye in all_data.iter_mut_activities() {
 			ye.set_changes(true);
 			for me in ye.iter_mut_act() {
-				for e in me.get_activities_mut().iter_mut().filter(|e| e.concept == old_type) {
+				for e in me.get_activities_mut().iter_mut().filter(|e| e.concept == old_concept) {
 					e.concept = new_type.clone();
 				}
 			}
 		}
 	}
 	else {
-		println!("Expense type '{old_type}' does not exist.")
+		println!("Expense type '{old_concept}' does not exist.")
 	}
 }
 
@@ -106,13 +104,10 @@ fn method(all_data: &mut AllExpenses) {
 )]
 fn method(all_data: &mut AllExpenses) {
 	println!("Enter the {} type to remove:", thing);
-	let type_to_remove = io::read_string();
+	let concept_to_remove_opt = io::read_from_options_or_empty(&all_data.get().get_concepts());
 
-	if let Some(idx) = all_data.get().position_type(&type_to_remove) {
-		all_data.get_mut().remove(idx);
-	}
-	else {
-		println!("Expense type to remove '{type_to_remove}' does not exist.");
+	if let Some(concept) = concept_to_remove_opt {
+		all_data.get_mut().remove_concept(concept);
 	}
 }
 

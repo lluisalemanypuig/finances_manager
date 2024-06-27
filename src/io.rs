@@ -127,6 +127,27 @@ pub fn read_float<T: FromStr>() -> T where T: Decimal {
 
 /* ------------------------------------------------------------------------- */
 
+pub fn read_from_options_or_empty(options: &Vec<String>) -> Option<String> {
+	loop {
+		if let Some(str) = read_string_or_empty() {
+			if str == "?".to_string() {
+				for opt in options.iter() {
+					println!("    {opt}");
+				}
+				println!("");
+			}
+			else if options.contains(&str) {
+				return Some(str);
+			}
+		}
+		else {
+			return None;
+		}
+	}
+}
+
+/* ------------------------------------------------------------------------- */
+
 pub fn read_correct_month() -> Option<date::Month> {
 	loop {
 		match read_string_or_empty() {
@@ -266,9 +287,9 @@ fn read_types(data_dir: &String, filename: String, concept_types: &mut ConceptTy
 			.collect();
 
 		let concept_type = values[0].to_string();
-		concept_types.add_type(concept_type.clone());
+		concept_types.add_concept(concept_type.clone());
 		let concept_subtypes: Vec<String> = values[1..].iter().map(|s| s.to_string()).collect();
-		concept_types.set_subtypes(concept_type, concept_subtypes);
+		concept_types.set_subconcept(concept_type, concept_subtypes);
 	}
 }
 
