@@ -41,7 +41,6 @@ pub struct ConceptTypes {
 	m_changes: bool,
 
 	m_concepts: Vec<String>,
-
 	m_subconcepts: Container
 }
 
@@ -95,11 +94,6 @@ impl ConceptTypes {
 		&self.m_subconcepts.get(concept).unwrap()
 	}
 
-
-	fn position_in_vector(v: &Vec<String>, elem: &String) -> Option<usize> {
-		v.iter().position(|e| e == elem)
-	}
-
 	pub fn remove_concept(&mut self, concept: String) {
 		if let Some(idx) = Self::position_in_vector(&self.m_concepts, &concept) {
 			self.m_subconcepts.remove(&concept);
@@ -131,5 +125,11 @@ impl ConceptTypes {
 			self.set_changes(true);
 		}
 	}
-	
+
+	/* PRIVATE */
+
+	fn position_in_vector(v: &Vec<String>, elem: &String) -> Option<usize> {
+		v.iter().position(|e| e == elem)
+	}
+
 }
