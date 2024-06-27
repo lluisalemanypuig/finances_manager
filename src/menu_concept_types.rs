@@ -68,9 +68,9 @@ fn method(all_data: &mut AllExpenses) {
 }
 
 #[duplicate::duplicate_item(
-	thing        method                        get                         get_mut                         iter_mut_act;
-	["expense"]  [rename_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut] [iter_mut_expenses];
-	["income"]   [rename_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut]  [iter_mut_incomes];
+	thing       method                        get                         get_mut                         iter_mut_act;
+	["expense"] [rename_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut] [iter_mut_expenses];
+	["income"]  [rename_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut]  [iter_mut_incomes];
 )]
 fn method(all_data: &mut AllExpenses) {
 	println!("Enter the {} type to rename:", thing);
@@ -98,9 +98,9 @@ fn method(all_data: &mut AllExpenses) {
 }
 
 #[duplicate::duplicate_item(
-	thing        method                        get                         get_mut;
-	["expense"]  [remove_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut];
-	["income"]   [remove_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut];
+	thing       method                        get                         get_mut;
+	["expense"] [remove_expense_concept_type] [get_expense_concept_types] [get_expense_concept_types_mut];
+	["income"]  [remove_income_concept_type]  [get_income_concept_types]  [get_income_concept_types_mut];
 )]
 fn method(all_data: &mut AllExpenses) {
 	println!("Enter the {} type to remove:", thing);
@@ -112,9 +112,9 @@ fn method(all_data: &mut AllExpenses) {
 }
 
 #[duplicate::duplicate_item(
-	thing        method;
-	["expense"]  [print_expense_concept_types_menu];
-	["income"]   [print_income_concept_types_menu];
+	thing       method;
+	["expense"] [print_expense_concept_types_menu];
+	["income"]  [print_income_concept_types_menu];
 )]
 fn method() {
 	println!("Query and edit the expense concept types:");
@@ -127,9 +127,9 @@ fn method() {
 }
 
 #[duplicate::duplicate_item(
-	menu                          print_menu                          print_all_types                    add_type                    rename_type                    remove_type;
-	[menu_expense_concept_types]  [print_expense_concept_types_menu]  [print_expense_concept_types_all]  [add_expense_concept_type]  [rename_expense_concept_type]  [remove_expense_concept_type];
-	[menu_income_concept_types]   [print_income_concept_types_menu]   [print_income_concept_types_all]   [add_income_concept_type]   [rename_income_concept_type]   [remove_income_concept_type];
+	menu                         print_menu                         print_all_types                   add_type                   rename_type                   remove_type;
+	[menu_expense_concept_types] [print_expense_concept_types_menu] [print_expense_concept_types_all] [add_expense_concept_type] [rename_expense_concept_type] [remove_expense_concept_type];
+	[menu_income_concept_types]  [print_income_concept_types_menu]  [print_income_concept_types_all]  [add_income_concept_type]  [rename_income_concept_type]  [remove_income_concept_type];
 )]
 pub fn menu(all_data: &mut AllExpenses) {
 	let print_function = print_menu;
