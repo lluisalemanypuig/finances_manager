@@ -363,7 +363,12 @@ pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
 	summary
 }
 
-pub type Cell = (String, u32, f32);
+pub struct Cell {
+	pub num_times: u32,
+	pub total_value: f32,
+	pub city: String
+}
+
 pub fn display_history_summary(
 	vec_summary: &Vec<(String, Cell)>,
 	first_title: String,
@@ -387,7 +392,7 @@ pub fn display_history_summary(
 		second_title.len(),
 		vec_summary
 		.iter()
-		.map(|v| -> usize { v.1.0.len() })
+		.map(|v| -> usize { v.1.city.len() })
 		.max()
 		.unwrap_or(0)
 	);
@@ -395,13 +400,32 @@ pub fn display_history_summary(
 	let second_header = center_string(&second_title, second_column_width);
 
 	let tab = "    ";
-	println!("{tab}+—{first_main_divider}—+—{second_main_divider}—+—————————————+———————————————————+");
-	println!("{tab}| {first_header} | {second_header} | Times found | Total money spent |");
-	println!("{tab}+—{first_main_divider}—+—{second_main_divider}—+—————————————+———————————————————+");
-	for (thing, (a, num_times, total_value)) in vec_summary.iter() {
-		let thing_text = center_string( thing, first_column_width);
-		let a_text = center_string( a, second_column_width);
-		println!("{tab}| {thing_text} | {a_text} | {num_times:>11} | {total_value:>17.2} |");
+
+	if second_column_width > 0 {
+		println!("{tab}+—{first_main_divider}—+—{second_main_divider}—+—————————————+———————————————————+");
+		println!("{tab}| {first_header} | {second_header} | Times found | Total money spent |");
+		println!("{tab}+—{first_main_divider}—+—{second_main_divider}—+—————————————+———————————————————+");
 	}
-	println!("{tab}+—{first_main_divider}—+—{second_main_divider}—+—————————————+———————————————————+");
+	else {
+		println!("{tab}+—{first_main_divider}—+—————————————+———————————————————+");
+		println!("{tab}| {first_header} | Times found | Total money spent |");
+		println!("{tab}+—{first_main_divider}—+—————————————+———————————————————+");
+	}
+	
+	for (thing, Cell {city, num_times, total_value}) in vec_summary.iter() {
+		let thing_text = center_string( thing, first_column_width);
+		if second_column_width > 0 {
+			let city_text = center_string( city, second_column_width);
+			println!("{tab}| {thing_text} | {city_text} | {num_times:>11} | {total_value:>17.2} |");
+		}
+		else {
+			println!("{tab}| {thing_text} | {num_times:>11} | {total_value:>17.2} |");
+		}
+	}
+	if second_column_width > 0 {
+		println!("{tab}+—{first_main_divider}—+—{second_main_divider}—+—————————————+———————————————————+");
+	}
+	else {
+		println!("{tab}+—{first_main_divider}—+—————————————+———————————————————+");
+	}
 }

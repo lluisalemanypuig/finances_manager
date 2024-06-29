@@ -30,12 +30,14 @@
  *
  ********************************************************************/
 
+use crate::expense;
 use crate::io;
 use crate::menu_utils;
 
 use crate::all_activities;
 use crate::activity_summary;
 
+type Expense = expense::Expense;
 type AllExpenses = all_activities::AllActivities;
 type ActivitySummary = activity_summary::ActivitySummary;
 type Cell = menu_utils::Cell;
@@ -183,25 +185,31 @@ fn statistics_by_place_substring(all_data: &AllExpenses) {
 	}
 }
 
-fn history_of_expenses<F: FnMut( &(String,Cell), &(String,Cell) ) -> std::cmp::Ordering>
-(all_data: &AllExpenses, func: F)
+fn history_of_expenses<SortFunc, ConvertFunc> (
+	all_data: &AllExpenses,
+	sort: SortFunc,
+	convert: ConvertFunc
+)
+where
+	SortFunc: FnMut( &(String,Cell), &(String,Cell) ) -> std::cmp::Ordering,
+	ConvertFunc: Fn(&Expense) -> String
 {
-
 	let mut summary: std::collections::BTreeMap<String, Cell> = std::collections::BTreeMap::new();
 
 	for year in all_data.iter_activities() {
 		for month in year.iter_expenses() {
-			for exp in month.iter().filter(|e| e.concept != "Income") {
+			for exp in month.iter() {
 
-				match summary.get_mut(&exp.concept) {
-					Some( (_, num_times, total_value) ) => {
+				let key_exp = convert(&exp);
+				match summary.get_mut(&key_exp) {
+					Some( Cell { city: _, num_times, total_value} ) => {
 						*num_times += 1;
 						*total_value += exp.price;
 					},
 					None => {
 						summary.insert(
-							exp.concept.clone(),
-							("".to_string(), 1, exp.price)
+							key_exp,
+							Cell { city: "".to_string(), num_times:1, total_value: exp.price}
 						);
 					}
 				}
@@ -210,15 +218,17 @@ fn history_of_expenses<F: FnMut( &(String,Cell), &(String,Cell) ) -> std::cmp::O
 	}
 
 	let mut vec_summary: Vec<(String, Cell)> = summary.into_iter().collect();
-	vec_summary.sort_by(func );
+	vec_summary.sort_by(sort );
 
 	menu_utils::display_history_summary(&vec_summary, "Expense Type".to_string(), "".to_string());
 }
 
-fn history_of_expense_places<F: FnMut( &(String,Cell), &(String,Cell) ) -> std::cmp::Ordering>
-(all_data: &AllExpenses, func: F)
+fn history_of_expense_places<F>(
+	all_data: &AllExpenses, func: F
+)
+where
+	F: FnMut( &(String,Cell), &(String,Cell) ) -> std::cmp::Ordering
 {
-
 	let mut summary: std::collections::BTreeMap<String, Cell> = std::collections::BTreeMap::new();
 
 	for year in all_data.iter_activities() {
@@ -226,14 +236,14 @@ fn history_of_expense_places<F: FnMut( &(String,Cell), &(String,Cell) ) -> std::
 			for exp in month.iter().filter(|e| e.concept != "Income") {
 
 				match summary.get_mut(&exp.shop) {
-					Some( (_, num_times, total_value) ) => {
+					Some( Cell { city: _, num_times, total_value} ) => {
 						*num_times += 1;
 						*total_value += exp.price;
 					},
 					None => {
 						summary.insert(
 							exp.shop.clone(),
-							(exp.city.clone(), 1, exp.price)
+							Cell { city: exp.city.clone(), num_times: 1, total_value: exp.price }
 						);
 					}
 				}
@@ -259,35 +269,51 @@ fn print_statistics_menu_expenses() {
 	println!("    5.    Sorted alphabetically");
 	println!("    6.    Sorted by times");
 	println!("    7.    Sorted by values");
-	println!("    History of expenses by place");
+	println!("    History of expenses by type and subtype");
 	println!("    8.    Sorted alphabetically");
 	println!("    9.    Sorted by times");
-	println!("   10.    Sorted by value");
+	println!("   10.    Sorted by values");
+	println!("    History of expenses by place");
+	println!("   11.    Sorted alphabetically");
+	println!("   12.    Sorted by times");
+	println!("   13.    Sorted by value");
 	println!("    0. Leave");
 }
 
-fn sort_alphabetically(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
+fn sort_by_concept_alphabetically(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
 	a.0.cmp(&b.0)
 }
 
 fn sort_by_times(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
-	if b.1.1 == a.1.1 {
+	if b.1.num_times == a.1.num_times {
 		return a.0.cmp(&b.0);
 	}
-	b.1.1.cmp(&a.1.1)
+	b.1.num_times.cmp(&a.1.num_times)
 }
 
 fn sort_by_value(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
-	if b.1.2 == a.1.2 {
+	if b.1.total_value == a.1.total_value {
 		return a.0.cmp(&b.0);
 	}
-	b.1.2.total_cmp(&a.1.2)
+	b.1.total_value.total_cmp(&a.1.total_value)
+}
+
+fn concept(e: &Expense) -> String { e.concept.clone() }
+fn concept_subconcept(e: &Expense) -> String {
+	let sub_concept;
+	if e.sub_concept != "".to_string() {
+		sub_concept = " - ".to_owned() + &e.sub_concept.clone();
+	}
+	else {
+		sub_concept = "".to_string();
+	}
+	e.concept.clone() + &sub_concept
 }
 
 pub fn menu_expenses(all_data: &AllExpenses) {
 	let print_function = print_statistics_menu_expenses;
 	let min_option = 0;
-	let max_option = 10;
+	let max_option = 13;
 
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -297,12 +323,18 @@ pub fn menu_expenses(all_data: &AllExpenses) {
 			2 => statistics_by_price(&all_data),
 			3 => statistics_by_place(&all_data),
 			4 => statistics_by_place_substring(&all_data),
-			5 => history_of_expenses(&all_data, sort_alphabetically),
-			6 => history_of_expenses(&all_data, sort_by_times),
-			7 => history_of_expenses(&all_data, sort_by_value),
-			8 => history_of_expense_places(&all_data, sort_alphabetically),
-			9 => history_of_expense_places(&all_data, sort_by_times),
-			10 => history_of_expense_places(&all_data, sort_by_value),
+			// by type
+			5 => history_of_expenses(&all_data, sort_by_concept_alphabetically, concept),
+			6 => history_of_expenses(&all_data, sort_by_times, concept),
+			7 => history_of_expenses(&all_data, sort_by_value, concept),
+			// by type and subtype
+			8 => history_of_expenses(&all_data, sort_by_concept_alphabetically, concept_subconcept),
+			9 => history_of_expenses(&all_data, sort_by_times, concept_subconcept),
+			10 => history_of_expenses(&all_data, sort_by_value, concept_subconcept),
+			// by place
+			11 => history_of_expense_places(&all_data, sort_by_concept_alphabetically),
+			12 => history_of_expense_places(&all_data, sort_by_times),
+			13 => history_of_expense_places(&all_data, sort_by_value),
 			_ => println!("Nothing to do..."),
 		}
 		
