@@ -191,7 +191,7 @@ fn history_of_expenses<SortFunc, ConvertFunc> (
 	convert: ConvertFunc
 )
 where
-	SortFunc: FnMut( &(String,Cell), &(String,Cell) ) -> std::cmp::Ordering,
+	SortFunc: Fn( &(String,Cell), &(String,Cell) ) -> std::cmp::Ordering,
 	ConvertFunc: Fn(&Expense) -> String
 {
 	let mut summary: std::collections::BTreeMap<String, Cell> = std::collections::BTreeMap::new();
@@ -220,14 +220,18 @@ where
 	let mut vec_summary: Vec<(String, Cell)> = summary.into_iter().collect();
 	vec_summary.sort_by(sort );
 
-	menu_utils::display_history_summary(&vec_summary, "Expense Type".to_string(), "".to_string());
+	menu_utils::display_history_summary(
+		&vec_summary, 
+		"Expense Type".to_string(),
+		"".to_string()
+	);
 }
 
 fn history_of_expense_places<F>(
 	all_data: &AllExpenses, func: F
 )
 where
-	F: FnMut( &(String,Cell), &(String,Cell) ) -> std::cmp::Ordering
+	F: Fn( &(String,Cell), &(String,Cell) ) -> std::cmp::Ordering
 {
 	let mut summary: std::collections::BTreeMap<String, Cell> = std::collections::BTreeMap::new();
 
@@ -255,7 +259,11 @@ where
 	let mut vec_summary: Vec<(String, Cell)> = summary.into_iter().collect();
 	vec_summary.sort_by(func );
 
-	menu_utils::display_history_summary(&vec_summary, "Place".to_string(), "City".to_string());
+	menu_utils::display_history_summary(
+		&vec_summary, 
+		"Place".to_string(),
+		"City".to_string()
+	);
 }
 
 fn print_statistics_menu_expenses() {
