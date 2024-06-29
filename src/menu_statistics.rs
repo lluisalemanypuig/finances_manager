@@ -266,18 +266,18 @@ fn print_statistics_menu_expenses() {
 	println!("    0. Leave");
 }
 
-pub fn sort_alphabetically(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
+fn sort_alphabetically(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
 	a.0.cmp(&b.0)
 }
 
-pub fn sort_by_times(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
+fn sort_by_times(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
 	if b.1.1 == a.1.1 {
 		return a.0.cmp(&b.0);
 	}
 	b.1.1.cmp(&a.1.1)
 }
 
-pub fn sort_by_value(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
+fn sort_by_value(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
 	if b.1.2 == a.1.2 {
 		return a.0.cmp(&b.0);
 	}
