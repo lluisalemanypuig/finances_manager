@@ -54,8 +54,13 @@ fn method(all_data: &AllExpenses) {
 					else { acc + ", " + s }
 				}
 			);
-
-		println!("    {i}: {concept_type} : {res}");
+		
+		if res.len() == 0 {
+			println!("    {i}: {concept_type}");
+		}
+		else {
+			println!("    {i}: {concept_type} : {res}");
+		}
 	}
 	println!("");
 }

@@ -113,11 +113,10 @@ pub fn display_summary_activity(summary: &ActivitySummary, pre_tab: &str) {
 	println!("");
 }
 
-pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
-	month_data: &MonthlyActivities<Expense>,
-	func: F
-)
+pub fn display_and_accounting_expenses<F>(month_data: &MonthlyActivities<Expense>, func: &F)
 -> ActivitySummary
+where
+	F: Fn(&Expense) -> bool
 {
 	let shop_column_width =
 		std::cmp::max(
@@ -238,11 +237,10 @@ pub fn display_and_accounting_expenses<F: Fn(&Expense) -> bool>(
 	summary
 }
 
-pub fn display_and_accounting_incomes<F: Fn(&Income) -> bool>(
-	month_data: &MonthlyActivities<Income>,
-	func: F
-)
+pub fn display_and_accounting_incomes<F>(month_data: &MonthlyActivities<Income>, func: &F)
 -> ActivitySummary
+where
+	F: Fn(&Income) -> bool
 {
 	let place_column_width =
 		std::cmp::max(
