@@ -591,26 +591,26 @@ fn edit_income(all_data: &mut AllActivities) {
 	let income_type_opt: Option<String>;
 	{
 		let month_data = all_data.get_month_incomes(&year, &month).expect("Expected month data");
-		let expense = month_data.get(id_income);
-		println!("Expense Type: {} (leave blank to keep the value)", expense.concept);
+		let income = month_data.get(id_income);
+		println!("Expense Type: {} (leave blank to keep the value)", income.concept);
 		income_type_opt = io::read_from_options_or_empty(&all_data.get_income_concepts().get_concepts())
 	}
 	let income_subtype_opt: Option<String>;
 	{
-		let month_data = all_data.get_month_expenses(&year, &month).expect("Expected month data");
-		let expense = month_data.get(id_income);
-		println!("Expense Subtype: {} (leave blank to keep the value)", expense.sub_concept);
+		let month_data = all_data.get_month_incomes(&year, &month).expect("Expected month data");
+		let income = month_data.get(id_income);
+		println!("Expense Subtype: {} (leave blank to keep the value)", income.sub_concept);
 
 		let et;
 		if income_type_opt.is_some() {
 			et = income_type_opt.clone().unwrap();
 		}
 		else {
-			et = expense.concept.clone();
+			et = income.concept.clone();
 		}
 
 		income_subtype_opt = io::read_from_options_or_empty
-			(&all_data.get_expense_concepts().get_subconcepts(&et))
+			(&all_data.get_income_concepts().get_subconcepts(&et))
 	}
 	
 	let year_data = all_data.add_year(year);
@@ -689,15 +689,15 @@ fn method() {
 	println!("Query and edit the expenses:");
 	println!("");
 	println!("     1. Show all current data");
-	println!("     2. Show all {}s by type", thing);
-	println!("     3. Show all {}s by type (substring)", thing);
-	println!("     4. Show all {}s by price range", thing);
-	println!("     5. Show all {}s by {}", thing, place);
-	println!("     6. Show all {}s by {} (substring)", thing, place);
-	println!("     7. Show data of a year");
-	println!("     8.     Show data of the current year");
-	println!("     9. Show data of a month");
-	println!("    10.     Show data of the current month");
+	println!("     2. Show data of a year");
+	println!("     3.     Show data of the current year");
+	println!("     4. Show data of a month");
+	println!("     5.     Show data of the current month");
+	println!("     6. Show all {}s by type", thing);
+	println!("     7. Show all {}s by type (substring)", thing);
+	println!("     8. Show all {}s by price range", thing);
+	println!("     9. Show all {}s by {}", thing, place);
+	println!("    10. Show all {}s by {} (substring)", thing, place);
 	println!("    11. Add another {}", thing);
 	println!("    12.     Add another {} today", thing);
 	println!("    13.     Add {}s to a year and month", thing);
@@ -716,15 +716,15 @@ pub fn menu_expenses(all_data: &mut AllActivities) {
 		
 		match option {
 			1 => print_data_all_expenses(&all_data),
-			2 => print_expenses_by_type(&all_data),
-			3 => print_expenses_by_type_substring(&all_data),
-			4 => print_expenses_by_price_range(&all_data),
-			5 => print_expenses_by_place(&all_data),
-			6 => print_expenses_by_place_substring(&all_data),
-			7 => print_data_year_user_expenses(&all_data),
-			8 => print_data_year_current_expenses(&all_data),
-			9 => print_data_month_user_expenses(&all_data),
-			10 => print_data_month_current_expenses(&all_data),
+			2 => print_data_year_user_expenses(&all_data),
+			3 => print_data_year_current_expenses(&all_data),
+			4 => print_data_month_user_expenses(&all_data),
+			5 => print_data_month_current_expenses(&all_data),
+			6 => print_expenses_by_type(&all_data),
+			7 => print_expenses_by_type_substring(&all_data),
+			8 => print_expenses_by_price_range(&all_data),
+			9 => print_expenses_by_place(&all_data),
+			10 => print_expenses_by_place_substring(&all_data),
 			11 => add_new_expense(all_data),
 			12 => add_new_today_expense(all_data),
 			13 => add_new_year_month_expense(all_data),
@@ -747,15 +747,15 @@ pub fn menu_incomes(all_data: &mut AllActivities) {
 		
 		match option {
 			1 => print_data_all_incomes(&all_data),
-			2 => print_incomes_by_type(&all_data),
-			3 => print_incomes_by_type_substring(&all_data),
-			4 => print_incomes_by_price_range(&all_data),
-			5 => print_incomes_by_place(&all_data),
-			6 => print_incomes_by_place_substring(&all_data),
-			7 => print_data_year_user_incomes(&all_data),
-			8 => print_data_year_current_incomes(&all_data),
-			9 => print_data_month_user_incomes(&all_data),
-			10 => print_data_month_current_incomes(&all_data),
+			2 => print_data_year_user_incomes(&all_data),
+			3 => print_data_year_current_incomes(&all_data),
+			4 => print_data_month_user_incomes(&all_data),
+			5 => print_data_month_current_incomes(&all_data),
+			6 => print_incomes_by_type(&all_data),
+			7 => print_incomes_by_type_substring(&all_data),
+			8 => print_incomes_by_price_range(&all_data),
+			9 => print_incomes_by_place(&all_data),
+			10 => print_incomes_by_place_substring(&all_data),
 			11 => add_new_income(all_data),
 			12 => add_new_today_income(all_data),
 			13 => add_new_year_month_income(all_data),
