@@ -64,7 +64,8 @@ fn center_string(s: &String, width: usize) -> String {
 	format!("{left_pad}{s}{right_pad}")
 }
 
-static CONCEPT_TYPE_WIDTH: usize = 4;
+// the concept type width is 5 (and not 4) due to the length of the word "Total"
+static CONCEPT_TYPE_WIDTH: usize = 5;
 static CONCEPT_SUBTYPE_WIDTH: usize = 7;
 static PRICE_WIDTH: usize = 8;
 static DATE_WIDTH: usize = 17;
