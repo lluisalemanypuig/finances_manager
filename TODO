@@ -2,5 +2,4 @@
 Menus for statistics of expenses/incomes
 ========================================
 
-- Show all expenses/incomes of a specific type and subtype (so far, it is implemented only for types)
-- History of expenses/income by type and subtype (so far, it is implemented only for types)
+- History of income by type and subtype
