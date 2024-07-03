@@ -154,16 +154,9 @@ where
 	pub fn set_changes(&mut self, c: bool) {
 		self.m_changes = c;
 	}
-	fn nothing(&self, _: bool) { }
 	
 	pub fn has_month(&self, m: &Month) -> bool {
-		let res = self.m_activities.binary_search_by(
-			|e| e.get_month().cmp(&m)
-		);
-		match res {
-			Ok(_) => true,
-			Err(_) => false
-		}
+		self.m_activities.binary_search_by(|e| e.get_month().cmp(&m)).is_ok()
 	}
 
 	#[duplicate::duplicate_item(
@@ -172,15 +165,12 @@ where
 		[get_month_mut]  [as_mut]  [set_changes]  [&mut type]    ;
 	)]
 	pub fn method(self: reference([Self]), m: &Month) -> Option<reference([MonthlyActivities<T>])> {
-		let res = self.m_activities.binary_search_by(
-			|e| e.get_month().cmp(&m)
-		);
-		match res {
-			Ok(idx) => {
-				self.update(true);
-				Some(self.m_activities[idx].convert())
-			},
-			Err(_) => None
+		if let Ok(idx) = self.m_activities.binary_search_by(|e| e.get_month().cmp(&m)) {
+			self.update(true);
+			return Some(self.m_activities[idx].convert());
+		}
+		else {
+			return None;
 		}
 	}
 
@@ -205,7 +195,7 @@ where
 	pub fn push(&mut self, m: MonthlyActivities<T>) {
 		self.set_changes(true);
 		let res = self.m_activities.binary_search_by(
-				|e| e.get_month().cmp(&m.get_month())
+			|e| e.get_month().cmp(&m.get_month())
 		);
 
 		match res {
@@ -227,5 +217,9 @@ where
 			}
 		}
 	}
+
+	/* PRIVATE */
+
+	fn nothing(&self, _: bool) { }
 
 }
