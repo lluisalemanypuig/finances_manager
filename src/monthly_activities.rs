@@ -196,7 +196,7 @@ where
 			},
 			Err(pos) => {
 				// month does not exist
-				self.m_activities.insert(pos, MonthlyActivities::new());
+				self.m_activities.insert(pos, MonthlyActivities::new_month(m));
 				&mut self.m_activities[pos]
 			}
 		}
