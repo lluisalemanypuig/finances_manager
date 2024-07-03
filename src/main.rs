@@ -72,7 +72,7 @@ fn print_main_menu() {
 fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 	let print_function = print_main_menu;
 	let min_option = 0;
-	let max_option = 6;
+	let max_option = 7;
 
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
