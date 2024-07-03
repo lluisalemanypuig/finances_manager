@@ -94,8 +94,8 @@ where
 
 #[duplicate::duplicate_item(
 	method                   get                    display                  Activity;
-	[print_expenses_by_type] [get_expense_concepts] [print_expenses_by_func] [Expense];
-	[print_incomes_by_type]  [get_income_concepts]  [print_incomes_by_func]  [Income];
+	[print_by_type_expenses] [get_expense_concepts] [print_expenses_by_func] [Expense];
+	[print_by_type_incomes]  [get_income_concepts]  [print_incomes_by_func]  [Income];
 )]
 fn method(all_data: &AllActivities) {
 	let concept_type_opt = io::read_from_options_or_empty(&all_data.get().get_concepts());
@@ -108,8 +108,8 @@ fn method(all_data: &AllActivities) {
 
 #[duplicate::duplicate_item(
 	method                             display                  Activity;
-	[print_expenses_by_type_substring] [print_expenses_by_func] [Expense];
-	[print_incomes_by_type_substring]  [print_incomes_by_func]  [Income];
+	[print_by_type_substring_expenses] [print_expenses_by_func] [Expense];
+	[print_by_type_substring_incomes]  [print_incomes_by_func]  [Income];
 )]
 fn method(all_data: &AllActivities) {
 	let concept_type = io::read_string();
@@ -120,8 +120,8 @@ fn method(all_data: &AllActivities) {
 
 #[duplicate::duplicate_item(
 	method                          display                  Activity;
-	[print_expenses_by_price_range] [print_expenses_by_func] [Expense];
-	[print_incomes_by_price_range]  [print_incomes_by_func]  [Income];
+	[print_by_price_range_expenses] [print_expenses_by_func] [Expense];
+	[print_by_price_range_incomes]  [print_incomes_by_func]  [Income];
 )]
 fn method(all_data: &AllActivities) {
 	let lower: f32 = io::read_float();
@@ -132,26 +132,26 @@ fn method(all_data: &AllActivities) {
 	display(all_data, &func);
 }
 
-fn print_expenses_by_place(all_data: &AllActivities) {
+fn print_by_place_expenses(all_data: &AllActivities) {
 	let place: String = io::read_string();
 
 	let func = |e: &Expense| { e.shop == place };
 	print_expenses_by_func(all_data, &func);
 }
-fn print_incomes_by_place(all_data: &AllActivities) {
+fn print_by_place_incomes(all_data: &AllActivities) {
 	let from: String = io::read_string();
 
 	let func = |i: &Income| { i.from == from };
 	print_incomes_by_func(all_data, &func);
 }
 
-fn print_expenses_by_place_substring(all_data: &AllActivities) {
+fn print_by_place_substring_expenses(all_data: &AllActivities) {
 	let place: String = io::read_string();
 
 	let func = |e: &Expense| { e.shop.contains(&place) };
 	print_expenses_by_func(all_data, &func);
 }
-fn print_incomes_by_place_substring(all_data: &AllActivities) {
+fn print_by_place_substring_incomes(all_data: &AllActivities) {
 	let place: String = io::read_string();
 
 	let func = |i: &Income| { i.from.contains(&place) };
@@ -204,8 +204,8 @@ fn method(year_data: &YearlyActivities)
 
 #[duplicate::duplicate_item(
 	method                    print;
-	[print_data_all_expenses] [print_data_year_expenses];
-	[print_data_all_incomes]  [print_data_year_incomes];
+	[print_all_expenses] [print_data_year_expenses];
+	[print_all_incomes]  [print_data_year_incomes];
 )]
 fn method(all_data: &AllActivities) {
 	let mut all_years = ActivitySummary::new();
@@ -222,8 +222,8 @@ fn method(all_data: &AllActivities) {
 
 #[duplicate::duplicate_item(
 	method                          print;
-	[print_data_year_user_expenses] [print_data_year_expenses];
-	[print_data_year_user_incomes]  [print_data_year_incomes];
+	[print_year_user_expenses] [print_data_year_expenses];
+	[print_year_user_incomes]  [print_data_year_incomes];
 )]
 fn method(all_data: &AllActivities) {
 	println!("What year do you want to see?");
@@ -240,8 +240,8 @@ fn method(all_data: &AllActivities) {
 
 #[duplicate::duplicate_item(
 	method                             print;
-	[print_data_year_current_expenses] [print_data_year_expenses];
-	[print_data_year_current_incomes]  [print_data_year_incomes];
+	[print_year_current_expenses] [print_data_year_expenses];
+	[print_year_current_incomes]  [print_data_year_incomes];
 )]
 fn method(all_data: &AllActivities) {
 	let now = chrono::prelude::Utc::now();
@@ -260,8 +260,8 @@ fn method(all_data: &AllActivities) {
 
 #[duplicate::duplicate_item(
 	method                           get                  print;
-	[print_data_month_user_expenses] [get_month_expenses] [print_data_month_expenses];
-	[print_data_month_user_incomes]  [get_month_incomes]  [print_data_month_incomes];
+	[print_month_user_expenses] [get_month_expenses] [print_data_month_expenses];
+	[print_month_user_incomes]  [get_month_incomes]  [print_data_month_incomes];
 )]
 fn method(all_data: &AllActivities) {
 	println!("What year and month do you want to see? Year -> Month");
@@ -286,8 +286,8 @@ fn method(all_data: &AllActivities) {
 
 #[duplicate::duplicate_item(
 	method                              get                  print;
-	[print_data_month_current_expenses] [get_month_expenses] [print_data_month_expenses];
-	[print_data_month_current_incomes]  [get_month_incomes]  [print_data_month_incomes];
+	[print_month_current_expenses] [get_month_expenses] [print_data_month_expenses];
+	[print_month_current_incomes]  [get_month_incomes]  [print_data_month_incomes];
 )]
 fn method(all_data: &AllActivities) {
 	let now = chrono::prelude::Utc::now();
@@ -715,16 +715,16 @@ pub fn menu_expenses(all_data: &mut AllActivities) {
 	while option != 0 {
 		
 		match option {
-			1 => print_data_all_expenses(&all_data),
-			2 => print_data_year_user_expenses(&all_data),
-			3 => print_data_year_current_expenses(&all_data),
-			4 => print_data_month_user_expenses(&all_data),
-			5 => print_data_month_current_expenses(&all_data),
-			6 => print_expenses_by_type(&all_data),
-			7 => print_expenses_by_type_substring(&all_data),
-			8 => print_expenses_by_price_range(&all_data),
-			9 => print_expenses_by_place(&all_data),
-			10 => print_expenses_by_place_substring(&all_data),
+			1 => print_all_expenses(&all_data),
+			2 => print_year_user_expenses(&all_data),
+			3 => print_year_current_expenses(&all_data),
+			4 => print_month_user_expenses(&all_data),
+			5 => print_month_current_expenses(&all_data),
+			6 => print_by_type_expenses(&all_data),
+			7 => print_by_type_substring_expenses(&all_data),
+			8 => print_by_price_range_expenses(&all_data),
+			9 => print_by_place_expenses(&all_data),
+			10 => print_by_place_substring_expenses(&all_data),
 			11 => add_new_expense(all_data),
 			12 => add_new_today_expense(all_data),
 			13 => add_new_year_month_expense(all_data),
@@ -746,16 +746,16 @@ pub fn menu_incomes(all_data: &mut AllActivities) {
 	while option != 0 {
 		
 		match option {
-			1 => print_data_all_incomes(&all_data),
-			2 => print_data_year_user_incomes(&all_data),
-			3 => print_data_year_current_incomes(&all_data),
-			4 => print_data_month_user_incomes(&all_data),
-			5 => print_data_month_current_incomes(&all_data),
-			6 => print_incomes_by_type(&all_data),
-			7 => print_incomes_by_type_substring(&all_data),
-			8 => print_incomes_by_price_range(&all_data),
-			9 => print_incomes_by_place(&all_data),
-			10 => print_incomes_by_place_substring(&all_data),
+			1 => print_all_incomes(&all_data),
+			2 => print_year_user_incomes(&all_data),
+			3 => print_year_current_incomes(&all_data),
+			4 => print_month_user_incomes(&all_data),
+			5 => print_month_current_incomes(&all_data),
+			6 => print_by_type_incomes(&all_data),
+			7 => print_by_type_substring_incomes(&all_data),
+			8 => print_by_price_range_incomes(&all_data),
+			9 => print_by_place_incomes(&all_data),
+			10 => print_by_place_substring_incomes(&all_data),
 			11 => add_new_income(all_data),
 			12 => add_new_today_income(all_data),
 			13 => add_new_year_month_income(all_data),
