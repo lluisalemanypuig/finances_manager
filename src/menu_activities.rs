@@ -311,19 +311,16 @@ fn method(all_data: &AllActivities) {
 }
 
 fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: date::Month, day: u8) {
-	let expense_type_opt = || -> Option<String> {
-		println!("Expense Type:");
-		io::read_from_options_or_empty(all_data.get_expense_concepts().get_concepts())
-	}();
+	println!("Expense Type:");
+	let expense_type_opt =
+		io::read_from_options_or_empty(all_data.get_expense_concepts().get_concepts());
 	if expense_type_opt.is_none() { return; }
 	let expense_type = expense_type_opt.unwrap();
 
-	let expense_subtype_opt = || -> Option<String> {
-		println!("Expense Subtype:");
-		io::read_from_options_or_empty(all_data.get_expense_concepts().get_subconcepts(&expense_type))
-	}();
-	if expense_subtype_opt.is_none() { return; }
-	let expense_subtype = expense_subtype_opt.unwrap();
+	println!("Expense Subtype:");
+	let expense_subtype_opt =
+		io::read_from_options_or_empty(all_data.get_expense_concepts().get_subconcepts(&expense_type));
+	let expense_subtype = expense_subtype_opt.unwrap_or("".to_string());
 
 	let year_data = all_data.add_year(year);
 	let month_data = year_data.get_expenses_mut().add(&month);
@@ -355,19 +352,16 @@ fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: dat
 }
 
 fn add_new_with_date_income(all_data: &mut AllActivities, year: u32, month: date::Month, day: u8) {
-	let income_type_opt = || -> Option<String> {
-		println!("Income Type:");
-		io::read_from_options_or_empty(all_data.get_income_concepts().get_concepts())
-	}();
+	println!("Income Type:");
+	let income_type_opt =
+		io::read_from_options_or_empty(all_data.get_income_concepts().get_concepts());
 	if income_type_opt.is_none() { return; }
 	let income_type = income_type_opt.unwrap();
 
-	let income_subtype_opt = || -> Option<String> {
-		println!("Income Subyype:");
-		io::read_from_options_or_empty(all_data.get_income_concepts().get_subconcepts(&income_type))
-	}();
-	if income_subtype_opt.is_none() { return; }
-	let income_subtype = income_subtype_opt.unwrap();
+	println!("Income Subtype:");
+	let income_subtype_opt = 
+		io::read_from_options_or_empty(all_data.get_income_concepts().get_subconcepts(&income_type));
+	let income_subtype = income_subtype_opt.unwrap_or("".to_string());
 
 	let year_data = all_data.add_year(year);
 	let month_data = year_data.get_incomes_mut().add(&month);
