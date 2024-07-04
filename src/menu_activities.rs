@@ -318,9 +318,9 @@ fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: dat
 	let expense_type = expense_type_opt.unwrap();
 
 	println!("Expense Subtype:");
-	let expense_subtype_opt =
-		io::read_from_options_or_empty(all_data.get_expense_concepts().get_subconcepts(&expense_type));
-	let expense_subtype = expense_subtype_opt.unwrap_or("".to_string());
+	let expense_subtype =
+		io::read_from_options_or_empty(all_data.get_expense_concepts().get_subconcepts(&expense_type))
+		.unwrap_or("".to_string());
 
 	let year_data = all_data.add_year(year);
 	let month_data = year_data.get_expenses_mut().add(&month);
@@ -335,10 +335,7 @@ fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: dat
 	let city = io::read_string();
 
 	println!("Description:");
-	let description = match io::read_string_or_empty() {
-		Some(str) => str,
-		None => "".to_string()
-	};
+	let description = io::read_string_or_empty().unwrap_or("".to_string());
 
 	month_data.push(Expense {
 		day_of_year : date::Date { year, month, day},
@@ -358,10 +355,10 @@ fn add_new_with_date_income(all_data: &mut AllActivities, year: u32, month: date
 	if income_type_opt.is_none() { return; }
 	let income_type = income_type_opt.unwrap();
 
-	println!("Income Subtype:");
-	let income_subtype_opt = 
-		io::read_from_options_or_empty(all_data.get_income_concepts().get_subconcepts(&income_type));
-	let income_subtype = income_subtype_opt.unwrap_or("".to_string());
+	println!("Income Subyype:");
+	let income_subtype =
+		io::read_from_options_or_empty(all_data.get_income_concepts().get_subconcepts(&income_type))
+		.unwrap_or("".to_string());
 
 	let year_data = all_data.add_year(year);
 	let month_data = year_data.get_incomes_mut().add(&month);
@@ -376,10 +373,7 @@ fn add_new_with_date_income(all_data: &mut AllActivities, year: u32, month: date
 	let place = io::read_string();
 
 	println!("Description:");
-	let description = match io::read_string_or_empty() {
-		Some(str) => str,
-		None => "".to_string()
-	};
+	let description = io::read_string_or_empty().unwrap_or("".to_string());
 
 	month_data.push(Income {
 		day_of_year : date::Date { year, month, day},
@@ -457,6 +451,149 @@ fn method(all_data: &mut AllActivities) {
 			None => {
 				break;
 			}
+		}
+	}
+}
+
+fn add_monthly_expense(all_data: &mut AllActivities) {
+	println!("Enter expense information first");
+
+	println!("Expense Type:");
+	let concept_opt =
+		io::read_from_options_or_empty(all_data.get_expense_concepts().get_concepts());
+	if concept_opt.is_none() { return; }
+	let concept = concept_opt.unwrap();
+
+	println!("Expense Subtype:");
+	let subconcept =
+		io::read_from_options_or_empty(all_data.get_expense_concepts().get_subconcepts(&concept))
+		.unwrap_or("".to_string());
+
+	println!("Price:");
+	let price: f32 = io::read_float();
+
+	println!("Shop:");
+	let shop = io::read_string();
+
+	println!("City:");
+	let city = io::read_string();
+
+	println!("Description:");
+	let description = io::read_string_or_empty().unwrap_or("".to_string());
+
+	println!("Start year:");
+	let year_start: u32 = io::read_int();
+
+	println!("Start month:");
+	let month_start = io::read_correct_month().unwrap();
+
+	println!("Finish year:");
+	let year_finish: u32 = io::read_int();
+
+	println!("Finish month:");
+	let month_finish = io::read_correct_month().unwrap();
+
+	println!("Day:");
+	let day: u8 = io::read_int();
+
+	for y in year_start..=year_finish {
+		let m_start: date::Month =
+			if y == year_start { month_start.clone() }
+			else { date::Month::January };
+
+		let m_finish: date::Month =
+			if y == year_finish { month_finish.clone() }
+			else { date::Month::December };
+
+		let i_start = m_start as u32;
+		let i_finish = m_finish as u32;
+		for i in i_start..=i_finish {
+			let m = date::Month::from_u32(i).unwrap();
+
+			let year_data = all_data.add_year(y);
+			let month_data = year_data.get_expenses_mut().add(&m);
+
+			month_data.push(Expense {
+				day_of_year : date::Date { year: y, month: m, day: day},
+				price: price,
+				concept: concept.clone(),
+				sub_concept: subconcept.clone(),
+				shop: shop.clone(),
+				city: city.clone(),
+				description: description.clone()
+			});
+		}
+	}
+}
+
+fn add_monthly_income(all_data: &mut AllActivities) {
+	println!("Enter income information first");
+
+	println!("Income Type:");
+	let concept_opt =
+		io::read_from_options_or_empty(all_data.get_income_concepts().get_concepts());
+
+	if concept_opt.is_none() { return; }
+	let concept = concept_opt.unwrap();
+
+	println!("Income Subtype:");
+	let subconcept =
+		io::read_from_options_or_empty(all_data.get_income_concepts().get_subconcepts(&concept))
+		.unwrap_or("".to_string());
+
+	println!("Price:");
+	let price: f32 = io::read_float();
+
+	println!("From:");
+	let from = io::read_string();
+
+	println!("Place:");
+	let place = io::read_string();
+
+	println!("Description:");
+	let description = io::read_string_or_empty().unwrap_or("".to_string());
+
+	println!("Start year:");
+	let year_start: u32 = io::read_int();
+
+	println!("Start month:");
+	let month_start = io::read_correct_month().unwrap();
+
+	println!("Finish year:");
+	let year_finish: u32 = io::read_int();
+
+	println!("Finish month:");
+	let month_finish = io::read_correct_month().unwrap();
+
+	println!("Day:");
+	let day: u8 = io::read_int();
+
+	for y in year_start..=year_finish {
+		let m_start: date::Month =
+			if y == year_start { month_start.clone() }
+			else { date::Month::January };
+
+		let m_finish: date::Month =
+			if y == year_finish { month_finish.clone() }
+			else { date::Month::December };
+
+		let i_start = m_start as u32;
+		let i_finish = m_finish as u32;
+		for i in i_start..=i_finish {
+			let m = date::Month::from_u32(i).unwrap();
+
+			let year_data = all_data.add_year(y);
+			let month_data = year_data.get_incomes_mut().add(&m);
+
+			month_data.push(Income {
+				day_of_year : date::Date { year: y, month: m, day: day},
+				price: price,
+				concept: concept.clone(),
+				sub_concept: subconcept.clone(),
+				from: from.clone(),
+				place: place.clone(),
+				description: description.clone()
+			});
 		}
 	}
 }
@@ -695,15 +832,16 @@ fn method() {
 	println!("    11. Add another {}", thing);
 	println!("    12.     Add another {} today", thing);
 	println!("    13.     Add {}s to a year and month", thing);
-	println!("    14. Edit an {}", thing);
-	println!("    15. Remove an {}", thing);
+	println!("    14. Add a monthly {}", thing);
+	println!("    15. Edit an {}", thing);
+	println!("    16. Remove an {}", thing);
 	println!("     0. Leave");
 }
 
 pub fn menu_expenses(all_data: &mut AllActivities) {
 	let print_function = print_menu_expenses;
 	let min_option = 0;
-	let max_option = 15;
+	let max_option = 16;
 	
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -722,8 +860,9 @@ pub fn menu_expenses(all_data: &mut AllActivities) {
 			11 => add_new_expense(all_data),
 			12 => add_new_today_expense(all_data),
 			13 => add_new_year_month_expense(all_data),
-			14 => edit_expense(all_data),
-			15 => remove_expense(all_data),
+			14 => add_monthly_expense(all_data),
+			15 => edit_expense(all_data),
+			16 => remove_expense(all_data),
 			_ => println!("Nothing to do..."),
 		}
 		
@@ -734,7 +873,7 @@ pub fn menu_expenses(all_data: &mut AllActivities) {
 pub fn menu_incomes(all_data: &mut AllActivities) {
 	let print_function = print_menu_income;
 	let min_option = 0;
-	let max_option = 15;
+	let max_option = 16;
 	
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -753,8 +892,9 @@ pub fn menu_incomes(all_data: &mut AllActivities) {
 			11 => add_new_income(all_data),
 			12 => add_new_today_income(all_data),
 			13 => add_new_year_month_income(all_data),
-			14 => edit_income(all_data),
-			15 => remove_income(all_data),
+			14 => add_monthly_income(all_data),
+			15 => edit_income(all_data),
+			16 => remove_income(all_data),
 			_ => println!("Nothing to do..."),
 		}
 		
