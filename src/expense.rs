@@ -31,6 +31,8 @@
  ********************************************************************/
 
 use crate::traits::AsReferences;
+use crate::traits::HasConceptType;
+use crate::traits::HasSubConceptType;
 
 use crate::date;
 
@@ -52,7 +54,6 @@ impl Ord for Expense {
 		self.day_of_year.cmp(&other.day_of_year)
 	}
 }
-
 impl PartialOrd for Expense {
 	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
 		Some(self.cmp(other))
@@ -132,4 +133,11 @@ impl std::str::FromStr for Expense {
 impl AsReferences<Expense> for Expense {
 	fn as_ref(&self) -> &Expense { self }
 	fn as_mut(&mut self) -> &mut Expense { self }
+}
+
+impl HasConceptType for Expense {
+	fn concept(&self) -> &String { &self.concept }
+}
+impl HasSubConceptType for Expense {
+	fn sub_concept(&self) -> &String { &self.sub_concept }
 }

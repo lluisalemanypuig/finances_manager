@@ -31,6 +31,8 @@
  ********************************************************************/
 
 use crate::traits::AsReferences;
+use crate::traits::HasConceptType;
+use crate::traits::HasSubConceptType;
 
 use crate::date;
 
@@ -132,4 +134,10 @@ impl AsReferences<Income> for Income {
 	fn as_ref(&self) -> &Income { self }
 	fn as_mut(&mut self) -> &mut Income { self }
 }
- 
+
+impl HasConceptType for Income {
+	fn concept(&self) -> &String { &self.concept }
+}
+impl HasSubConceptType for Income {
+	fn sub_concept(&self) -> &String { &self.sub_concept }
+}

@@ -83,6 +83,7 @@ fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 			3 => menu_activities::menu_incomes(all_data),
 			4 => menu_concept_types::menu_income_concepts(all_data),
 			5 => menu_statistics::menu_expenses(all_data),
+			6 => menu_statistics::menu_incomes(all_data),
 			7 => {
 				io::write_all_data(&data_dir, all_data)
 					.expect("Could not write data");

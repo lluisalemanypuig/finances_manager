@@ -269,7 +269,7 @@ where
 		);
 	let from_main_divider = std::iter::repeat("—").take(from_column_width).collect::<String>();
 	let from_mid_divider: String = std::iter::repeat("·").take(from_column_width).collect::<String>();
-	let from_header = center_string(&"City".to_string(), from_column_width);
+	let from_header = center_string(&"From".to_string(), from_column_width);
 
 	let concept_type_column_width =
 		std::cmp::max(
@@ -365,7 +365,7 @@ where
 pub struct Cell {
 	pub num_times: u32,
 	pub total_value: f32,
-	pub city: String
+	pub classifier: String
 }
 
 pub fn display_history_summary(
@@ -391,7 +391,7 @@ pub fn display_history_summary(
 		second_title.len(),
 		vec_summary
 		.iter()
-		.map(|v| -> usize { v.1.city.len() })
+		.map(|v| -> usize { v.1.classifier.len() })
 		.max()
 		.unwrap_or(0)
 	);
@@ -411,7 +411,7 @@ pub fn display_history_summary(
 		println!("{tab}+—{first_main_divider}—+—————————————+———————————————————+");
 	}
 	
-	for (thing, Cell {city, num_times, total_value}) in vec_summary.iter() {
+	for (thing, Cell {classifier: city, num_times, total_value}) in vec_summary.iter() {
 		let thing_text = center_string( thing, first_column_width);
 		if second_column_width > 0 {
 			let city_text = center_string( city, second_column_width);
