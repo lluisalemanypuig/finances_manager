@@ -67,6 +67,14 @@ impl Month {
 			_ => None,
 		}
 	}
+
+	pub fn next(&self) -> Month {
+		let m = self.clone() as u32;
+		match Month::from_u32(m + 1) {
+			Some(m) => m,
+			None => Month::January
+		}
+	}
 }
 
 impl fmt::Display for Month {
@@ -161,4 +169,52 @@ impl FromStr for Date {
 			day: day_fromstr
 		})
 	}
+}
+
+/* ------------------------------------------------------------------------- */
+
+#[derive(Debug,Clone)]
+pub struct YearMonth {
+	pub year: u32,
+	pub month: Month
+}
+
+pub struct YearMonthIter {
+	pub current: YearMonth,
+	pub end: YearMonth
+}
+
+impl YearMonthIter {
+	pub fn new(start: YearMonth, end: YearMonth) -> YearMonthIter {
+		YearMonthIter {
+			current: start,
+			end
+		}
+	}
+}
+
+impl Iterator for YearMonthIter {
+	type Item = YearMonth;
+
+	fn next(&mut self) -> Option<Self::Item> {
+		if self.current.year > self.end.year { return None; }
+		if self.current.year == self.end.year {
+			if self.current.month > self.end.month {
+				return None;
+			}
+		}
+
+		let result: YearMonth = self.current.clone();
+
+		self.current.month = self.current.month.next();
+		if self.current.month == Month::January {
+			self.current.year = self.current.year + 1;
+		}
+
+		Some(result)
+	}
+}
+
+pub fn month_range(start: YearMonth, end: YearMonth) -> YearMonthIter {
+	YearMonthIter::new(start, end)
 }

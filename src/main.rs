@@ -133,5 +133,4 @@ fn main() {
 	main_menu(&mut all_data, &data_dir);
 	
 	io::write_all_data(&data_dir, &all_data).expect("Could not write data");
-
 }

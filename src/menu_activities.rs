@@ -488,41 +488,30 @@ fn add_monthly_expense(all_data: &mut AllActivities) {
 	let month_start = io::read_correct_month().unwrap();
 
 	println!("Finish year:");
-	let year_finish: u32 = io::read_int();
+	let year_end: u32 = io::read_int();
 
 	println!("Finish month:");
-	let month_finish = io::read_correct_month().unwrap();
+	let month_end = io::read_correct_month().unwrap();
 
 	println!("Day:");
 	let day: u8 = io::read_int();
 
-	for y in year_start..=year_finish {
-		let m_start: date::Month =
-			if y == year_start { month_start.clone() }
-			else { date::Month::January };
+	let start = date::YearMonth { year: year_start, month: month_start };
+	let end = date::YearMonth { year: year_end, month: month_end };
 
-		let m_finish: date::Month =
-			if y == year_finish { month_finish.clone() }
-			else { date::Month::December };
+	for date::YearMonth { year, month } in date::month_range(start, end) {
+		let year_data = all_data.add_year(year);
+		let month_data = year_data.get_expenses_mut().add(&month);
 
-		let i_start = m_start as u32;
-		let i_finish = m_finish as u32;
-		for i in i_start..=i_finish {
-			let m = date::Month::from_u32(i).unwrap();
-
-			let year_data = all_data.add_year(y);
-			let month_data = year_data.get_expenses_mut().add(&m);
-
-			month_data.push(Expense {
-				day_of_year : date::Date { year: y, month: m, day: day},
-				price: price,
-				concept: concept.clone(),
-				sub_concept: subconcept.clone(),
-				shop: shop.clone(),
-				city: city.clone(),
-				description: description.clone()
-			});
-		}
+		month_data.push(Expense {
+			day_of_year : date::Date { year, month, day },
+			price: price,
+			concept: concept.clone(),
+			sub_concept: subconcept.clone(),
+			shop: shop.clone(),
+			city: city.clone(),
+			description: description.clone()
+		});
 	}
 }
 
@@ -560,41 +549,30 @@ fn add_monthly_income(all_data: &mut AllActivities) {
 	let month_start = io::read_correct_month().unwrap();
 
 	println!("Finish year:");
-	let year_finish: u32 = io::read_int();
+	let year_end: u32 = io::read_int();
 
 	println!("Finish month:");
-	let month_finish = io::read_correct_month().unwrap();
+	let month_end = io::read_correct_month().unwrap();
 
 	println!("Day:");
 	let day: u8 = io::read_int();
 
-	for y in year_start..=year_finish {
-		let m_start: date::Month =
-			if y == year_start { month_start.clone() }
-			else { date::Month::January };
+	let start = date::YearMonth { year: year_start, month: month_start };
+	let end = date::YearMonth { year: year_end, month: month_end };
 
-		let m_finish: date::Month =
-			if y == year_finish { month_finish.clone() }
-			else { date::Month::December };
+	for date::YearMonth { year, month } in date::month_range(start, end) {
+		let year_data = all_data.add_year(year);
+		let month_data = year_data.get_incomes_mut().add(&month);
 
-		let i_start = m_start as u32;
-		let i_finish = m_finish as u32;
-		for i in i_start..=i_finish {
-			let m = date::Month::from_u32(i).unwrap();
-
-			let year_data = all_data.add_year(y);
-			let month_data = year_data.get_incomes_mut().add(&m);
-
-			month_data.push(Income {
-				day_of_year : date::Date { year: y, month: m, day: day},
-				price: price,
-				concept: concept.clone(),
-				sub_concept: subconcept.clone(),
-				from: from.clone(),
-				place: place.clone(),
-				description: description.clone()
-			});
-		}
+		month_data.push(Income {
+			day_of_year : date::Date { year, month, day },
+			price: price,
+			concept: concept.clone(),
+			sub_concept: subconcept.clone(),
+			from: from.clone(),
+			place: place.clone(),
+			description: description.clone()
+		});
 	}
 }
 
