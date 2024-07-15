@@ -429,8 +429,53 @@ fn method(all_data: &mut AllActivities) {
 
 #[duplicate::duplicate_item(
 	method                       add;
-	[add_new_year_month_expense] [add_new_with_date_expense];
-	[add_new_year_month_income]  [add_new_with_date_income];
+	[add_new_this_month_expense] [add_new_with_date_expense];
+	[add_new_this_month_income]  [add_new_with_date_income];
+)]
+fn method(all_data: &mut AllActivities) {
+	let now = chrono::prelude::Utc::now();
+	let local_date = now.with_timezone(&chrono::prelude::Local);
+
+	let year = local_date.year() as u32;
+
+	let month_conv = date::Month::from_u32(local_date.month() - 1);
+	if month_conv.is_none() {
+		println!("Retrieval of current date failed for month '{}'.", local_date.month());
+	}
+	let month = month_conv.expect("This should have worked!");
+	
+	println!("Day:");
+	let day = io::read_int();
+
+	add(all_data, year, month, day);
+}
+
+#[duplicate::duplicate_item(
+	method                      add;
+	[add_new_this_year_expense] [add_new_with_date_expense];
+	[add_new_this_year_income]  [add_new_with_date_income];
+)]
+fn method(all_data: &mut AllActivities) {
+	let now = chrono::prelude::Utc::now();
+	let local_date = now.with_timezone(&chrono::prelude::Local);
+
+	let year = local_date.year() as u32;
+
+	println!("Month:");
+	let month_opt = io::read_correct_month();
+	if month_opt.is_none() { return; }
+	let month = month_opt.unwrap();
+	
+	println!("Day:");
+	let day = io::read_int();
+
+	add(all_data, year, month, day);
+}
+
+#[duplicate::duplicate_item(
+	method                       add;
+	[add_many_year_month_expense] [add_new_with_date_expense];
+	[add_many_year_month_income]  [add_new_with_date_income];
 )]
 fn method(all_data: &mut AllActivities) {
 	println!("Year:");
@@ -809,17 +854,19 @@ fn method() {
 	println!("    10. Show all {}s by {} (substring)", thing, place);
 	println!("    11. Add another {}", thing);
 	println!("    12.     Add another {} today", thing);
-	println!("    13.     Add {}s to a year and month", thing);
-	println!("    14. Add a monthly {}", thing);
-	println!("    15. Edit an {}", thing);
-	println!("    16. Remove an {}", thing);
+	println!("    13.     Add another {} this month", thing);
+	println!("    14.     Add another {} this year", thing);
+	println!("    15.     Add many {}s to a year and month", thing);
+	println!("    16. Add a monthly {}", thing);
+	println!("    17. Edit an {}", thing);
+	println!("    18. Remove an {}", thing);
 	println!("     0. Leave");
 }
 
 pub fn menu_expenses(all_data: &mut AllActivities) {
 	let print_function = print_menu_expenses;
 	let min_option = 0;
-	let max_option = 16;
+	let max_option = 18;
 	
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -837,10 +884,12 @@ pub fn menu_expenses(all_data: &mut AllActivities) {
 			10 => print_by_place_substring_expenses(&all_data),
 			11 => add_new_expense(all_data),
 			12 => add_new_today_expense(all_data),
-			13 => add_new_year_month_expense(all_data),
-			14 => add_monthly_expense(all_data),
-			15 => edit_expense(all_data),
-			16 => remove_expense(all_data),
+			13 => add_new_this_month_expense(all_data),
+			14 => add_new_this_year_expense(all_data),
+			15 => add_many_year_month_expense(all_data),
+			16 => add_monthly_expense(all_data),
+			17 => edit_expense(all_data),
+			18 => remove_expense(all_data),
 			_ => println!("Nothing to do..."),
 		}
 		
@@ -851,7 +900,7 @@ pub fn menu_expenses(all_data: &mut AllActivities) {
 pub fn menu_incomes(all_data: &mut AllActivities) {
 	let print_function = print_menu_income;
 	let min_option = 0;
-	let max_option = 16;
+	let max_option = 18;
 	
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -869,10 +918,12 @@ pub fn menu_incomes(all_data: &mut AllActivities) {
 			10 => print_by_place_substring_incomes(&all_data),
 			11 => add_new_income(all_data),
 			12 => add_new_today_income(all_data),
-			13 => add_new_year_month_income(all_data),
-			14 => add_monthly_income(all_data),
-			15 => edit_income(all_data),
-			16 => remove_income(all_data),
+			13 => add_new_this_month_income(all_data),
+			14 => add_new_this_year_income(all_data),
+			15 => add_many_year_month_income(all_data),
+			16 => add_monthly_income(all_data),
+			17 => edit_income(all_data),
+			18 => remove_income(all_data),
 			_ => println!("Nothing to do..."),
 		}
 		
