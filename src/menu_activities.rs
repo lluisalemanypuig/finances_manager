@@ -355,7 +355,7 @@ fn add_new_with_date_income(all_data: &mut AllActivities, year: u32, month: date
 	if income_type_opt.is_none() { return; }
 	let income_type = income_type_opt.unwrap();
 
-	println!("Income Subyype:");
+	println!("Income Subtype:");
 	let income_subtype =
 		io::read_from_options_or_empty(all_data.get_income_concepts().get_subconcepts(&income_type))
 		.unwrap_or("".to_string());
