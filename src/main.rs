@@ -65,14 +65,15 @@ fn print_main_menu() {
 	println!("    4. Income concepts menu");
 	println!("    5. Expense statistics menu");
 	println!("    6. Income statistics menu");
-	println!("    7. Save all data");
+	println!("    7. Save changes");
+	println!("    8. Force data overwrite");
 	println!("    0. Leave");
 }
 
 fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 	let print_function = print_main_menu;
 	let min_option = 0;
-	let max_option = 7;
+	let max_option = 8;
 
 	let mut option = menu_utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -85,6 +86,15 @@ fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 			5 => menu_statistics::menu_expenses(all_data),
 			6 => menu_statistics::menu_incomes(all_data),
 			7 => {
+				io::write_all_data(&data_dir, all_data)
+					.expect("Could not write data");
+				
+				all_data.set_changes(false);
+			},
+			8 => {
+				// set changes to true to force overwrite
+				all_data.set_changes(true);
+
 				io::write_all_data(&data_dir, all_data)
 					.expect("Could not write data");
 				

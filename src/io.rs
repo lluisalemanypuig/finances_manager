@@ -346,7 +346,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 			println!("Writing into '{expense_filename}'...");
 			let mut expense_file =
 				std::fs::File::create(expense_filename)
-					.expect("I wanted to create a file");
+					.expect("I wanted to create an output file for the expenses, but couldn't");
 			
 			for me in ye.iter_expenses() {
 				for Expense {
@@ -360,7 +360,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 				}
 				in me.get_activities().iter()
 				{
-					writeln!(expense_file, "{d} {pr} \"{c}\" \"{sc}\" \"{pl}\" \"{ci}\" \"{descr}\"")?;
+					writeln!(expense_file, "\"{d}\"\t\"{pr}\"\t\"{c}\"\t\"{sc}\"\t\"{pl}\"\t\"{ci}\"\t\"{descr}\"")?;
 				}
 			}
 		}
@@ -387,7 +387,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 				}
 				in me.get_activities().iter()
 				{
-					writeln!(income_file, "{d} {pr} \"{c}\" \"{sc}\" \"{fr}\" \"{pl}\" \"{descr}\"")?;
+					writeln!(income_file, "\"{d}\",\"{pr}\",\"{c}\",\"{sc}\",\"{fr}\",\"{pl}\",\"{descr}\"")?;
 				}
 			}
 		}

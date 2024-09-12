@@ -63,45 +63,23 @@ impl PartialOrd for Expense {
 #[derive(Debug,PartialEq,Eq)]
 pub struct ParseExpenseError;
 
-fn split_string_data(data: &str) -> Vec<String> {
-	let all: Vec<_> =
+fn split_string_data(data: &str) -> Vec<&str> {
+	let all: Vec<&str> =
 		data
-		.split_terminator(' ')
+		.split_terminator('\t')
 		.map(str::trim)
 		.filter(|&s| s != "")
 		.collect();
-	
-	let mut parts: Vec<String> = vec![
-		all[0].to_string(),
-		all[1].to_string()
+
+	let parts: Vec<&str> = vec![
+		&all[0][1..all[0].len() - 1],
+		&all[1][1..all[1].len() - 1],
+		&all[2][1..all[2].len() - 1],
+		&all[3][1..all[3].len() - 1],
+		&all[4][1..all[4].len() - 1],
+		&all[5][1..all[5].len() - 1],
+		&all[6][1..all[6].len() - 1],
 	];
-	
-	let mut next_string = "".to_string();
-	
-	for s in all.iter().skip(2) {
-		if s.starts_with('"') && s.ends_with('"') {
-			let trimmed = &s[1..s.len() - 1];
-			parts.push( trimmed.to_string() );
-		}
-		else {
-			if s.starts_with('"') {
-				next_string += &s[1..];
-			}
-			else if s.ends_with('"') {
-				
-				next_string += " ";
-				next_string += s;
-				let trimmed = &next_string[..next_string.len() - 1];
-				
-				parts.push( trimmed.to_string() );
-				next_string = "".to_string();
-			}
-			else {
-				next_string += " ";
-				next_string += s;
-			}
-		}
-	}
 	
 	parts
 }
@@ -110,7 +88,7 @@ impl std::str::FromStr for Expense {
 	type Err = ParseExpenseError;
 	
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		let parts: Vec<String> = split_string_data(s);
+		let parts: Vec<&str> = split_string_data(s);
 		let [d, pr, c, sc, pl, ci, descr] = parts.as_slice() else {
 			panic!("Can't segment string '{s}' into 7 parts")
 		};
