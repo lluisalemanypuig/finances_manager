@@ -394,12 +394,10 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 	}
 	if all_data.get_expense_concepts().has_changes() {
 		let filename = "expense_types.txt".to_string();
-		println!("Writing into '{filename}'...");
 		write_concept_types(data_dir, filename, all_data.iter_expense_subconcepts())?;
 	}
 	if all_data.get_income_concepts().has_changes() {
 		let filename = "income_types.txt".to_string();
-		println!("Writing into '{filename}'...");
 		write_concept_types(data_dir, filename, all_data.iter_income_subconcepts())?;
 	}
 
