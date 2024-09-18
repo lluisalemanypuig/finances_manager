@@ -203,7 +203,7 @@ fn method(year_data: &YearlyActivities)
 }
 
 #[duplicate::duplicate_item(
-	method                    print;
+	method               print;
 	[print_all_expenses] [print_data_year_expenses];
 	[print_all_incomes]  [print_data_year_incomes];
 )]
@@ -221,7 +221,7 @@ fn method(all_data: &AllActivities) {
 }
 
 #[duplicate::duplicate_item(
-	method                          print;
+	method                     print;
 	[print_year_user_expenses] [print_data_year_expenses];
 	[print_year_user_incomes]  [print_data_year_incomes];
 )]
@@ -259,7 +259,7 @@ fn method(all_data: &AllActivities) {
 }
 
 #[duplicate::duplicate_item(
-	method                           get                  print;
+	method                      get                  print;
 	[print_month_user_expenses] [get_month_expenses] [print_data_month_expenses];
 	[print_month_user_incomes]  [get_month_incomes]  [print_data_month_incomes];
 )]
@@ -285,7 +285,7 @@ fn method(all_data: &AllActivities) {
 }
 
 #[duplicate::duplicate_item(
-	method                              get                  print;
+	method                         get                  print;
 	[print_month_current_expenses] [get_month_expenses] [print_data_month_expenses];
 	[print_month_current_incomes]  [get_month_incomes]  [print_data_month_incomes];
 )]
@@ -709,8 +709,6 @@ fn edit_expense(all_data: &mut AllActivities) {
 	if let Some(value) = io::read_string_or_empty() {
 		expense.description = value;
 	}
-	
-	year_data.set_changes(true);
 }
 
 fn edit_income(all_data: &mut AllActivities) {
@@ -797,14 +795,12 @@ fn edit_income(all_data: &mut AllActivities) {
 	if let Some(value) = io::read_string_or_empty() {
 		income.description = value;
 	}
-	
-	year_data.set_changes(true);
 }
 
 #[duplicate::duplicate_item(
-	method           get            get_mut;
-	[remove_expense] [get_expenses] [get_expenses_mut];
-	[remove_income]  [get_incomes]  [get_incomes_mut];
+	method           get            get_mut            thing;
+	[remove_expense] [get_expenses] [get_expenses_mut] ["expense"];
+	[remove_income]  [get_incomes]  [get_incomes_mut]  ["income"];
 )]
 fn method(all_data: &mut AllActivities) {
 	println!("Select year:");
@@ -824,13 +820,12 @@ fn method(all_data: &mut AllActivities) {
 		return;
 	}
 
-	println!("Id of expense to be deleted.");
+	println!("Id of {} to be deleted.", thing);
 	if let Some(id_expense) = io::read_int_or_empty::<usize>() {
 		let year_data = all_data.add_year(year);
 		let month_data = year_data.get_mut().add(&month);
 
 		month_data.remove(id_expense);
-		year_data.set_changes(true);
 	}
 }
 
