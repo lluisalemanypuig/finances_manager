@@ -387,7 +387,7 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 				}
 				in me.get_activities().iter()
 				{
-					writeln!(income_file, "\"{d}\",\"{pr}\",\"{c}\",\"{sc}\",\"{fr}\",\"{pl}\",\"{descr}\"")?;
+					writeln!(income_file, "\"{d}\"\t\"{pr}\"\t\"{c}\"\t\"{sc}\"\t\"{fr}\"\t\"{pl}\"\t\"{descr}\"")?;
 				}
 			}
 		}
