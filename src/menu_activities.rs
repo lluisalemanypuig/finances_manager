@@ -820,6 +820,12 @@ fn method(all_data: &mut AllActivities) {
 		return;
 	}
 
+	{
+	let year_data = all_data.get_year(&year).unwrap();
+	let month_data = year_data.get_incomes().get_month(&month).unwrap();
+	menu_utils::display_and_accounting_incomes(month_data, &|_| true);
+	}
+
 	println!("Id of {} to be deleted.", thing);
 	if let Some(id_expense) = io::read_int_or_empty::<usize>() {
 		let year_data = all_data.add_year(year);
