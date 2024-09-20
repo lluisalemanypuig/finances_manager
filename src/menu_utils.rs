@@ -86,7 +86,6 @@ pub fn display_summary_activity(summary: &ActivitySummary, pre_tab: &str) {
 	let percentage_main_divider = std::iter::repeat("—").take(percentage_width).collect::<String>();
 	let percentage_header = center_string(&"Percentage".to_string(), percentage_width);
 
-	println!("");
 	let tab = pre_tab.to_owned() + "    ";
 	println!("{tab}+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{price_main_divider}—+—{percentage_main_divider}—+");
 	println!("{tab}| {concept_type_header} | {concept_subtype_header} | {price_header} | {percentage_header} |");
@@ -186,7 +185,7 @@ where
 	let mut summary = ActivitySummary::new();
 	
 	let mut first: bool = true;
-	let mut some_data: bool = false;
+	let mut size_data: u32 = 0;
 	let mut previous_date: date::Date = date::Date { year: 1900, month: date::Month::January, day: 1};
 	for (i, Expense {
 		day_of_year: d,
@@ -199,7 +198,7 @@ where
 	})
 	in month_data.iter().filter(|e| func(e)).enumerate()
 	{
-		some_data = true;
+		size_data = size_data + 1;
 		summary.add(et.clone(), sc.clone(), *pr);
 
 		let expense_type_text = center_string( et, concept_type_column_width);
@@ -227,11 +226,12 @@ where
 			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {expense_type_text} | {expense_subtype_text} | {place_text} | {city_text} | {descr}");
 		}
 	}
-	if some_data {
+	if size_data > 0 {
 		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{shop_main_divider}—+—{city_main_divider}—+");
+		println!("");
 	}
 
-	if some_data {
+	if size_data > 1 {
 		display_summary_activity(&summary, &"    ");
 	}
 
@@ -310,7 +310,7 @@ where
 	let mut summary = ActivitySummary::new();
 	
 	let mut first: bool = true;
-	let mut some_data: bool = false;
+	let mut size_data: u32 = 0;
 	let mut previous_date: date::Date = date::Date { year: 1900, month: date::Month::January, day: 1};
 	for (i, Income {
 		day_of_year: d,
@@ -323,7 +323,7 @@ where
 	})
 	in month_data.iter().filter(|e| func(e)).enumerate()
 	{
-		some_data = true;
+		size_data = size_data + 1;
 		summary.add(et.clone(), sc.clone(), *pr);
 
 		let income_type_text = center_string( et, concept_type_column_width);
@@ -351,11 +351,12 @@ where
 			println!("    | {i:>2} | {date_text} | {pr:>PRICE_WIDTH$.2} | {income_type_text} | {income_subtype_text} | {place_text} | {from_text} | {descr}");
 		}
 	}
-	if some_data {
+	if size_data > 0 {
 		println!("    +————+—{date_main_divider}—+—{price_main_divider}—+—{concept_type_main_divider}—+—{concept_subtype_main_divider}—+—{place_main_divider}—+—{from_main_divider}—+");
+		println!("");
 	}
 
-	if some_data {
+	if size_data > 1 {
 		display_summary_activity(&summary, &"    ");
 	}
 
