@@ -798,9 +798,9 @@ fn edit_income(all_data: &mut AllActivities) {
 }
 
 #[duplicate::duplicate_item(
-	method           get            get_mut            thing;
-	[remove_expense] [get_expenses] [get_expenses_mut] ["expense"];
-	[remove_income]  [get_incomes]  [get_incomes_mut]  ["income"];
+	method           get            get_mut            display                           thing;
+	[remove_expense] [get_expenses] [get_expenses_mut] [display_and_accounting_expenses] ["expense"];
+	[remove_income]  [get_incomes]  [get_incomes_mut]  [display_and_accounting_incomes]  ["income"];
 )]
 fn method(all_data: &mut AllActivities) {
 	println!("Select year:");
@@ -822,8 +822,8 @@ fn method(all_data: &mut AllActivities) {
 
 	{
 	let year_data = all_data.get_year(&year).unwrap();
-	let month_data = year_data.get_incomes().get_month(&month).unwrap();
-	menu_utils::display_and_accounting_incomes(month_data, &|_| true);
+	let month_data = year_data.get().get_month(&month).unwrap();
+	menu_utils::display(month_data, &|_| true);
 	}
 
 	println!("Id of {} to be deleted.", thing);
