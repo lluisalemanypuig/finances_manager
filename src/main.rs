@@ -35,26 +35,14 @@ extern crate serde_json;
 
 use std::io::Read;
 
-mod traits;
-
-mod date;
 mod io;
 
-mod income;
-mod expense;
+mod concepts;
+mod time;
+mod menus;
+mod economy;
 
-mod monthly_activities;
-mod yearly_activities;
-mod all_activities;
-mod concept_types;
-mod activity_summary;
-
-mod menu_utils;
-mod menu_activities;
-mod menu_concept_types;
-mod menu_statistics;
-
-type AllExpenses = all_activities::AllActivities;
+use crate::economy::all_activities::AllActivities;
 
 fn print_main_menu() {
 	println!("What menu do you want to access?");
@@ -70,24 +58,24 @@ fn print_main_menu() {
 	println!("    0. Leave");
 }
 
-fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
+fn main_menu(all_data: &mut AllActivities, data_dir: &String) {
 	let print_function = print_main_menu;
 	let min_option = 0;
 	let max_option = 8;
 
-	let mut option = menu_utils::read_option(print_function, min_option, max_option);
+	let mut option = menus::utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
 
 		match option {
-			1 => menu_activities::menu_expenses(all_data),
-			2 => menu_concept_types::menu_expense_concepts(all_data),
-			3 => menu_activities::menu_incomes(all_data),
-			4 => menu_concept_types::menu_income_concepts(all_data),
-			5 => menu_statistics::menu_expenses(all_data),
-			6 => menu_statistics::menu_incomes(all_data),
+			1 => menus::activities::menu_expenses(all_data),
+			2 => menus::concept_types::menu_expense_concepts(all_data),
+			3 => menus::activities::menu_incomes(all_data),
+			4 => menus::concept_types::menu_income_concepts(all_data),
+			5 => menus::statistics::menu_expenses(all_data),
+			6 => menus::statistics::menu_incomes(all_data),
 			7 => {
-				io::write_all_data(&data_dir, all_data)
-					.expect("Could not write data");
+				economy::io::write_all_data(&data_dir, all_data).expect("Could not write data");
+				concepts::io::write_all_data(&data_dir, all_data).expect("Could not write data");
 				
 				all_data.set_changes(false);
 			},
@@ -95,15 +83,15 @@ fn main_menu(all_data: &mut AllExpenses, data_dir: &String) {
 				// set changes to true to force overwrite
 				all_data.set_changes(true);
 
-				io::write_all_data(&data_dir, all_data)
-					.expect("Could not write data");
+				economy::io::write_all_data(&data_dir, all_data).expect("Could not write data");
+				concepts::io::write_all_data(&data_dir, all_data).expect("Could not write data");
 				
 				all_data.set_changes(false);
 			},
 			_ => println!("Nothing to do..."),
 		}
 		
-		option = menu_utils::read_option(print_function, min_option, max_option);
+		option = menus::utils::read_option(print_function, min_option, max_option);
 	}
 	
 	println!("Goodbye!");
@@ -124,15 +112,15 @@ fn main() {
 
 	let json: ProjectData = serde_json::from_str(&data).unwrap();
 	let data_dir = json.base_path;
-	
+
 	println!("Reading data from directory '{data_dir}'...");
 	println!("    Reading activities data...");
-	let mut all_data = io::read_all_activities_data(&data_dir);
-	
+	let mut all_data = economy::io::read_all_activities_data(&data_dir);
+
 	println!("    Reading expense types...");
-	io::read_expense_types(&data_dir, &mut all_data);
+	concepts::io::read_expense_types(&data_dir, &mut all_data);
 	println!("    Reading income types...");
-	io::read_income_types(&data_dir, &mut all_data);
+	concepts::io::read_income_types(&data_dir, &mut all_data);
 
 	all_data.set_changes(false);
 
@@ -141,6 +129,7 @@ fn main() {
 	println!("");
 	println!("");
 	main_menu(&mut all_data, &data_dir);
-	
-	io::write_all_data(&data_dir, &all_data).expect("Could not write data");
+
+	economy::io::write_all_data(&data_dir, &all_data).expect("Could not write data");
+	concepts::io::write_all_data(&data_dir, &all_data).expect("Could not write data");
 }

@@ -30,10 +30,10 @@
  *
  ********************************************************************/
 
-use crate::traits::AsReferences;
-use crate::traits::HasConcepts;
+use crate::economy::traits::AsReferences;
+use crate::economy::traits::HasConcepts;
 
-use crate::date;
+use crate::time::date;
 
 #[derive(Debug,PartialEq)]
 pub struct Expense {

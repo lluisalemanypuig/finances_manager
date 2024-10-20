@@ -30,16 +30,17 @@
  *
  ********************************************************************/
 
-use crate::expense;
-use crate::income;
-use crate::all_activities;
-use crate::menu_utils;
-use crate::traits::HasConcepts;
+use crate::economy::expense;
+use crate::economy::income;
+use crate::economy::all_activities;
+use crate::economy::traits::HasConcepts;
+
+use crate::menus::utils;
 
 type Expense = expense::Expense;
 type Income = income::Income;
 type AllActivities = all_activities::AllActivities;
-type Cell = menu_utils::Cell;
+type Cell = utils::Cell;
 
 fn sort_by_concept(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
 	a.0.cmp(&b.0)
@@ -116,7 +117,7 @@ where
 	let mut vec_summary: Vec<(String, Cell)> = summary.into_iter().collect();
 	vec_summary.sort_by(sort );
 
-	menu_utils::display_history_summary(
+	utils::display_history_summary(
 		&vec_summary, 
 		title.to_string(),
 		"".to_string()
@@ -157,7 +158,7 @@ where
 	let mut vec_summary: Vec<(String, Cell)> = summary.into_iter().collect();
 	vec_summary.sort_by(func );
 
-	menu_utils::display_history_summary(
+	utils::display_history_summary(
 		&vec_summary, 
 		"Place".to_string(),
 		"City".to_string()
@@ -187,7 +188,7 @@ pub fn menu_expenses(all_data: &AllActivities) {
 	let min_option = 0;
 	let max_option = 9;
 
-	let mut option = menu_utils::read_option(print_function, min_option, max_option);
+	let mut option = utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
 		
 		match option {
@@ -208,7 +209,7 @@ pub fn menu_expenses(all_data: &AllActivities) {
 			_ => println!("Nothing to do..."),
 		}
 		
-		option = menu_utils::read_option(print_function, min_option, max_option);
+		option = utils::read_option(print_function, min_option, max_option);
 	}
 }
 
@@ -255,7 +256,7 @@ where
 	let mut vec_summary: Vec<(String, Cell)> = summary.into_iter().collect();
 	vec_summary.sort_by(func );
 
-	menu_utils::display_history_summary(
+	utils::display_history_summary(
 		&vec_summary, 
 		title,
 		"".to_string()
@@ -297,7 +298,7 @@ pub fn menu_incomes(all_data: &AllActivities) {
 	let min_option = 0;
 	let max_option = 15;
 
-	let mut option = menu_utils::read_option(print_function, min_option, max_option);
+	let mut option = utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
 		
 		match option {
@@ -326,6 +327,6 @@ pub fn menu_incomes(all_data: &AllActivities) {
 			_ => println!("Nothing to do..."),
 		}
 		
-		option = menu_utils::read_option(print_function, min_option, max_option);
+		option = utils::read_option(print_function, min_option, max_option);
 	}
 }

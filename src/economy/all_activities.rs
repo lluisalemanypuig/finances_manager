@@ -32,16 +32,15 @@
 
 extern crate duplicate;
 
-use crate::expense::Expense;
-use crate::income::Income;
+use crate::economy::expense::Expense;
+use crate::economy::income::Income;
+use crate::economy::monthly_activities::MonthlyActivities;
+use crate::economy::yearly_activities::YearlyActivities;
 
-use crate::date::Month;
+use crate::time::date::Month;
 
-use crate::concept_types;
-use crate::concept_types::ConceptTypes;
-
-use crate::monthly_activities::MonthlyActivities;
-use crate::yearly_activities::YearlyActivities;
+use crate::concepts::types;
+use crate::concepts::types::ConceptTypes;
 
 #[derive(Debug)]
 pub struct AllActivities {
@@ -85,7 +84,7 @@ impl AllActivities {
 		self.m_expense_types.iter_mut_types()
 	}
 	*/
-	pub fn iter_expense_subconcepts(&self) -> concept_types::Iter { self.m_expense_types.iter_subconcepts() }
+	pub fn iter_expense_subconcepts(&self) -> types::Iter { self.m_expense_types.iter_subconcepts() }
 	/*
 	pub fn iter_mut_expense_concept_subtypes(&mut self) -> concept_types::IterMut {
 		self.m_expense_types.set_changes(true);
@@ -115,7 +114,7 @@ impl AllActivities {
 		&mut self.m_income_types
 	}
 
-	pub fn iter_income_subconcepts(&self) -> concept_types::Iter { self.m_income_types.iter_subconcepts() }
+	pub fn iter_income_subconcepts(&self) -> types::Iter { self.m_income_types.iter_subconcepts() }
 	/*
 	pub fn iter_mut_income_subconcepts(&mut self) -> concept_types::IterMut {
 		self.m_income_types.set_changes(true);

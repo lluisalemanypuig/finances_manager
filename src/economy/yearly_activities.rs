@@ -30,11 +30,11 @@
  *
  ********************************************************************/
 
-use crate::monthly_activities::MonthlyActivities;
-use crate::monthly_activities::MonthlyActivitiesCollection;
+use crate::economy::monthly_activities::MonthlyActivities;
+use crate::economy::monthly_activities::MonthlyActivitiesCollection;
 
-use crate::expense::Expense;
-use crate::income::Income;
+use crate::economy::expense::Expense;
+use crate::economy::income::Income;
 
 #[derive(Debug)]
 pub struct YearlyActivities {

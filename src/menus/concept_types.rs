@@ -31,9 +31,9 @@
  ********************************************************************/
 
 use crate::io;
-use crate::menu_utils;
+use crate::menus::utils;
 
-use crate::all_activities;
+use crate::economy::all_activities;
 
 type AllExpenses = all_activities::AllActivities;
 
@@ -230,7 +230,7 @@ pub fn menu_expense_concepts(all_data: &mut AllExpenses) {
 	let min_option = 0;
 	let max_option = 7;
 	
-	let mut option = menu_utils::read_option(print_function, min_option, max_option);
+	let mut option = utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
 		
 		match option {
@@ -244,7 +244,7 @@ pub fn menu_expense_concepts(all_data: &mut AllExpenses) {
 			_ => println!("Nothing to do..."),
 		}
 		
-		option = menu_utils::read_option(print_function, min_option, max_option);
+		option = utils::read_option(print_function, min_option, max_option);
 	}
 }
 
@@ -253,7 +253,7 @@ pub fn menu_income_concepts(all_data: &mut AllExpenses) {
 	let min_option = 0;
 	let max_option = 7;
 	
-	let mut option = menu_utils::read_option(print_function, min_option, max_option);
+	let mut option = utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
 		
 		match option {
@@ -267,6 +267,6 @@ pub fn menu_income_concepts(all_data: &mut AllExpenses) {
 			_ => println!("Nothing to do..."),
 		}
 		
-		option = menu_utils::read_option(print_function, min_option, max_option);
+		option = utils::read_option(print_function, min_option, max_option);
 	}
 }

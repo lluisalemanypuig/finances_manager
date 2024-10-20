@@ -32,9 +32,9 @@
 
 extern crate duplicate;
 
-use crate::traits::AsReferences;
+use crate::economy::traits::AsReferences;
 
-use crate::date::Month;
+use crate::time::date::Month;
 
 #[derive(Debug)]
 pub struct MonthlyActivities<T> {

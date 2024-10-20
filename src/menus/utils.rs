@@ -32,13 +32,15 @@
 
 use crate::io;
 
-use crate::date;
-use crate::expense;
-use crate::income;
-use crate::monthly_activities;
-use crate::activity_summary;
-use crate::traits::AsReferences;
-use crate::traits::HasConcepts;
+use crate::time::date;
+
+use crate::economy::expense;
+use crate::economy::income;
+use crate::economy::monthly_activities;
+use crate::economy::traits::AsReferences;
+use crate::economy::traits::HasConcepts;
+
+use crate::menus::activity_summary;
 
 type Expense = expense::Expense;
 type Income = income::Income;
