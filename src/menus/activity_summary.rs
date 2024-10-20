@@ -51,16 +51,16 @@ impl ActivitySummary {
 				.max()
 				.unwrap_or(0);
 
-		let mut maxs: Vec<usize> = vec![];
-		maxs.resize(number_of_types, 0);
+		let mut max_widths: Vec<usize> = vec![];
+		max_widths.resize(number_of_types, 0);
 
 		for (row, _) in self.m_activity_to_money.iter() {
 			for j in 0..row.len() {
-				maxs[j] = std::cmp::max(maxs[j], row[j].chars().count())
+				max_widths[j] = std::cmp::max(max_widths[j], row[j].chars().count())
 			}
 		}
 
-		maxs
+		max_widths
 	}
 
 	pub fn iter_summary(&self) -> std::collections::btree_map::Iter<'_, Vec<String>, f32>

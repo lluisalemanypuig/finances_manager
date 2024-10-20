@@ -35,6 +35,7 @@ use crate::economy::income;
 use crate::economy::all_activities;
 use crate::economy::traits::HasConcepts;
 
+use crate::io;
 use crate::menus::utils;
 
 type Expense = expense::Expense;
@@ -42,66 +43,57 @@ type Income = income::Income;
 type AllActivities = all_activities::AllActivities;
 type Cell = utils::Cell;
 
-fn sort_by_concept(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
+fn sort_by_concept(a: &(Vec<String>, Cell), b: &(Vec<String>, Cell)) -> std::cmp::Ordering {
 	a.0.cmp(&b.0)
 }
-fn sort_by_times(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
+
+fn sort_by_times(a: &(Vec<String>, Cell), b: &(Vec<String>, Cell)) -> std::cmp::Ordering {
 	if b.1.num_times == a.1.num_times {
 		return a.0.cmp(&b.0);
 	}
 	b.1.num_times.cmp(&a.1.num_times)
 }
-fn sort_by_value(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
+
+fn sort_by_value(a: &(Vec<String>, Cell), b: &(Vec<String>, Cell)) -> std::cmp::Ordering {
 	if b.1.total_value == a.1.total_value {
 		return a.0.cmp(&b.0);
 	}
 	b.1.total_value.total_cmp(&a.1.total_value)
 }
 
-/*
-fn concept<T: HasConcepts>(t: &T) -> String { t.concept().clone() }
-fn concept_subconcept<T: HasConcepts>(t: &T) -> String {
-	let sub_concept;
-	if t.sub_concept() != &"".to_string() {
-		sub_concept = " - ".to_owned() + &t.sub_concept();
-	}
-	else {
-		sub_concept = "".to_string();
-	}
-	
-	t.concept().clone() + &sub_concept
+fn concept<T: HasConcepts>(n: usize, t: &T) -> Vec<String> {
+	t.get_concepts().iter().take(n).cloned().collect()
 }
-*/
 
 #[duplicate::duplicate_item(
 	method                      t         title            iter_thing;
 	[history_expenses_concepts] [Expense] ["Expense type"] [iter_expenses];
 	[history_incomes_concepts]  [Income]  ["Income type"]  [iter_incomes];
 )]
-fn method<SortFunc, ConvertFunc>(
+fn method<SortFunc, GroupByFunc>(
 	all_data: &AllActivities,
 	sort: SortFunc,
-	convert: ConvertFunc
+	group_by: GroupByFunc
 )
 where
-	SortFunc: Fn( &(String,Cell), &(String,Cell) ) -> std::cmp::Ordering,
-	ConvertFunc: Fn(&t) -> String
+	SortFunc: Fn( &(Vec<String>, Cell), &(Vec<String>, Cell) ) -> std::cmp::Ordering,
+	GroupByFunc: Fn(&t) -> Vec<String>
 {
-	let mut summary: std::collections::BTreeMap<String, Cell> = std::collections::BTreeMap::new();
+	let mut summary: std::collections::BTreeMap<Vec<String>, Cell> = std::collections::BTreeMap::new();
 
 	for year in all_data.iter_activities() {
 		for month in year.iter_thing() {
 			for exp in month.iter() {
 
-				let key_exp = convert(&exp);
-				match summary.get_mut(&key_exp) {
+				let group = group_by(&exp);
+				match summary.get_mut(&group) {
 					Some( Cell { classifier: _, num_times, total_value} ) => {
 						*num_times += 1;
 						*total_value += exp.price;
 					},
 					None => {
 						summary.insert(
-							key_exp,
+							group,
 							Cell {
 								classifier: "".to_string(),
 								num_times:1,
@@ -114,8 +106,8 @@ where
 		}
 	}
 
-	let mut vec_summary: Vec<(String, Cell)> = summary.into_iter().collect();
-	vec_summary.sort_by(sort );
+	let mut vec_summary: Vec<(Vec<String>, Cell)> = summary.into_iter().collect();
+	vec_summary.sort_by(sort);
 
 	utils::display_history_summary(
 		&vec_summary, 
@@ -126,22 +118,22 @@ where
 
 fn history_expenses_shops<F>(all_data: &AllActivities, func: F)
 where
-	F: Fn( &(String,Cell), &(String,Cell) ) -> std::cmp::Ordering
+	F: Fn( &(Vec<String>, Cell), &(Vec<String>, Cell) ) -> std::cmp::Ordering
 {
-	let mut summary: std::collections::BTreeMap<String, Cell> = std::collections::BTreeMap::new();
+	let mut summary: std::collections::BTreeMap<Vec<String>, Cell> = std::collections::BTreeMap::new();
 
 	for year in all_data.iter_activities() {
 		for month in year.iter_expenses() {
 			for exp in month.iter() {
 
-				match summary.get_mut(&exp.shop) {
+				match summary.get_mut(&vec![exp.shop.clone()]) {
 					Some( Cell { classifier: _, num_times, total_value} ) => {
 						*num_times += 1;
 						*total_value += exp.price;
 					},
 					None => {
 						summary.insert(
-							exp.shop.clone(),
+							vec![exp.shop.clone()],
 							Cell {
 								classifier: exp.city.clone(),
 								num_times: 1,
@@ -155,11 +147,11 @@ where
 		}
 	}
 
-	let mut vec_summary: Vec<(String, Cell)> = summary.into_iter().collect();
+	let mut vec_summary: Vec<(Vec<String>, Cell)> = summary.into_iter().collect();
 	vec_summary.sort_by(func );
 
 	utils::display_history_summary(
-		&vec_summary, 
+		&vec_summary,
 		"Place".to_string(),
 		"City".to_string()
 	);
@@ -172,14 +164,10 @@ fn print_statistics_menu_expenses() {
 	println!("    1.    Sorted alphabetically");
 	println!("    2.    Sorted by times");
 	println!("    3.    Sorted by values");
-	println!("    History of expenses by type and subtype");
+	println!("    History of expenses by place");
 	println!("    4.    Sorted alphabetically");
 	println!("    5.    Sorted by times");
-	println!("    6.    Sorted by values");
-	println!("    History of expenses by shop");
-	println!("    7.    Sorted alphabetically");
-	println!("    8.    Sorted by times");
-	println!("    9.    Sorted by value");
+	println!("    6.    Sorted by value");
 	println!("    0. Leave");
 }
 
@@ -192,20 +180,29 @@ pub fn menu_expenses(all_data: &AllActivities) {
 	while option != 0 {
 		
 		match option {
-			/*
 			// by type
-			1 => history_expenses_concepts(&all_data, sort_by_concept, concept),
-			2 => history_expenses_concepts(&all_data, sort_by_times, concept),
-			3 => history_expenses_concepts(&all_data, sort_by_value, concept),
-			// by type and subtype
-			4 => history_expenses_concepts(&all_data, sort_by_concept, concept_subconcept),
-			5 => history_expenses_concepts(&all_data, sort_by_times, concept_subconcept),
-			6 => history_expenses_concepts(&all_data, sort_by_value, concept_subconcept),
-			*/
+			1 => {
+				println!("How many types?");
+				let num_types = io::read_int();
+				history_expenses_concepts(&all_data, sort_by_concept, |e| concept(num_types, e));
+			}
+			2 => {
+				println!("How many types?");
+				let num_types = io::read_int();
+				history_expenses_concepts(&all_data, sort_by_times, |e| concept(num_types, e));
+			}
+			3 => {
+				println!("How many types?");
+				let num_types = io::read_int();
+				history_expenses_concepts(&all_data, sort_by_value, |e| concept(num_types, e));
+			}
+			
 			// by place
-			7 => history_expenses_shops(&all_data, sort_by_concept),
-			8 => history_expenses_shops(&all_data, sort_by_times),
-			9 => history_expenses_shops(&all_data, sort_by_value),
+			4 => history_expenses_shops(&all_data, sort_by_concept),
+			5 => history_expenses_shops(&all_data, sort_by_times),
+			6 => history_expenses_shops(&all_data, sort_by_value),
+
+			//
 			_ => println!("Nothing to do..."),
 		}
 		
@@ -215,23 +212,23 @@ pub fn menu_expenses(all_data: &AllActivities) {
 
 // -----------------------------------------------------------------------------
 
-fn history_of_from_and_place_incomes<SortFunc, ConvertFunc>(
+fn history_of_from_and_place_incomes<SortFunc, GroupByFunc>(
 	all_data: &AllActivities,
 	title: String,
 	func: SortFunc,
-	convert: ConvertFunc
+	group_by: GroupByFunc
 )
 where
-	SortFunc: Fn( &(String,Cell), &(String,Cell) ) -> std::cmp::Ordering,
-	ConvertFunc: Fn(&Income) -> String
+	SortFunc: Fn( &(Vec<String>, Cell), &(Vec<String>, Cell) ) -> std::cmp::Ordering,
+	GroupByFunc: Fn(&Income) -> Vec<String>
 {
-	let mut summary: std::collections::BTreeMap<String, Cell> = std::collections::BTreeMap::new();
+	let mut summary: std::collections::BTreeMap<Vec<String>, Cell> = std::collections::BTreeMap::new();
 
 	for year in all_data.iter_activities() {
 		for month in year.iter_incomes() {
 			for inc in month.iter() {
 
-				let key = convert(inc);
+				let key = group_by(inc);
 				match summary.get_mut(&key) {
 					Some( Cell { classifier: _, num_times, total_value} ) => {
 						*num_times += 1;
@@ -253,7 +250,7 @@ where
 		}
 	}
 
-	let mut vec_summary: Vec<(String, Cell)> = summary.into_iter().collect();
+	let mut vec_summary: Vec<(Vec<String>, Cell)> = summary.into_iter().collect();
 	vec_summary.sort_by(func );
 
 	utils::display_history_summary(
@@ -263,9 +260,9 @@ where
 	);
 }
 
-fn from(i: &Income) -> String { i.from.clone() }
-fn place(i: &Income) -> String { i.place.clone() }
-fn from_place(i: &Income) -> String { from(i) + " - " + &place(i) }
+fn from(i: &Income) -> Vec<String> { vec![i.from.clone()] }
+fn place(i: &Income) -> Vec<String> { vec![i.place.clone()] }
+fn from_place(i: &Income) -> Vec<String> { vec![ i.from.clone() + " - " + &i.place.clone() ] }
 
 fn print_statistics_menu_incomes() {
 	println!("Income statistics:");
@@ -274,22 +271,18 @@ fn print_statistics_menu_incomes() {
 	println!("    1.    Sorted alphabetically");
 	println!("    2.    Sorted by times");
 	println!("    3.    Sorted by values");
-	println!("    History of incomes by type and subtype");
+	println!("    History of incomes by from");
 	println!("    4.    Sorted alphabetically");
 	println!("    5.    Sorted by times");
-	println!("    6.    Sorted by values");
-	println!("    History of incomes by from");
+	println!("    6.    Sorted by value");
+	println!("    History of incomes by place");
 	println!("    7.    Sorted alphabetically");
 	println!("    8.    Sorted by times");
 	println!("    9.    Sorted by value");
-	println!("    History of incomes by place");
+	println!("    History of incomes by from and place");
 	println!("   10.    Sorted alphabetically");
 	println!("   11.    Sorted by times");
 	println!("   12.    Sorted by value");
-	println!("    History of incomes by from and place");
-	println!("   13.    Sorted alphabetically");
-	println!("   14.    Sorted by times");
-	println!("   15.    Sorted by value");
 	println!("    0. Leave");
 }
 
@@ -302,28 +295,39 @@ pub fn menu_incomes(all_data: &AllActivities) {
 	while option != 0 {
 		
 		match option {
-			/*
 			// by type
-			1 => history_incomes_concepts(&all_data, sort_by_concept, concept),
-			2 => history_incomes_concepts(&all_data, sort_by_times, concept),
-			3 => history_incomes_concepts(&all_data, sort_by_value, concept),
-			// by type and subtype
-			4 => history_expenses_concepts(&all_data, sort_by_concept, concept_subconcept),
-			5 => history_expenses_concepts(&all_data, sort_by_times, concept_subconcept),
-			6 => history_expenses_concepts(&all_data, sort_by_value, concept_subconcept),
-			*/
+			1 => {
+				println!("How many types?");
+				let num_types = io::read_int();
+				history_incomes_concepts(&all_data, sort_by_concept, |e| concept(num_types, e));
+			}
+			2 => {
+				println!("How many types?");
+				let num_types = io::read_int();
+				history_incomes_concepts(&all_data, sort_by_times, |e| concept(num_types, e));
+			}
+			3 => {
+				println!("How many types?");
+				let num_types = io::read_int();
+				history_incomes_concepts(&all_data, sort_by_value, |e| concept(num_types, e));
+			}
+
 			// by from
-			7 => history_of_from_and_place_incomes(&all_data, "From".to_string(), sort_by_concept, from),
-			8 => history_of_from_and_place_incomes(&all_data, "From".to_string(), sort_by_times, from),
-			9 => history_of_from_and_place_incomes(&all_data, "From".to_string(), sort_by_value, from),
+			4 => history_of_from_and_place_incomes(&all_data, "From".to_string(), sort_by_concept, from),
+			5 => history_of_from_and_place_incomes(&all_data, "From".to_string(), sort_by_times, from),
+			6 => history_of_from_and_place_incomes(&all_data, "From".to_string(), sort_by_value, from),
+
 			// by place
-			10 => history_of_from_and_place_incomes(&all_data, "Place".to_string(), sort_by_concept, place),
-			11 => history_of_from_and_place_incomes(&all_data, "Place".to_string(), sort_by_times, place),
-			12 => history_of_from_and_place_incomes(&all_data, "Place".to_string(), sort_by_value, place),
+			7 => history_of_from_and_place_incomes(&all_data, "Place".to_string(), sort_by_concept, place),
+			8 => history_of_from_and_place_incomes(&all_data, "Place".to_string(), sort_by_times, place),
+			9 => history_of_from_and_place_incomes(&all_data, "Place".to_string(), sort_by_value, place),
+
 			// by from and place
-			13 => history_of_from_and_place_incomes(&all_data, "From - Place".to_string(), sort_by_concept, from_place),
-			14 => history_of_from_and_place_incomes(&all_data, "From - Place".to_string(), sort_by_times, from_place),
-			15 => history_of_from_and_place_incomes(&all_data, "From - Place".to_string(), sort_by_value, from_place),
+			10 => history_of_from_and_place_incomes(&all_data, "From - Place".to_string(), sort_by_concept, from_place),
+			11 => history_of_from_and_place_incomes(&all_data, "From - Place".to_string(), sort_by_times, from_place),
+			12 => history_of_from_and_place_incomes(&all_data, "From - Place".to_string(), sort_by_value, from_place),
+			
+			//
 			_ => println!("Nothing to do..."),
 		}
 		

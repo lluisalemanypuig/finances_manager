@@ -66,6 +66,7 @@ fn left_justify_string(s: &String, width: usize) -> String {
 
 fn center_string(s: &String, width: usize) -> String {
 	let length_s = s.chars().count();
+
 	let left_pad_size = (width - length_s)/2;
 	let right_pad_size = width - left_pad_size - length_s;
 
@@ -75,13 +76,13 @@ fn center_string(s: &String, width: usize) -> String {
 	format!("{left_pad}{s}{right_pad}")
 }
 
-fn types_text(ts: &Vec<String>, column_widths: &Vec<usize>, sep: &str) -> String {
+fn left_justified_columns_text(column_texts: &Vec<String>, column_widths: &Vec<usize>, sep: &str) -> String {
 	let mut justified_types: Vec<String> = vec![];
 	justified_types.resize(column_widths.len(), "".to_string());
 
 	for i in 0..justified_types.len() {
-		if i < ts.len() {
-			justified_types[i] = left_justify_string(&ts[i], column_widths[i]);
+		if i < column_texts.len() {
+			justified_types[i] = left_justify_string(&column_texts[i], column_widths[i]);
 		}
 		else {
 			justified_types[i] = left_justify_string(&"".to_string(), column_widths[i]);
@@ -148,7 +149,7 @@ pub fn display_summary_activity(summary: &ActivitySummary, pre_tab: &str) {
 	for (v, value) in summary.iter_summary() {
 		println!(
 			"{tab}| {:<type_width$} | {:>PRICE_WIDTH$.2} | {:>9.2}% |",
-			types_text(v, &type_columns_width, CONCEPT_TYPE_SEPARATOR),
+			left_justified_columns_text(v, &type_columns_width, CONCEPT_TYPE_SEPARATOR),
 			value,
 			(value/summary.get_total())*100.0
 		);
@@ -242,7 +243,7 @@ where
 		let types_to_summarize: Vec<String> = cs.iter().take(type_depth).cloned().collect();
 		summary.add(types_to_summarize, *pr);
 
-		let expense_type_text = types_text(cs, &type_columns_width, CONCEPT_TYPE_SEPARATOR);
+		let expense_type_text = left_justified_columns_text(cs, &type_columns_width, CONCEPT_TYPE_SEPARATOR);
 		let place_text = center_string( pl, shop_column_width);
 		let city_text = center_string( ci, city_column_width);
 		if &previous_date != d {
@@ -316,11 +317,10 @@ where
 	let from_header = center_string(&"From".to_string(), from_column_width);
 
 	let type_columns_width = calculate_type_columns_width(month_data, func);
-	let type_sep = " ; ";
 	let type_column_width: usize =
 		type_columns_width.iter().sum::<usize>()
 		+
-		(type_columns_width.len() - 1)*type_sep.len()
+		(type_columns_width.len() - 1)*CONCEPT_TYPE_SEPARATOR.len()
 		;
 
 	let concept_type_main_divider = std::iter::repeat("—").take(type_column_width).collect::<String>();
@@ -355,7 +355,7 @@ where
 		let types_to_summarize: Vec<String> = cs.iter().take(type_depth).cloned().collect();
 		summary.add(types_to_summarize, *pr);
 
-		let income_type_text = types_text(cs, &type_columns_width, type_sep);
+		let income_type_text = left_justified_columns_text(cs, &type_columns_width, CONCEPT_TYPE_SEPARATOR);
 		let place_text = center_string( pl, place_column_width);
 		let from_text = center_string( fr, from_column_width);
 		if &previous_date != d {
@@ -398,21 +398,41 @@ pub struct Cell {
 }
 
 pub fn display_history_summary(
-	vec_summary: &Vec<(String, Cell)>,
+	vec_summary: &Vec<(Vec<String>, Cell)>,
 	first_title: String,
 	second_title: String
 )
 {
-	let first_column_width =
-	std::cmp::max(
-		first_title.len(),
+	let number_subcolumns =
 		vec_summary
-		.iter()
-		.map(|v| -> usize { v.0.len() })
-		.max()
-		.unwrap_or(0)
-	);
+			.iter()
+			.map(|(s, _)| -> usize { s.len() })
+			.max()
+			.unwrap_or(0);
+
+	let mut column_widths: Vec<usize> = vec![];
+	column_widths.resize(number_subcolumns, 0);
+
+	for (row, _) in vec_summary.iter() {
+		for j in 0..row.len() {
+			column_widths[j] = std::cmp::max(column_widths[j], row[j].chars().count())
+		}
+	}
+
+	let first_column_width =
+		std::cmp::max(
+			column_widths.iter().sum::<usize>() + (column_widths.len() - 1)*CONCEPT_TYPE_SEPARATOR.len(),
+			first_title.chars().count()
+		);
+	
+	if number_subcolumns == 1 {
+		for j in 0..number_subcolumns {
+			column_widths[j] = std::cmp::max(column_widths[j], first_column_width);
+		}
+	}
+
 	let first_main_divider = std::iter::repeat("—").take(first_column_width).collect::<String>();
+
 	let first_header = center_string(&first_title, first_column_width);
 
 	let second_column_width =
@@ -440,14 +460,14 @@ pub fn display_history_summary(
 		println!("{tab}+—{first_main_divider}—+—————————————+———————————————————+");
 	}
 	
-	for (thing, Cell {classifier: city, num_times, total_value}) in vec_summary.iter() {
-		let thing_text = center_string( thing, first_column_width);
+	for (things, Cell {classifier: city, num_times, total_value}) in vec_summary.iter() {
+		let first_column_text = left_justified_columns_text(things, &column_widths, CONCEPT_TYPE_SEPARATOR);
 		if second_column_width > 0 {
 			let city_text = center_string( city, second_column_width);
-			println!("{tab}| {thing_text} | {city_text} | {num_times:>11} | {total_value:>17.2} |");
+			println!("{tab}| {first_column_text} | {city_text} | {num_times:>11} | {total_value:>17.2} |");
 		}
 		else {
-			println!("{tab}| {thing_text} | {num_times:>11} | {total_value:>17.2} |");
+			println!("{tab}| {first_column_text} | {num_times:>11} | {total_value:>17.2} |");
 		}
 	}
 	if second_column_width > 0 {
