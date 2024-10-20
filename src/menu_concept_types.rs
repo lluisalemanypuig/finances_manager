@@ -112,6 +112,7 @@ fn method(all_data: &mut AllExpenses) {
 	["income"]  [rename_income_concept]  [get_income_concepts]  [get_income_concepts_mut]  [iter_mut_incomes];
 )]
 fn method(all_data: &mut AllExpenses) {
+	/*
 	println!("Enter the {} concept to rename:", thing);
 	let previous_concept = io::read_from_options(all_data.get().get_concepts());
 
@@ -129,6 +130,7 @@ fn method(all_data: &mut AllExpenses) {
 			}
 		}
 	}
+	*/
 }
 
 #[duplicate::duplicate_item(
@@ -137,6 +139,7 @@ fn method(all_data: &mut AllExpenses) {
 	["income"]  [rename_income_subconcept]  [get_income_concepts]  [get_income_concepts_mut]  [iter_mut_incomes];
 )]
 fn method(all_data: &mut AllExpenses) {
+	/*
 	println!("Enter the {} concept (this will not be renamed):", thing);
 	let concept = io::read_from_options(all_data.get().get_concepts());
 
@@ -167,6 +170,7 @@ fn method(all_data: &mut AllExpenses) {
 	else {
 		println!("Concept '{concept}' does not exist.");
 	}
+	*/
 }
 
 #[duplicate::duplicate_item(

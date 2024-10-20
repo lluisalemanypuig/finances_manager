@@ -74,7 +74,7 @@ where
 		for month_data in year_data.iter() {
 
 			let current_month: activity_summary::ActivitySummary = menu_utils::display
-			( month_data, func );
+			( month_data, func, 2 );
 
 			current_year.merge(current_month);
 		}
@@ -102,7 +102,10 @@ fn method(all_data: &AllActivities) {
 	if concept_type_opt.is_none() { return; }
 	let concept_type = concept_type_opt.unwrap();
 
-	let func = |activity: &Activity| { activity.concept == concept_type };
+	let func =
+	|activity: &Activity| {
+		activity.concepts.iter().any(|s| s == &concept_type)
+	};
 	display(all_data, &func);
 }
 
@@ -114,7 +117,10 @@ fn method(all_data: &AllActivities) {
 fn method(all_data: &AllActivities) {
 	let concept_type = io::read_string();
 	
-	let func = |activity: &Activity| { activity.concept.contains(&concept_type) };
+	let func =
+	|activity: &Activity| {
+		activity.concepts.iter().any(|s| s.contains(&concept_type))
+	};
 	display(all_data, &func);
 }
 
@@ -166,7 +172,7 @@ fn print_by_place_substring_incomes(all_data: &AllActivities) {
 fn method(month_data: &MonthlyActivities<activity>)
 -> ActivitySummary
 {
-	menu_utils::display(month_data, &|_| true)
+	menu_utils::display(month_data, &|_| true, 2)
 }
 
 #[duplicate::duplicate_item(
@@ -311,6 +317,7 @@ fn method(all_data: &AllActivities) {
 }
 
 fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: date::Month, day: u8) {
+	/*
 	println!("Expense Type:");
 	let expense_type_opt =
 		io::read_from_options_or_empty(all_data.get_expense_concepts().get_concepts());
@@ -337,6 +344,7 @@ fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: dat
 	println!("Description:");
 	let description = io::read_string_or_empty().unwrap_or("".to_string());
 
+	
 	month_data.push(Expense {
 		day_of_year : date::Date { year, month, day},
 		price: price,
@@ -346,9 +354,11 @@ fn add_new_with_date_expense(all_data: &mut AllActivities, year: u32, month: dat
 		city,
 		description: description
 	});
+	*/
 }
 
 fn add_new_with_date_income(all_data: &mut AllActivities, year: u32, month: date::Month, day: u8) {
+	/*
 	println!("Income Type:");
 	let income_type_opt =
 		io::read_from_options_or_empty(all_data.get_income_concepts().get_concepts());
@@ -375,6 +385,7 @@ fn add_new_with_date_income(all_data: &mut AllActivities, year: u32, month: date
 	println!("Description:");
 	let description = io::read_string_or_empty().unwrap_or("".to_string());
 
+	
 	month_data.push(Income {
 		day_of_year : date::Date { year, month, day},
 		price: price,
@@ -384,6 +395,7 @@ fn add_new_with_date_income(all_data: &mut AllActivities, year: u32, month: date
 		place: place,
 		description: description
 	});
+	*/
 }
 
 #[duplicate::duplicate_item(
@@ -501,6 +513,7 @@ fn method(all_data: &mut AllActivities) {
 }
 
 fn add_monthly_expense(all_data: &mut AllActivities) {
+	/*
 	println!("Enter expense information first");
 
 	println!("Expense Type:");
@@ -558,9 +571,11 @@ fn add_monthly_expense(all_data: &mut AllActivities) {
 			description: description.clone()
 		});
 	}
+	*/
 }
 
 fn add_monthly_income(all_data: &mut AllActivities) {
+	/*
 	println!("Enter income information first");
 
 	println!("Income Type:");
@@ -619,9 +634,11 @@ fn add_monthly_income(all_data: &mut AllActivities) {
 			description: description.clone()
 		});
 	}
+	*/
 }
 
 fn edit_expense(all_data: &mut AllActivities) {
+	/*
 	println!("Select year:");
 	let year: u32 = io::read_int();
 	if !all_data.has_year(&year) {
@@ -709,9 +726,11 @@ fn edit_expense(all_data: &mut AllActivities) {
 	if let Some(value) = io::read_string_or_empty() {
 		expense.description = value;
 	}
+	*/
 }
 
 fn edit_income(all_data: &mut AllActivities) {
+	/*
 	println!("Select year:");
 	let year: u32 = io::read_int();
 	if !all_data.has_year(&year) {
@@ -795,6 +814,7 @@ fn edit_income(all_data: &mut AllActivities) {
 	if let Some(value) = io::read_string_or_empty() {
 		income.description = value;
 	}
+	*/
 }
 
 #[duplicate::duplicate_item(
@@ -823,7 +843,7 @@ fn method(all_data: &mut AllActivities) {
 	{
 	let year_data = all_data.get_year(&year).unwrap();
 	let month_data = year_data.get().get_month(&month).unwrap();
-	menu_utils::display(month_data, &|_| true);
+	menu_utils::display(month_data, &|_| true, 2);
 	}
 
 	println!("Id of {} to be deleted.", thing);

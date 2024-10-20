@@ -34,8 +34,7 @@ use crate::expense;
 use crate::income;
 use crate::all_activities;
 use crate::menu_utils;
-use crate::traits::HasConceptType;
-use crate::traits::HasSubConceptType;
+use crate::traits::HasConcepts;
 
 type Expense = expense::Expense;
 type Income = income::Income;
@@ -57,8 +56,10 @@ fn sort_by_value(a: &(String, Cell), b: &(String, Cell)) -> std::cmp::Ordering {
 	}
 	b.1.total_value.total_cmp(&a.1.total_value)
 }
-fn concept<T: HasConceptType>(t: &T) -> String { t.concept().clone() }
-fn concept_subconcept<T: HasConceptType + HasSubConceptType>(t: &T) -> String {
+
+/*
+fn concept<T: HasConcepts>(t: &T) -> String { t.concept().clone() }
+fn concept_subconcept<T: HasConcepts>(t: &T) -> String {
 	let sub_concept;
 	if t.sub_concept() != &"".to_string() {
 		sub_concept = " - ".to_owned() + &t.sub_concept();
@@ -69,6 +70,7 @@ fn concept_subconcept<T: HasConceptType + HasSubConceptType>(t: &T) -> String {
 	
 	t.concept().clone() + &sub_concept
 }
+*/
 
 #[duplicate::duplicate_item(
 	method                      t         title            iter_thing;
@@ -189,6 +191,7 @@ pub fn menu_expenses(all_data: &AllActivities) {
 	while option != 0 {
 		
 		match option {
+			/*
 			// by type
 			1 => history_expenses_concepts(&all_data, sort_by_concept, concept),
 			2 => history_expenses_concepts(&all_data, sort_by_times, concept),
@@ -197,6 +200,7 @@ pub fn menu_expenses(all_data: &AllActivities) {
 			4 => history_expenses_concepts(&all_data, sort_by_concept, concept_subconcept),
 			5 => history_expenses_concepts(&all_data, sort_by_times, concept_subconcept),
 			6 => history_expenses_concepts(&all_data, sort_by_value, concept_subconcept),
+			*/
 			// by place
 			7 => history_expenses_shops(&all_data, sort_by_concept),
 			8 => history_expenses_shops(&all_data, sort_by_times),
@@ -297,6 +301,7 @@ pub fn menu_incomes(all_data: &AllActivities) {
 	while option != 0 {
 		
 		match option {
+			/*
 			// by type
 			1 => history_incomes_concepts(&all_data, sort_by_concept, concept),
 			2 => history_incomes_concepts(&all_data, sort_by_times, concept),
@@ -305,6 +310,7 @@ pub fn menu_incomes(all_data: &AllActivities) {
 			4 => history_expenses_concepts(&all_data, sort_by_concept, concept_subconcept),
 			5 => history_expenses_concepts(&all_data, sort_by_times, concept_subconcept),
 			6 => history_expenses_concepts(&all_data, sort_by_value, concept_subconcept),
+			*/
 			// by from
 			7 => history_of_from_and_place_incomes(&all_data, "From".to_string(), sort_by_concept, from),
 			8 => history_of_from_and_place_incomes(&all_data, "From".to_string(), sort_by_times, from),

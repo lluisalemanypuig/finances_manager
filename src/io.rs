@@ -352,15 +352,15 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 				for Expense {
 					day_of_year: d,
 					price: pr,
-					concept: c,
-					sub_concept: sc,
+					concepts: cs,
 					shop: pl,
 					city: ci,
 					description: descr
 				}
 				in me.get_activities().iter()
 				{
-					writeln!(expense_file, "\"{d}\"\t\"{pr}\"\t\"{c};{sc}\"\t\"{pl}\"\t\"{ci}\"\t\"{descr}\"")?;
+					let concept_list = cs.join(";");
+					writeln!(expense_file, "\"{d}\"\t\"{pr}\"\t\"{concept_list}\"\t\"{pl}\"\t\"{ci}\"\t\"{descr}\"")?;
 				}
 			}
 		}
@@ -379,15 +379,15 @@ pub fn write_all_data(data_dir: &String, all_data: &AllActivities) -> Result<()>
 				for Income {
 					day_of_year: d,
 					price: pr,
-					concept: c,
-					sub_concept: sc,
+					concepts: cs,
 					from: fr,
 					place: pl,
 					description: descr
 				}
 				in me.get_activities().iter()
 				{
-					writeln!(income_file, "\"{d}\"\t\"{pr}\"\t\"{c};{sc}\"\t\"{fr}\"\t\"{pl}\"\t\"{descr}\"")?;
+					let concept_list = cs.join(";");
+					writeln!(income_file, "\"{d}\"\t\"{pr}\"\t\"{concept_list}\"\t\"{fr}\"\t\"{pl}\"\t\"{descr}\"")?;
 				}
 			}
 		}

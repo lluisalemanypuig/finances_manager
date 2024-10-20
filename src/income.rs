@@ -31,8 +31,7 @@
  ********************************************************************/
 
 use crate::traits::AsReferences;
-use crate::traits::HasConceptType;
-use crate::traits::HasSubConceptType;
+use crate::traits::HasConcepts;
 
 use crate::date;
 
@@ -40,8 +39,7 @@ use crate::date;
 pub struct Income {
 	pub day_of_year: date::Date,
 	pub price: f32,
-	pub concept: String,
-	pub sub_concept: String,
+	pub concepts: Vec<String>,
 	pub from: String,
 	pub place: String,
 	pub description: String
@@ -92,11 +90,12 @@ impl std::str::FromStr for Income {
 			panic!("Can't segment string '{s}' into 7 parts")
 		};
 		
-		let concepts: Vec<&str> =
+		let concepts: Vec<String> =
 			concept_list
 			.split_terminator(';')
 			.map(str::trim)
 			.filter(|&s| s != "")
+			.map(|s| s.to_string())
 			.collect();
 
 		let date_fromstr = d.parse::<date::Date>().map_err(|_| ParseIncomeError)?;
@@ -105,8 +104,7 @@ impl std::str::FromStr for Income {
 		Ok(Income {
 			day_of_year: date_fromstr,
 			price: price_fromstr,
-			concept: concepts[0].to_string(),
-			sub_concept: if concepts.len() > 1 { concepts[1].to_string() } else { "".to_string() },
+			concepts: concepts,
 			from: fr.to_string(),
 			place: pl.to_string(),
 			description: descr.to_string()
@@ -119,9 +117,6 @@ impl AsReferences<Income> for Income {
 	fn as_mut(&mut self) -> &mut Income { self }
 }
 
-impl HasConceptType for Income {
-	fn concept(&self) -> &String { &self.concept }
-}
-impl HasSubConceptType for Income {
-	fn sub_concept(&self) -> &String { &self.sub_concept }
+impl HasConcepts for Income {
+	fn get_concepts(&self) -> &Vec<String> { &self.concepts }
 }

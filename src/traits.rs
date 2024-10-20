@@ -35,9 +35,6 @@ pub trait AsReferences<T> {
 	fn as_mut(&mut self) -> &mut T;
 }
 
-pub trait HasConceptType {
-	fn concept(&self) -> &String;
-}
-pub trait HasSubConceptType {
-	fn sub_concept(&self) -> &String;
+pub trait HasConcepts {
+	fn get_concepts(&self) -> &Vec<String>;
 }
