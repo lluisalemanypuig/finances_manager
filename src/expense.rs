@@ -78,7 +78,6 @@ fn split_string_data(data: &str) -> Vec<&str> {
 		&all[3][1..all[3].len() - 1],
 		&all[4][1..all[4].len() - 1],
 		&all[5][1..all[5].len() - 1],
-		&all[6][1..all[6].len() - 1],
 	];
 	
 	parts
@@ -89,18 +88,25 @@ impl std::str::FromStr for Expense {
 	
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		let parts: Vec<&str> = split_string_data(s);
-		let [d, pr, c, sc, pl, ci, descr] = parts.as_slice() else {
-			panic!("Can't segment string '{s}' into 7 parts")
+		let [d, pr, concept_list, pl, ci, descr] = parts.as_slice() else {
+			panic!("Can't segment string '{s}' into 6 parts")
 		};
 		
+		let concepts: Vec<&str> =
+			concept_list
+			.split_terminator(';')
+			.map(str::trim)
+			.filter(|&s| s != "")
+			.collect();
+
 		let date_fromstr = d.parse::<date::Date>().map_err(|_| ParseExpenseError)?;
 		let price_fromstr = pr.parse::<f32>().map_err(|_| ParseExpenseError)?;
 		
 		Ok(Expense {
 			day_of_year: date_fromstr,
 			price: price_fromstr,
-			concept: c.to_string(),
-			sub_concept: sc.to_string(),
+			concept: concepts[0].to_string(),
+			sub_concept: if concepts.len() > 1 { concepts[1].to_string() } else { "".to_string() },
 			shop: pl.to_string(),
 			city: ci.to_string(),
 			description: descr.to_string()
