@@ -147,7 +147,7 @@ fn print_by_place_substring_incomes(all_data: &AllActivities) {
 fn method(month_data: &MonthlyActivities<activity>)
 -> ActivitySummary
 {
-	menus::utils::display(month_data, &|_| true, 2)
+	menus::utils::display(month_data, &|_| true, -1)
 }
 
 #[duplicate::duplicate_item(
