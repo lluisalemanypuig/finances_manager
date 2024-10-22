@@ -216,6 +216,15 @@ impl Tree {
 	}
 	*/
 
+	pub fn normalize_tree(&mut self) {
+		self.m_children.sort_by(|k1, k2| k1.key.cmp(&k2.key));
+		for KeyTree { key: _, tree } in self.m_children.iter_mut() {
+			if let Some(t) = tree {
+				t.normalize_tree();
+			}
+		}
+	}
+
 	pub fn num_keys(&self) -> usize {
 		self.m_children.len()
 	}

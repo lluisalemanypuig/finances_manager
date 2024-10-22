@@ -52,7 +52,8 @@ fn read_types(data_dir: &String, filename: String, concept_types: &mut ConceptTy
 		entire_file_str.push_str( line.unwrap().trim() );
 	}
 
-	let tree = build_tree(entire_file_str);
+	let mut tree = build_tree(entire_file_str);
+	tree.normalize_tree();
 	concept_types.set_tree(tree);
 }
 
