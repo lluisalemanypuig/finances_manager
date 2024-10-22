@@ -77,17 +77,17 @@ fn method(all_data: &mut AllExpenses) {
 	println!("Enter the new {} concept:", thing);
 	let new_concept = io::read_string();
 
-	all_data
-		.get_concepts_mut()
-		.get_tree_mut()
+	let tree = all_data.get_concepts_mut().get_tree_mut();
+
+	tree
 		.make_subtree(&branch[0..branch.len()-1])
 		.rename_key(branch.last().unwrap(), new_concept.clone());
+	tree.normalize_tree();
 
 	for y in all_data.iter_mut_activities() {
 		for m in y.iter_mut_act() {
 			for d in m.iter_mut() {
 				if !utils::vector_includes(&d.concepts, &branch) { continue; }
-
 				if d.concepts.len() >= branch.len() {
 					let s = branch.len();
 					d.concepts[s - 1] = new_concept.clone();
