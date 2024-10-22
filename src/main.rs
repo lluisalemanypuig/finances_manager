@@ -35,12 +35,13 @@ extern crate serde_json;
 
 use std::io::Read;
 
-mod io;
-
 mod concepts;
 mod time;
 mod menus;
 mod economy;
+
+mod io;
+mod utils;
 
 use crate::economy::all_activities::AllActivities;
 

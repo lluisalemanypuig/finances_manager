@@ -43,7 +43,7 @@ impl ActivitySummary {
 		}
 	}
 
-	pub fn get_type_max_widths(&self) -> Vec<usize> {
+	pub fn get_concepts_max_widths(&self) -> Vec<usize> {
 		let number_of_types =
 			self.m_activity_to_money
 				.iter()

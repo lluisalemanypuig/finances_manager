@@ -32,6 +32,8 @@
 
 use std::str::FromStr;
 
+use crate::concepts::tree::Tree;
+
 pub fn read_input_string() -> String {
 	let mut s = String::new();
 	let stdin = std::io::stdin();
@@ -135,10 +137,21 @@ pub fn read_from_options_or_empty(options: &Vec<String>) -> Option<String> {
 	}
 }
 
-pub fn read_from_options(options: &Vec<String>) -> String {
-	loop {
-		if let Some(s) = read_from_options_or_empty(options) {
-			return s;
+pub fn read_from_tree_options(options: &Tree) -> Vec<String> {
+	let mut res: Vec<String> = Vec::new();
+
+	let available = options.get_keys().iter().map(|s| s.to_string()).collect();
+	let opt = read_from_options_or_empty(&available);
+	
+	if let Some(s) = opt {
+		let st = options.get_child(&s);
+		res.push(s);
+
+		if let Some(stt) = st {
+			let mut more = read_from_tree_options(&stt);
+			res.append(&mut more);
 		}
 	}
+
+	res
 }

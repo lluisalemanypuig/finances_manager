@@ -39,7 +39,6 @@ use crate::economy::yearly_activities::YearlyActivities;
 
 use crate::time::date::Month;
 
-use crate::concepts::types;
 use crate::concepts::types::ConceptTypes;
 
 #[derive(Debug)]
@@ -69,28 +68,12 @@ impl AllActivities {
 		self.m_activities.iter_mut()
 	}
 
-	//pub fn get_activities(&self) -> &Vec<YearlyActivities> { &self.m_activities }
 	pub fn get_activities_mut(&mut self) -> &mut Vec<YearlyActivities> {
 		self.set_changes_activities(true);
 		&mut self.m_activities
 	}
 
 	// Expenses
-
-	/*
-	pub fn iter_expense_concept(&self) -> std::slice::Iter<'_, String> { self.m_expense_types.iter_concepts() }
-	pub fn iter_mut_expense_concepts(&mut self) -> std::slice::IterMut<'_, String> {
-		self.m_expense_types.set_changes(true);
-		self.m_expense_types.iter_mut_types()
-	}
-	*/
-	pub fn iter_expense_subconcepts(&self) -> types::Iter { self.m_expense_types.iter_subconcepts() }
-	/*
-	pub fn iter_mut_expense_concept_subtypes(&mut self) -> concept_types::IterMut {
-		self.m_expense_types.set_changes(true);
-		self.m_expense_types.iter_mut_subtypes()
-	}
-	*/
 
 	pub fn get_expense_concepts(&self) -> &ConceptTypes { &self.m_expense_types }
 	pub fn get_expense_concepts_mut(&mut self) -> &mut ConceptTypes {
@@ -100,27 +83,11 @@ impl AllActivities {
 
 	// Incomes
 
-	/*
-	pub fn iter_income_concepts(&self) -> std::slice::Iter<'_, String> { self.m_income_types.iter_concepts() }
-	pub fn iter_mut_income_concepts(&mut self) -> std::slice::IterMut<'_, String> {
-		self.m_income_types.set_changes(true);
-		self.m_income_types.iter_mut_types()
-	}
-	*/
-
 	pub fn get_income_concepts(&self) -> &ConceptTypes { &self.m_income_types }
 	pub fn get_income_concepts_mut(&mut self) -> &mut ConceptTypes {
 		self.m_income_types.set_changes(true);
 		&mut self.m_income_types
 	}
-
-	pub fn iter_income_subconcepts(&self) -> types::Iter { self.m_income_types.iter_subconcepts() }
-	/*
-	pub fn iter_mut_income_subconcepts(&mut self) -> concept_types::IterMut {
-		self.m_income_types.set_changes(true);
-		self.m_income_types.iter_mut_subtypes()
-	}
-	*/
 
 	// -----
 

@@ -30,7 +30,12 @@
  *
  ********************************************************************/
 
-pub mod types;
-pub mod tree;
-
-pub mod io;
+pub fn vector_includes(v: &[String], w: &[String]) -> bool {
+	let limit = std::cmp::min(v.len(), w.len());
+	for i in 0..limit {
+		if v[i] != w[i] {
+			return false;
+		}
+	}
+	true
+}
