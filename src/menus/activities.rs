@@ -75,8 +75,7 @@ where
 
 		for month_data in year_data.iter() {
 
-			let current_month: activity_summary::ActivitySummary = utils::display
-			( month_data, func, 2 );
+			let current_month = utils::display( month_data, func, 2 );
 
 			current_year.merge(current_month);
 		}
