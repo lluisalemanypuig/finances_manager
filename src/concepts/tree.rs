@@ -71,12 +71,12 @@ impl Tree {
 
 	/*
 	// Pre: all keys in @e branch exist.
-	pub fn get_subtree(&self, branch: &[String]) -> &Self {
+	pub fn get_subtree(&self, branch: &[String]) -> &Tree {
 		if branch.len() == 0 { return self; }
 		self.get_child(&branch[0]).unwrap().get_subtree(&branch[1..])
 	}
 	*/
-	pub fn get_subtree_mut(&mut self, branch: &[String]) -> &mut Self {
+	pub fn get_subtree_mut(&mut self, branch: &[String]) -> &mut Tree {
 		if branch.len() == 0 { return self; }
 		self.get_child_mut(&branch[0]).unwrap().get_subtree_mut(&branch[1..])
 	}
@@ -134,12 +134,12 @@ impl Tree {
 		}
 	}
 
-	pub fn make_subtree(&mut self, branch: &[String]) -> &mut Self {
+	pub fn make_subtree(&mut self, branch: &[String]) -> &mut Tree {
 		if branch.len() == 0 { return self; }
 		self.make_child(&branch[0]).make_subtree(&branch[1..])
 	}
 
-	pub fn remove_child(&mut self, key: &String) {
+	pub fn remove_child(&mut self, key: &String) -> &mut Tree {
 		let pos = self.m_children.binary_search_by(
 			|e| { e.key.cmp(key) }
 		);
@@ -149,9 +149,10 @@ impl Tree {
 			},
 			Err(_) => {}
 		}
+		self
 	}
 
-	pub fn rename_key(&mut self, old_key: &String, new_key: String) -> &mut Self {
+	pub fn rename_key(&mut self, old_key: &String, new_key: String) -> &mut Tree {
 		let pos = self.m_children.binary_search_by(
 			|e| { e.key.cmp(old_key) }
 		);
@@ -174,7 +175,7 @@ impl Tree {
 	 * the existing tree. If the key does not exist, the tree passed is moved
 	 * as a child of the key.
 	 */
-	pub fn insert_key(&mut self, key: String, tree: Option<Tree>) -> &mut Self {
+	pub fn insert_key(&mut self, key: String, tree: Option<Tree>) -> &mut Tree {
 		let pos = self.m_children.binary_search_by(
 			|e| { e.key.cmp(&key) }
 		);
@@ -200,7 +201,7 @@ impl Tree {
 		self
 	}
 
-	pub fn merge(&mut self, t: Tree) -> &mut Self {
+	pub fn merge(&mut self, t: Tree) -> &mut Tree {
 		for KeyTree { key, tree } in t.m_children {
 			self.insert_key(key, tree);
 		}
