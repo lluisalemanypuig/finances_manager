@@ -598,9 +598,11 @@ fn edit_expense(all_data: &mut AllActivities) {
 	let id_expense_opt = io::read_int_or_empty::<usize>();
 	if id_expense_opt.is_none() { return; }
 	let id_expense = id_expense_opt.unwrap();
-
+	
+	println!("Enter new concepts (leave blank to keep the value)");
 	let concepts = io::read_from_tree_options(&all_data.get_expense_concepts().get_tree());
 	
+	// year is ensured to exist above
 	let year_data = all_data.add_year(year);
 	let month_data = year_data.get_expenses_mut().add(&month);
 	let expense = month_data.get_mut(id_expense);
