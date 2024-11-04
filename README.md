@@ -12,4 +12,4 @@ Before using the program, first create a file called `project_configuration.json
 
 where
 
-	- `BASE_PATH` is the path to the directory that will contain all your data.
+- `BASE_PATH` is the path to the directory that will contain all your data.
