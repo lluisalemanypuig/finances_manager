@@ -35,24 +35,28 @@ use std::str::FromStr;
 use crate::concepts::tree::Tree;
 
 pub fn read_input_string() -> String {
-	let mut s = String::new();
-	let stdin = std::io::stdin();
-	stdin.read_line(&mut s).expect("I was expecting standard input");
-	s.trim().to_string()
+    let mut s = String::new();
+    let stdin = std::io::stdin();
+    stdin
+        .read_line(&mut s)
+        .expect("I was expecting standard input");
+    s.trim().to_string()
 }
 
 pub fn read_string_or_empty() -> Option<String> {
-	let str = read_input_string();
-	if str == "".to_string() { return None; }
-	Some(str)
+    let str = read_input_string();
+    if str == "".to_string() {
+        return None;
+    }
+    Some(str)
 }
 
 pub fn read_string() -> String {
-	loop {
-		if let Some(str) = read_string_or_empty() {
-			break str;
-		}
-	}
+    loop {
+        if let Some(str) = read_string_or_empty() {
+            break str;
+        }
+    }
 }
 
 pub trait Numeric: FromStr {}
@@ -68,25 +72,30 @@ impl Numeric for usize {}
 impl Numeric for f32 {}
 impl Numeric for f64 {}
 
-pub fn read_num_or_empty<T>() -> Option<T> where T: Numeric {
-	loop {
-		if let Some(str) = read_string_or_empty() {
-			if let Ok(value) = str.parse::<T>() {
-				break Some(value);
-			}
-		}
-		else {
-			break None;
-		}
-	}
+pub fn read_num_or_empty<T>() -> Option<T>
+where
+    T: Numeric,
+{
+    loop {
+        if let Some(str) = read_string_or_empty() {
+            if let Ok(value) = str.parse::<T>() {
+                break Some(value);
+            }
+        } else {
+            break None;
+        }
+    }
 }
 
-pub fn read_num<T: FromStr>() -> T where T: Numeric {
-	loop {
-		if let Ok(value) = read_string().parse::<T>() {
-			return value;
-		}
-	}
+pub fn read_num<T: FromStr>() -> T
+where
+    T: Numeric,
+{
+    loop {
+        if let Ok(value) = read_string().parse::<T>() {
+            return value;
+        }
+    }
 }
 
 pub trait Integral: Numeric {}
@@ -96,62 +105,72 @@ impl Integral for u32 {}
 impl Integral for u64 {}
 impl Integral for usize {}
 
-pub fn read_int_or_empty<T: FromStr>() -> Option<T> where T: Integral {
-	read_num_or_empty::<T>()
+pub fn read_int_or_empty<T: FromStr>() -> Option<T>
+where
+    T: Integral,
+{
+    read_num_or_empty::<T>()
 }
 
-pub fn read_int<T: FromStr>() -> T where T: Integral {
-	read_num::<T>()
+pub fn read_int<T: FromStr>() -> T
+where
+    T: Integral,
+{
+    read_num::<T>()
 }
 
 pub trait Decimal: Numeric {}
 impl Decimal for f32 {}
 impl Decimal for f64 {}
 
-pub fn read_float_or_empty<T: FromStr>() -> Option<T> where T: Decimal {
-	read_num_or_empty::<T>()
+pub fn read_float_or_empty<T: FromStr>() -> Option<T>
+where
+    T: Decimal,
+{
+    read_num_or_empty::<T>()
 }
 
-pub fn read_float<T: FromStr>() -> T where T: Decimal {
-	read_num::<T>()
+pub fn read_float<T: FromStr>() -> T
+where
+    T: Decimal,
+{
+    read_num::<T>()
 }
 
 /* ------------------------------------------------------------------------- */
 
 pub fn read_from_options_or_empty(options: &Vec<String>) -> Option<String> {
-	loop {
-		if let Some(str) = read_string_or_empty() {
-			if str == "?".to_string() {
-				for opt in options.iter() {
-					println!("    {opt}");
-				}
-				println!("");
-			}
-			else if options.contains(&str) {
-				return Some(str);
-			}
-		}
-		else {
-			return None;
-		}
-	}
+    loop {
+        if let Some(str) = read_string_or_empty() {
+            if str == "?".to_string() {
+                for opt in options.iter() {
+                    println!("    {opt}");
+                }
+                println!("");
+            } else if options.contains(&str) {
+                return Some(str);
+            }
+        } else {
+            return None;
+        }
+    }
 }
 
 pub fn read_from_tree_options(options: &Tree) -> Vec<String> {
-	let mut res: Vec<String> = Vec::new();
+    let mut res: Vec<String> = Vec::new();
 
-	let available = options.get_keys().iter().map(|s| s.to_string()).collect();
-	let opt = read_from_options_or_empty(&available);
-	
-	if let Some(s) = opt {
-		let st = options.get_child(&s);
-		res.push(s);
+    let available = options.get_keys().iter().map(|s| s.to_string()).collect();
+    let opt = read_from_options_or_empty(&available);
 
-		if let Some(stt) = st {
-			let mut more = read_from_tree_options(&stt);
-			res.append(&mut more);
-		}
-	}
+    if let Some(s) = opt {
+        let st = options.get_child(&s);
+        res.push(s);
 
-	res
+        if let Some(stt) = st {
+            let mut more = read_from_tree_options(&stt);
+            res.append(&mut more);
+        }
+    }
+
+    res
 }

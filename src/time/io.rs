@@ -34,15 +34,15 @@ use crate::io;
 use crate::time::date;
 
 pub fn read_correct_month() -> Option<date::Month> {
-	loop {
-		match io::read_string_or_empty() {
-			Some(str) => {
-				let month_res = str.parse::<date::Month>();
-				if let Ok(m) = month_res {
-					return Some(m);
-				}
-			},
-			None => {}
-		}
-	}
+    loop {
+        match io::read_string_or_empty() {
+            Some(str) => {
+                let month_res = str.parse::<date::Month>();
+                if let Ok(m) = month_res {
+                    return Some(m);
+                }
+            }
+            None => {}
+        }
+    }
 }

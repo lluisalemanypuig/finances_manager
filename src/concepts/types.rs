@@ -32,31 +32,35 @@
 
 use crate::concepts::tree::Tree;
 
-
 #[derive(Debug)]
 pub struct ConceptTypes {
-	m_changes: bool,
-	m_concepts: Tree
+    m_changes: bool,
+    m_concepts: Tree,
 }
 
 impl ConceptTypes {
-	pub fn new() -> ConceptTypes {
-		ConceptTypes {
-			m_changes: false,
-			m_concepts: Tree::new()
-		}
-	}
+    pub fn new() -> ConceptTypes {
+        ConceptTypes {
+            m_changes: false,
+            m_concepts: Tree::new(),
+        }
+    }
 
-	pub fn set_tree(&mut self, t: Tree) {
-		self.m_concepts = t;
-	}
+    pub fn set_tree(&mut self, t: Tree) {
+        self.m_concepts = t;
+    }
 
-	pub fn get_tree(&self) -> &Tree { &self.m_concepts }
-	pub fn get_tree_mut(&mut self) -> &mut Tree { &mut self.m_concepts }
+    pub fn get_tree(&self) -> &Tree {
+        &self.m_concepts
+    }
+    pub fn get_tree_mut(&mut self) -> &mut Tree {
+        &mut self.m_concepts
+    }
 
-	pub fn has_changes(&self) -> bool { self.m_changes }
-	pub fn set_changes(&mut self, c: bool) {
-		self.m_changes = c;
-	}
-
+    pub fn has_changes(&self) -> bool {
+        self.m_changes
+    }
+    pub fn set_changes(&mut self, c: bool) {
+        self.m_changes = c;
+    }
 }

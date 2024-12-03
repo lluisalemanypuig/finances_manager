@@ -30,8 +30,8 @@
  *
  ********************************************************************/
 
-pub mod activity_summary;
 pub mod activities;
+pub mod activity_summary;
 pub mod concept_types;
 pub mod statistics;
 pub mod utils;

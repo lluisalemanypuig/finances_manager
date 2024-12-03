@@ -30,7 +30,7 @@
  *
  ********************************************************************/
 
-pub mod types;
 pub mod tree;
+pub mod types;
 
 pub mod io;
