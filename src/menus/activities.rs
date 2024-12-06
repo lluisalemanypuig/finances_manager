@@ -269,7 +269,7 @@ fn method(all_data: &AllActivities) {
 
     let year = local_date.year() as u32;
 
-   let month_opt = time::io::read_correct_month();
+    let month_opt = time::io::read_correct_month();
     if month_opt.is_none() {
         return;
     }
