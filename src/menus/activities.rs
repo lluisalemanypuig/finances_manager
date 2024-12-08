@@ -111,29 +111,39 @@ fn method(all_data: &AllActivities) {
 	display(all_data, &func);
 }
 
-fn print_by_place_expenses(all_data: &AllActivities, case_sensitive: bool) {
+fn print_by_place_expenses(all_data: &AllActivities, case_sensitive: bool, utf8_sensitive: bool) {
 	let place: String = io::read_string();
 
-	let func = |e: &Expense| utils::compare_strings(&e.shop, &place, case_sensitive);
+	let func =
+		|e: &Expense| utils::compare_strings(&e.shop, &place, case_sensitive, utf8_sensitive);
 	print_expenses_by_func(all_data, &func);
 }
-fn print_by_place_incomes(all_data: &AllActivities, case_sensitive: bool) {
+fn print_by_place_incomes(all_data: &AllActivities, case_sensitive: bool, utf8_sensitive: bool) {
 	let from: String = io::read_string();
 
-	let func = |i: &Income| utils::compare_strings(&i.from, &from, case_sensitive);
+	let func = |i: &Income| utils::compare_strings(&i.from, &from, case_sensitive, utf8_sensitive);
 	print_incomes_by_func(all_data, &func);
 }
 
-fn print_by_place_substring_expenses(all_data: &AllActivities, case_sensitive: bool) {
+fn print_by_place_substring_expenses(
+	all_data: &AllActivities,
+	case_sensitive: bool,
+	utf8_sensitive: bool,
+) {
 	let place: String = io::read_string();
 
-	let func = |e: &Expense| utils::string_contains(&place, &e.shop, case_sensitive);
+	let func =
+		|e: &Expense| utils::string_contains(&place, &e.shop, case_sensitive, utf8_sensitive);
 	print_expenses_by_func(all_data, &func);
 }
-fn print_by_place_substring_incomes(all_data: &AllActivities, case_sensitive: bool) {
+fn print_by_place_substring_incomes(
+	all_data: &AllActivities,
+	case_sensitive: bool,
+	utf8_sensitive: bool,
+) {
 	let place: String = io::read_string();
 
-	let func = |i: &Income| utils::string_contains(&place, &i.from, case_sensitive);
+	let func = |i: &Income| utils::string_contains(&place, &i.from, case_sensitive, utf8_sensitive);
 	print_incomes_by_func(all_data, &func);
 }
 
@@ -835,25 +845,29 @@ fn method() {
 	println!("     8. Show all {}s by price range", thing);
 	println!("     -- Show all {}s by {}", thing, place);
 	println!("     9.     Case sensitive");
-	println!("    10.     Case insensitive");
+	println!("    10.     Case sensitive (ignore UTF-8)");
+	println!("    11.     Case insensitive");
+	println!("    12.     Case insensitive (ignore UTF-8)");
 	println!("     -- Show all {}s by {} (substring)", thing, place);
-	println!("    11.     Case sensitive");
-	println!("    12.     Case insensitive");
-	println!("    13. Add another {}", thing);
-	println!("    14.     Add another {} today", thing);
-	println!("    15.     Add another {} this month", thing);
-	println!("    16.     Add another {} this year", thing);
-	println!("    17.     Add many {}s to a year and month", thing);
-	println!("    18. Add a monthly {}", thing);
-	println!("    19. Edit an {}", thing);
-	println!("    20. Remove an {}", thing);
+	println!("    13.     Case sensitive");
+	println!("    14.     Case sensitive (ignore UTF-8)");
+	println!("    15.     Case insensitive");
+	println!("    16.     Case insensitive (ignore UTF-8)");
+	println!("    17. Add another {}", thing);
+	println!("    18.     Add another {} today", thing);
+	println!("    19.     Add another {} this month", thing);
+	println!("    20.     Add another {} this year", thing);
+	println!("    21.     Add many {}s to a year and month", thing);
+	println!("    22. Add a monthly {}", thing);
+	println!("    23. Edit an {}", thing);
+	println!("    24. Remove an {}", thing);
 	println!("     0. Leave");
 }
 
 pub fn menu_expenses(all_data: &mut AllActivities) {
 	let print_function = print_menu_expenses;
 	let min_option = 0;
-	let max_option = 20;
+	let max_option = 24;
 
 	let mut option = menus::utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -866,18 +880,22 @@ pub fn menu_expenses(all_data: &mut AllActivities) {
 			6 => print_month_current_expenses(&all_data),
 			7 => print_by_type_expenses(&all_data),
 			8 => print_by_price_range_expenses(&all_data),
-			9 => print_by_place_expenses(&all_data, true),
-			10 => print_by_place_expenses(&all_data, false),
-			11 => print_by_place_substring_expenses(&all_data, true),
-			12 => print_by_place_substring_expenses(&all_data, false),
-			13 => add_new_expense(all_data),
-			14 => add_new_today_expense(all_data),
-			15 => add_new_this_month_expense(all_data),
-			16 => add_new_this_year_expense(all_data),
-			17 => add_many_year_month_expense(all_data),
-			18 => add_monthly_expense(all_data),
-			19 => edit_expense(all_data),
-			20 => remove_expense(all_data),
+			9 => print_by_place_expenses(&all_data, true, true),
+			10 => print_by_place_expenses(&all_data, true, false),
+			11 => print_by_place_expenses(&all_data, false, true),
+			12 => print_by_place_expenses(&all_data, false, false),
+			13 => print_by_place_substring_expenses(&all_data, true, true),
+			14 => print_by_place_substring_expenses(&all_data, true, false),
+			15 => print_by_place_substring_expenses(&all_data, false, true),
+			16 => print_by_place_substring_expenses(&all_data, false, false),
+			17 => add_new_expense(all_data),
+			18 => add_new_today_expense(all_data),
+			19 => add_new_this_month_expense(all_data),
+			20 => add_new_this_year_expense(all_data),
+			21 => add_many_year_month_expense(all_data),
+			22 => add_monthly_expense(all_data),
+			23 => edit_expense(all_data),
+			24 => remove_expense(all_data),
 			_ => println!("Nothing to do..."),
 		}
 
@@ -888,7 +906,7 @@ pub fn menu_expenses(all_data: &mut AllActivities) {
 pub fn menu_incomes(all_data: &mut AllActivities) {
 	let print_function = print_menu_income;
 	let min_option = 0;
-	let max_option = 20;
+	let max_option = 24;
 
 	let mut option = menus::utils::read_option(print_function, min_option, max_option);
 	while option != 0 {
@@ -901,18 +919,22 @@ pub fn menu_incomes(all_data: &mut AllActivities) {
 			6 => print_month_current_incomes(&all_data),
 			7 => print_by_type_incomes(&all_data),
 			8 => print_by_price_range_incomes(&all_data),
-			9 => print_by_place_incomes(&all_data, true),
-			10 => print_by_place_incomes(&all_data, false),
-			11 => print_by_place_substring_incomes(&all_data, true),
-			12 => print_by_place_substring_incomes(&all_data, false),
-			13 => add_new_income(all_data),
-			14 => add_new_today_income(all_data),
-			15 => add_new_this_month_income(all_data),
-			16 => add_new_this_year_income(all_data),
-			17 => add_many_year_month_income(all_data),
-			18 => add_monthly_income(all_data),
-			19 => edit_income(all_data),
-			20 => remove_income(all_data),
+			9 => print_by_place_incomes(&all_data, true, true),
+			10 => print_by_place_incomes(&all_data, true, false),
+			11 => print_by_place_incomes(&all_data, false, true),
+			12 => print_by_place_incomes(&all_data, false, false),
+			13 => print_by_place_substring_incomes(&all_data, true, true),
+			14 => print_by_place_substring_incomes(&all_data, true, false),
+			15 => print_by_place_substring_incomes(&all_data, false, true),
+			16 => print_by_place_substring_incomes(&all_data, false, false),
+			17 => add_new_income(all_data),
+			18 => add_new_today_income(all_data),
+			19 => add_new_this_month_income(all_data),
+			20 => add_new_this_year_income(all_data),
+			21 => add_many_year_month_income(all_data),
+			22 => add_monthly_income(all_data),
+			23 => edit_income(all_data),
+			24 => remove_income(all_data),
 			_ => println!("Nothing to do..."),
 		}
 

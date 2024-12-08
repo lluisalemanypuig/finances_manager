@@ -30,6 +30,8 @@
  *
  ********************************************************************/
 
+use unicode_normalization::UnicodeNormalization;
+
 pub fn vector_includes(v: &[String], w: &[String]) -> bool {
 	let limit = std::cmp::min(v.len(), w.len());
 	for i in 0..limit {
@@ -40,18 +42,51 @@ pub fn vector_includes(v: &[String], w: &[String]) -> bool {
 	true
 }
 
-pub fn compare_strings(s: &String, t: &String, case_sensitive: bool) -> bool {
-	if !case_sensitive {
-		return s.to_lowercase() == t.to_lowercase();
-	}
+pub fn compare_strings(s: &String, t: &String, case_sensitive: bool, utf8_sensitive: bool) -> bool {
+	let ss = if utf8_sensitive {
+		s.to_string()
+	} else {
+		s.nfd().filter(|c| c.is_ascii()).collect::<String>()
+	};
+	let tt = if utf8_sensitive {
+		t.to_string()
+	} else {
+		t.nfd().filter(|c| c.is_ascii()).collect::<String>()
+	};
 
-	s == t
+	if case_sensitive {
+		ss == tt
+	} else {
+		ss.to_lowercase() == tt.to_lowercase()
+	}
 }
 
-pub fn string_contains(contained: &String, containee: &String, case_sensitive: bool) -> bool {
-	if !case_sensitive {
-		return containee.to_lowercase().contains(&contained.to_lowercase());
-	}
+pub fn string_contains(
+	_contained: &String,
+	_containee: &String,
+	case_sensitive: bool,
+	utf8_sensitive: bool,
+) -> bool {
+	let contained = if utf8_sensitive {
+		_contained.to_string()
+	} else {
+		_contained
+			.nfd()
+			.filter(|c| c.is_ascii())
+			.collect::<String>()
+	};
+	let containee = if utf8_sensitive {
+		_containee.to_string()
+	} else {
+		_containee
+			.nfd()
+			.filter(|c| c.is_ascii())
+			.collect::<String>()
+	};
 
-	containee.contains(contained)
+	if case_sensitive {
+		containee.contains(&contained)
+	} else {
+		containee.to_lowercase().contains(&contained.to_lowercase())
+	}
 }
