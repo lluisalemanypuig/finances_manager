@@ -31,27 +31,27 @@
  ********************************************************************/
 
 pub fn vector_includes(v: &[String], w: &[String]) -> bool {
-    let limit = std::cmp::min(v.len(), w.len());
-    for i in 0..limit {
-        if v[i].to_lowercase() != w[i].to_lowercase() {
-            return false;
-        }
-    }
-    true
+	let limit = std::cmp::min(v.len(), w.len());
+	for i in 0..limit {
+		if v[i].to_lowercase() != w[i].to_lowercase() {
+			return false;
+		}
+	}
+	true
 }
 
 pub fn compare_strings(s: &String, t: &String, case_sensitive: bool) -> bool {
-    if !case_sensitive {
-        return s.to_lowercase() == t.to_lowercase();
-    }
+	if !case_sensitive {
+		return s.to_lowercase() == t.to_lowercase();
+	}
 
-    s == t
+	s == t
 }
 
 pub fn string_contains(contained: &String, containee: &String, case_sensitive: bool) -> bool {
-    if !case_sensitive {
-        return containee.to_lowercase().contains(&contained.to_lowercase());
-    }
+	if !case_sensitive {
+		return containee.to_lowercase().contains(&contained.to_lowercase());
+	}
 
-    containee.contains(contained)
+	containee.contains(contained)
 }

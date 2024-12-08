@@ -31,10 +31,10 @@
  ********************************************************************/
 
 pub trait AsReferences<T> {
-    fn as_ref(&self) -> &T;
-    fn as_mut(&mut self) -> &mut T;
+	fn as_ref(&self) -> &T;
+	fn as_mut(&mut self) -> &mut T;
 }
 
 pub trait HasConcepts {
-    fn get_concepts(&self) -> &Vec<String>;
+	fn get_concepts(&self) -> &Vec<String>;
 }
