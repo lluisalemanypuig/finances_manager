@@ -839,8 +839,8 @@ fn method() {
 	println!("     2. Show data of a year");
 	println!("     3.     Show data of the current year");
 	println!("     4. Show data of a month");
-	println!("     5.     Show data of a month of the current year");
-	println!("     6.     Show data of the current month");
+	println!("     5.     Show data of the current month");
+	println!("     6.     Show data of a month of the current year");
 	println!("     7. Show all {}s by type", thing);
 	println!("     8. Show all {}s by price range", thing);
 	println!("     -- Show all {}s by {}", thing, place);
@@ -876,8 +876,8 @@ pub fn menu_expenses(all_data: &mut AllActivities) {
 			2 => print_year_user_expenses(&all_data),
 			3 => print_year_current_expenses(&all_data),
 			4 => print_month_user_expenses(&all_data),
-			5 => print_year_current_month_expenses(&all_data),
-			6 => print_month_current_expenses(&all_data),
+			5 => print_month_current_expenses(&all_data),
+			6 => print_year_current_month_expenses(&all_data),
 			7 => print_by_type_expenses(&all_data),
 			8 => print_by_price_range_expenses(&all_data),
 			9 => print_by_place_expenses(&all_data, true, true),
@@ -915,8 +915,8 @@ pub fn menu_incomes(all_data: &mut AllActivities) {
 			2 => print_year_user_incomes(&all_data),
 			3 => print_year_current_incomes(&all_data),
 			4 => print_month_user_incomes(&all_data),
-			5 => print_year_current_month_incomes(&all_data),
-			6 => print_month_current_incomes(&all_data),
+			5 => print_month_current_incomes(&all_data),
+			6 => print_year_current_month_incomes(&all_data),
 			7 => print_by_type_incomes(&all_data),
 			8 => print_by_price_range_incomes(&all_data),
 			9 => print_by_place_incomes(&all_data, true, true),
